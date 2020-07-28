@@ -34,9 +34,9 @@ namespace Decima {
 
         void get_file_data(const std::string &file_id, std::vector<uint8_t> &data_out);
 
-        FileEntry *get_file_entry(const std::string &file_name);
+        FileEntry* get_file_entry(const std::string &file_name);
 
-        FileEntry *get_file_entry(uint64_t file_hash);
+        FileEntry* get_file_entry(uint64_t file_hash);
 
         void read_prefetch_file();
     };

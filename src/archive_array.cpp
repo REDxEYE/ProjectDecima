@@ -71,7 +71,7 @@ Decima::FileEntry* Decima::ArchiveArray::get_file_entry(const std::string &file_
 Decima::FileEntry* Decima::ArchiveArray::get_file_entry(uint64_t file_hash) {
     if (hash_to_archive.find(file_hash) != hash_to_archive.end()) {
         uint64_t archive_id = hash_to_archive.at(file_hash);
-        auto& archive = archives[archive_id];
+        auto &archive = archives[archive_id];
         uint64_t file_id = archive.get_file_id(file_hash);
         return &archive.content_table[file_id];
     }
