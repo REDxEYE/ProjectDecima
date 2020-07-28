@@ -5,6 +5,7 @@
 #include "file_tree.h"
 #include "imgui.h"
 #include <filesystem>
+#include <utils.h>
 
 FileTree* FileTree::add_folder(const std::string& name)
 {
@@ -61,7 +62,7 @@ void FileTree::reset_filter(bool state)
     }
 }
 
-void FileTree::draw(uint32_t& selected_file_hash, const Decima::ArchiveArray& archive_array)
+void FileTree::draw(uint32_t& selected_file_hash, Decima::ArchiveArray &archive_array)
 {
     for (auto& [name, data] : folders) {
         const auto show = ImGui::TreeNode(name.c_str());
@@ -86,9 +87,9 @@ void FileTree::draw(uint32_t& selected_file_hash, const Decima::ArchiveArray& ar
         if (ImGui::Selectable(name.c_str()))
             selected_file_hash = data.first;
 
-        auto& archive = archive_array.archives.at(archive_array.hash_to_archive.at(data.first));
-        auto file_id = archive.get_file_id(data.first);
-        auto size = archive.content_table.size() >= file_id ? archive.content_table.at(file_id).size : 0;
+        auto filename = sanitize_name(archive_array.hash_to_name[data.first]);
+        auto* file_entry = archive_array.get_file_entry(filename);
+        auto size = file_entry->size;
 
         ImGui::NextColumn();
         ImGui::Text("Unknown");

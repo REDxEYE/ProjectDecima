@@ -13,8 +13,8 @@
 #include <imgui.h>
 
 #include <utility>
-
 #include <iostream>
+#include <filesystem>
 
 #include "archive/decima_archive.h"
 #include "archive_array.h"
@@ -33,6 +33,7 @@ class MainLayer : public omc::layer {
     FileTree root_tree;
     uint32_t selected_file_hash = 0;
     uint32_t current_open_file_hash = 0;
+    std::string output_folder = "./";
     std::vector<uint8_t> current_open_file_data;
 
     int32_t file_id = 0;
@@ -41,30 +42,27 @@ class MainLayer : public omc::layer {
 
 public:
     explicit MainLayer(omc::application* app)
-        : layer(app) {};
+            : layer(app) {};
 
-    void on_attach() override
-    {
+    void on_attach() override {
         layer::on_attach();
     }
 
-    void on_detach() override
-    {
+    void on_detach() override {
         layer::on_detach();
     }
 
-    void on_update(double ts) override
-    {
+    void on_update(double ts) override {
         omc::opengl_backend::imgui_new_frame();
         {
-            //            ImGui::Begin("DEBUG");
-            //            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
-            //                        ImGui::GetIO().Framerate);
-            //
-            //            ImGui::End();
+            ImGui::Begin("DEBUG");
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
+                        ImGui::GetIO().Framerate);
+
+            ImGui::End();
 
             ImGui::Begin("Test");
-            if (ImGui::Button("Folder")) {
+            if (ImGui::Button("Open archives")) {
                 auto folder = pfd::select_folder("Select Death Stranding data folder!").result();
 
                 if (!folder.empty()) {
@@ -74,7 +72,7 @@ public:
                     file_names.clear();
                     file_names.reserve(archive_array.hash_to_name.size());
 
-                    for (auto& [hash, path] : archive_array.hash_to_name) {
+                    for (auto&[hash, path] : archive_array.hash_to_name) {
                         file_names.push_back(path.c_str());
                         auto* current_root = &root_tree;
 
@@ -84,9 +82,29 @@ public:
                         for (auto it = split_path.cbegin(); it != split_path.end() - 1; it++)
                             current_root = current_root->add_folder(*it);
 
-//                        if (archive_array.hash_to_archive.find(hash) != archive_array.hash_to_archive.end())
+                        if (archive_array.hash_to_archive.find(hash) != archive_array.hash_to_archive.end())
                             current_root->add_file(split_path.back(), hash);
                     }
+                }
+            }
+
+            if (ImGui::Button("Select output directory")) {
+                auto folder = pfd::select_folder("Select Death Stranding data folder!").result();
+
+                if (!folder.empty()) {
+                    output_folder = folder;
+                } else {
+                    output_folder = "./";
+                }
+            }
+            if (ImGui::Button("Export current file")) {
+                if (current_open_file_hash != 0 && !current_open_file_data.empty()) {
+                    std::filesystem::path full_path = std::filesystem::path(output_folder) /
+                                                      sanitize_name(archive_array.hash_to_name[selected_file_hash]);
+                    std::filesystem::create_directories(full_path.parent_path());
+                    std::ofstream output_file(full_path);
+                    output_file.write(reinterpret_cast<const char*>(current_open_file_data.data()),
+                                      current_open_file_data.size());
                 }
             }
 
@@ -102,7 +120,7 @@ public:
                     root_tree.update_filter(filter);
 
                     file_names.clear();
-                    for (auto& [_, path] : archive_array.hash_to_name)
+                    for (auto&[_, path] : archive_array.hash_to_name)
                         if (filter.PassFilter(path.c_str()))
                             file_names.push_back(path.c_str());
                 }
@@ -111,7 +129,7 @@ public:
                 if (ImGui::BeginTabItem("ListView")) {
                     ImGui::PushItemWidth(-1);
                     if (ImGui::ListBox("TREE", &file_id, file_names.data(), file_names.size(), 50)) {
-                        selected_file_hash = hash_string(std::string(file_names[file_id]) + ".core", Decima::seed);
+                        selected_file_hash = hash_string(sanitize_name(file_names[file_id]), Decima::seed);
                     }
                     ImGui::EndTabItem();
                 }
@@ -137,15 +155,17 @@ public:
             }
             ImGui::End();
 
+
             ImGui::Begin("File preview");
             {
                 if (selected_file_hash != 0) {
                     if (selected_file_hash != current_open_file_hash) {
-                        auto filename = archive_array.hash_to_name.at(selected_file_hash) + ".core";
+                        auto filename = sanitize_name(archive_array.hash_to_name[selected_file_hash]);
                         archive_array.get_file_data(filename, current_open_file_data);
                         current_open_file_hash = selected_file_hash;
                     }
                     file_viewer.DrawContents(current_open_file_data.data(), current_open_file_data.size());
+
                 }
             }
             ImGui::End();
@@ -154,8 +174,7 @@ public:
     }
 };
 
-int main()
-{
+int main() {
     auto app = std::make_shared<omc::application>("Application", 1280, 720, true);
 
     app->push_layer(std::make_shared<MainLayer>(app.get()));

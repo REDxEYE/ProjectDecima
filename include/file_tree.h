@@ -28,7 +28,7 @@ public:
 
     void reset_filter(bool state);
 
-    void draw(uint32_t& selected_file_hash, const Decima::ArchiveArray& archive);
+    void draw(uint32_t& selected_file_hash, Decima::ArchiveArray &archive_array);
 };
 
 

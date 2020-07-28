@@ -48,9 +48,9 @@ namespace Decima {
 
     class Archive {
         std::ifstream filebuffer;
+        std::vector<ChunkEntry> chunk_table;
     public:
         std::vector<FileEntry> content_table;
-        std::vector<ChunkEntry> chunk_table;
         std::string filepath;
         Header header = {0};
 
@@ -64,11 +64,9 @@ namespace Decima {
 
         void read_chunk_table();
 
-        bool is_encrypted();
+        bool is_encrypted() const;
 
-        bool is_valid();
-
-        static void decrypt(uint32_t key_1, uint32_t key_2, uint32_t* data);
+        bool is_valid() const;
 
         void get_file_data(uint32_t file_id, std::vector<uint8_t> &data_out);
 
@@ -79,13 +77,9 @@ namespace Decima {
         uint64_t get_file_id(const std::string &file_name) const;
 
     private:
-        uint64_t find_chunk_by_offset(uint64_t offset) {
-          for (int i = 0; i < chunk_table.size(); i++) {
-            if (chunk_table[i].uncompressed_offset == offset)
-              return i;
-          }
-          return -1;
-        }
+        static void decrypt(uint32_t key_1, uint32_t key_2, uint32_t* data);
+
+        uint64_t find_chunk_by_offset(uint64_t offset);
 
         void get_chunk_data(ChunkEntry &chunk, std::vector<uint8_t> &data);
 

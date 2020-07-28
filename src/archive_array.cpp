@@ -7,9 +7,10 @@
 #include <utility>
 #include <filesystem>
 #include <iostream>
+#include <optional>
 #include <utils.h>
 
-Decima::ArchiveArray::ArchiveArray(const std::string& _workdir){
+Decima::ArchiveArray::ArchiveArray(const std::string &_workdir) {
     open(_workdir);
 }
 
@@ -34,9 +35,7 @@ void Decima::ArchiveArray::get_file_data(uint64_t file_hash, std::vector<uint8_t
 }
 
 void Decima::ArchiveArray::get_file_data(const std::string &file_id, std::vector<uint8_t> &data_out) {
-    auto tmp = std::filesystem::path(file_id);
-    if (tmp.extension() != ".core") { tmp = tmp.replace_extension(tmp.extension().string() + ".core"); }
-    uint64_t hash = hash_string(tmp.string(), seed);
+    uint64_t hash = hash_string(sanitize_name(file_id), seed);
     get_file_data(hash, data_out);
 }
 
@@ -46,13 +45,13 @@ void Decima::ArchiveArray::read_prefetch_file() {
     prefetch.parse(prefetch_data);
 
     for (auto &string:prefetch.strings) {
-        auto hash = hash_string(string.string + ".core", seed);
+        auto hash = hash_string(sanitize_name(string.string), seed);
         hash_to_name[hash] = string.string;
     }
 
 }
 
-void Decima::ArchiveArray::open(const std::string& _workdir) {
+void Decima::ArchiveArray::open(const std::string &_workdir) {
     workdir = _workdir;
     for (auto &file:std::filesystem::directory_iterator(workdir,
                                                         std::filesystem::directory_options::skip_permission_denied)) {
@@ -62,5 +61,20 @@ void Decima::ArchiveArray::open(const std::string& _workdir) {
     for (auto &archive:archives) {
         archive.open();
     }
+}
+
+Decima::FileEntry* Decima::ArchiveArray::get_file_entry(const std::string &file_name) {
+    auto hash = hash_string(sanitize_name(file_name), seed);
+    return get_file_entry(hash);
+}
+
+Decima::FileEntry* Decima::ArchiveArray::get_file_entry(uint64_t file_hash) {
+    if (hash_to_archive.find(file_hash) != hash_to_archive.end()) {
+        uint64_t archive_id = hash_to_archive.at(file_hash);
+        auto& archive = archives[archive_id];
+        uint64_t file_id = archive.get_file_id(file_hash);
+        return &archive.content_table[file_id];
+    }
+    return {};
 }
 
