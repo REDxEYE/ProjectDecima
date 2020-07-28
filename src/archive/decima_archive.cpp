@@ -34,11 +34,11 @@ bool Decima::Archive::open() {
     return false;
 }
 
-bool Decima::Archive::is_valid() {
+bool Decima::Archive::is_valid() const {
     return (header.magic == magic || header.magic == encrypted_magic);
 }
 
-bool Decima::Archive::is_encrypted() {
+bool Decima::Archive::is_encrypted() const {
     return header.magic == encrypted_magic;
 }
 
@@ -82,7 +82,7 @@ void Decima::Archive::read_chunk_table() {
 }
 
 void Decima::Archive::get_file_data(uint32_t file_id, std::vector<uint8_t> &data_out) {
-    if(file_id==-1)return;
+    if (file_id == -1)return;
     auto &file_entry = content_table.at(file_id);
     uint64_t file_offset = file_entry.offset;
     uint32_t file_size = file_entry.size;
@@ -112,9 +112,7 @@ void Decima::Archive::get_file_data(uint32_t file_id, std::vector<uint8_t> &data
 }
 
 void Decima::Archive::get_file_data(const std::string &file_id, std::vector<uint8_t> &data_out) {
-
     uint64_t id = get_file_id(file_id);
-
     if (id != -1) {
         get_file_data(id, data_out);
     }
@@ -146,15 +144,21 @@ void Decima::Archive::decrypt_chunk(uint32_t chunk_id, std::vector<uint8_t> &src
 }
 
 uint64_t Decima::Archive::get_file_id(const std::string &file_name) const {
-    auto tmp = std::filesystem::path(file_name);
-    if (tmp.extension() != ".core") { tmp = tmp.replace_extension(tmp.extension().string() + ".core"); }
-    uint64_t hash = hash_string(tmp.string(), seed);
+    uint64_t hash = hash_string(sanitize_name(file_name), seed);
     return get_file_id(hash);
 }
 
 uint64_t Decima::Archive::get_file_id(uint64_t file_hash) const {
     for (uint64_t i = 0; i < content_table.size(); i++) {
         if (content_table[i].hash == file_hash)return i;
+    }
+    return -1;
+}
+
+uint64_t Decima::Archive::find_chunk_by_offset(uint64_t offset) {
+    for (int i = 0; i < chunk_table.size(); i++) {
+        if (chunk_table[i].uncompressed_offset == offset)
+            return i;
     }
     return -1;
 }
