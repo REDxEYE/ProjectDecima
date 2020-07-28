@@ -5,7 +5,7 @@
 #ifndef PROJECTDS_DECIMA_ARCHIVE_H
 #define PROJECTDS_DECIMA_ARCHIVE_H
 
-#include <filesystem>
+#include <vector>
 #include <fstream>
 
 namespace Decima {
@@ -47,15 +47,12 @@ namespace Decima {
     };
 
     class Archive {
-
         std::ifstream filebuffer;
+    public:
         std::vector<FileEntry> content_table;
         std::vector<ChunkEntry> chunk_table;
-
-    public:
         std::string filepath;
         Header header = {0};
-
 
         Archive(const std::string &workdir, const std::string &filename);
 
@@ -77,9 +74,9 @@ namespace Decima {
 
         void get_file_data(const std::string &file_id, std::vector<uint8_t> &data_out);
 
-        uint64_t get_file_id(uint64_t file_hash);
+        uint64_t get_file_id(uint64_t file_hash) const;
 
-        uint64_t get_file_id(const std::string &file_name);
+        uint64_t get_file_id(const std::string &file_name) const;
 
     private:
         uint64_t find_chunk_by_offset(uint64_t offset) {
