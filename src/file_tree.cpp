@@ -66,12 +66,13 @@ void FileTree::draw(uint32_t& selected_file_hash, Decima::ArchiveArray &archive_
 {
     for (auto& [name, data] : folders) {
         const auto show = ImGui::TreeNode((name+"##"+std::to_string(folders.size())).c_str());
-        const auto size = data.first->files.size();
+        const auto files_count = data.first->files.size();
+        const auto folders_count = data.first->files.size();
 
         ImGui::NextColumn();
         ImGui::Text("Folder");
         ImGui::NextColumn();
-        ImGui::Text("%llu file%c", size, size == 1 ? ' ' : 's');
+        ImGui::Text("%llu file%c / %llu folder%c", files_count, files_count == 1 ? ' ' : 's', folders_count, folders_count == 1 ? ' ' : 's');
         ImGui::NextColumn();
 
         if (data.second && show) {
