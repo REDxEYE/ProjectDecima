@@ -67,7 +67,7 @@ void FileTree::draw(uint32_t& selected_file_hash, Decima::ArchiveArray &archive_
     for (auto& [name, data] : folders) {
         const auto show = ImGui::TreeNode((name+"##"+std::to_string(folders.size())).c_str());
         const auto files_count = data.first->files.size();
-        const auto folders_count = data.first->files.size();
+        const auto folders_count = data.first->folders.size();
 
         ImGui::NextColumn();
         ImGui::Text("Folder");
