@@ -22,6 +22,6 @@ add_executable(ProjectDS
 target_include_directories(ProjectDS PUBLIC include ${HASHLIB_INC} ${OOZLIB_INC} ${LGLE_INCLUDE} ${LGLE_LIB_INCLUDE})
 
 target_link_libraries(ProjectDS PUBLIC
-        HashLib oozLib ${LGLE_LINK_OPTS})
+        HashLib oozLib ${LGLE_LINK_OPTS} -fuse-ld=lld)
 
 
