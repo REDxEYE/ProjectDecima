@@ -65,7 +65,7 @@ void FileTree::reset_filter(bool state)
 void FileTree::draw(uint32_t& selected_file_hash, Decima::ArchiveArray &archive_array)
 {
     for (auto& [name, data] : folders) {
-        const auto show = ImGui::TreeNode(name.c_str());
+        const auto show = ImGui::TreeNode((name+"##"+std::to_string(folders.size())).c_str());
         const auto size = data.first->files.size();
 
         ImGui::NextColumn();
