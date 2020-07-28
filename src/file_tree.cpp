@@ -61,18 +61,39 @@ void FileTree::reset_filter(bool state)
     }
 }
 
-void FileTree::draw(uint32_t& selected_file_hash)
+void FileTree::draw(uint32_t& selected_file_hash, const Decima::ArchiveArray& archive_array)
 {
     for (auto& [name, data] : folders) {
-        if (data.second && ImGui::TreeNode(name.c_str())) {
-            data.first->draw(selected_file_hash);
+        const auto show = ImGui::TreeNode(name.c_str());
+        const auto size = data.first->files.size();
+
+        ImGui::NextColumn();
+        ImGui::Text("Folder");
+        ImGui::NextColumn();
+        ImGui::Text("%llu file%c", size, size == 1 ? ' ' : 's');
+        ImGui::NextColumn();
+
+        if (data.second && show) {
+            data.first->draw(selected_file_hash, archive_array);
             ImGui::TreePop();
         }
     }
 
     for (auto& [name, data] : files) {
-        if (data.second && ImGui::Selectable(name.c_str())) {
+        if (!data.second)
+            continue;
+
+        if (ImGui::Selectable(name.c_str()))
             selected_file_hash = data.first;
-        }
+
+        auto& archive = archive_array.archives.at(archive_array.hash_to_archive.at(data.first));
+        auto file_id = archive.get_file_id(data.first);
+        auto size = archive.content_table.size() >= file_id ? archive.content_table.at(file_id).size : 0;
+
+        ImGui::NextColumn();
+        ImGui::Text("Unknown");
+        ImGui::NextColumn();
+        ImGui::Text("%dB", size);
+        ImGui::NextColumn();
     }
 }

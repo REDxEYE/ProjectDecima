@@ -41,24 +41,27 @@ class MainLayer : public omc::layer {
 
 public:
     explicit MainLayer(omc::application* app)
-            : layer(app) {};
+        : layer(app) {};
 
-    void on_attach() override {
+    void on_attach() override
+    {
         layer::on_attach();
     }
 
-    void on_detach() override {
+    void on_detach() override
+    {
         layer::on_detach();
     }
 
-    void on_update(double ts) override {
+    void on_update(double ts) override
+    {
         omc::opengl_backend::imgui_new_frame();
         {
-            ImGui::Begin("DEBUG");
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
-                        ImGui::GetIO().Framerate);
-
-            ImGui::End();
+            //            ImGui::Begin("DEBUG");
+            //            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
+            //                        ImGui::GetIO().Framerate);
+            //
+            //            ImGui::End();
 
             ImGui::Begin("Test");
             if (ImGui::Button("Folder")) {
@@ -71,7 +74,7 @@ public:
                     file_names.clear();
                     file_names.reserve(archive_array.hash_to_name.size());
 
-                    for (auto&[hash, path] : archive_array.hash_to_name) {
+                    for (auto& [hash, path] : archive_array.hash_to_name) {
                         file_names.push_back(path.c_str());
                         auto* current_root = &root_tree;
 
@@ -81,7 +84,8 @@ public:
                         for (auto it = split_path.cbegin(); it != split_path.end() - 1; it++)
                             current_root = current_root->add_folder(*it);
 
-                        current_root->add_file(split_path.back(), hash);
+//                        if (archive_array.hash_to_archive.find(hash) != archive_array.hash_to_archive.end())
+                            current_root->add_file(split_path.back(), hash);
                     }
                 }
             }
@@ -98,7 +102,7 @@ public:
                     root_tree.update_filter(filter);
 
                     file_names.clear();
-                    for (auto&[_, path] : archive_array.hash_to_name)
+                    for (auto& [_, path] : archive_array.hash_to_name)
                         if (filter.PassFilter(path.c_str()))
                             file_names.push_back(path.c_str());
                 }
@@ -112,24 +116,36 @@ public:
                     ImGui::EndTabItem();
                 }
                 if (ImGui::BeginTabItem("TreeView")) {
-                    root_tree.draw(selected_file_hash);
+                    ImGui::Columns(3);
+
+                    ImGui::Separator();
+                    ImGui::Text("Name");
+                    ImGui::NextColumn();
+                    ImGui::Text("Type");
+                    ImGui::NextColumn();
+                    ImGui::Text("Size");
+                    ImGui::NextColumn();
+                    ImGui::Separator();
+
+                    root_tree.draw(selected_file_hash, archive_array);
+
+                    ImGui::Columns(1);
+
                     ImGui::EndTabItem();
                 }
                 ImGui::EndTabBar();
             }
             ImGui::End();
 
-
             ImGui::Begin("File preview");
             {
                 if (selected_file_hash != 0) {
-                    if(selected_file_hash!=current_open_file_hash){
-                        auto filename = archive_array.hash_to_name[selected_file_hash]+".core";
-                        archive_array.get_file_data(filename,current_open_file_data);
+                    if (selected_file_hash != current_open_file_hash) {
+                        auto filename = archive_array.hash_to_name.at(selected_file_hash) + ".core";
+                        archive_array.get_file_data(filename, current_open_file_data);
                         current_open_file_hash = selected_file_hash;
                     }
-                    file_viewer.DrawContents(current_open_file_data.data(),current_open_file_data.size());
-
+                    file_viewer.DrawContents(current_open_file_data.data(), current_open_file_data.size());
                 }
             }
             ImGui::End();
@@ -138,7 +154,8 @@ public:
     }
 };
 
-int main() {
+int main()
+{
     auto app = std::make_shared<omc::application>("Application", 1280, 720, true);
 
     app->push_layer(std::make_shared<MainLayer>(app.get()));

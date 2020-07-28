@@ -5,6 +5,7 @@
 #ifndef PROJECTDS_FILE_TREE_H
 #define PROJECTDS_FILE_TREE_H
 
+#include "archive_array.h"
 #include <imgui.h>
 #include <map>
 #include <memory>
@@ -27,7 +28,7 @@ public:
 
     void reset_filter(bool state);
 
-    void draw(uint32_t& selected_file_hash);
+    void draw(uint32_t& selected_file_hash, const Decima::ArchiveArray& archive);
 };
 
 

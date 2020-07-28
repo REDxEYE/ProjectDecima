@@ -5,7 +5,8 @@
 #ifndef PROJECTDS_ARCHIVE_ARRAY_H
 #define PROJECTDS_ARCHIVE_ARRAY_H
 
-#include <file_types/prefetch.h>
+#include <unordered_map>
+#include "file_types/prefetch.h"
 #include "archive/decima_archive.h"
 
 namespace Decima {
@@ -34,7 +35,6 @@ namespace Decima {
         void get_file_data(const std::string &file_id, std::vector<uint8_t> &data_out);
 
         void read_prefetch_file();
-
     };
 
 }
