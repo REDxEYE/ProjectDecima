@@ -12,10 +12,9 @@
 
 #include <imgui.h>
 
-#include <utility>
-#include <iostream>
 #include <filesystem>
-#include <unordered_set>
+#include <iostream>
+
 
 #include "archive/decima_archive.h"
 #include "archive_array.h"
@@ -23,7 +22,6 @@
 #include "imgui_memory_editor.h"
 
 #include <application/application.hpp>
-#include <application/opengl_backend.h>
 #include <utils.h>
 
 #include "portable-file-dialogs.h"
@@ -39,7 +37,7 @@ class MainLayer : public omc::layer {
 
 public:
     explicit MainLayer(omc::application* app)
-            : layer(app) {};
+        : layer(app) {};
 
     void on_attach() override {
         layer::on_attach();
@@ -105,7 +103,6 @@ public:
 
                 ImGui::EndMenuBar();
             }
-
         }
         ImGui::End();
 
@@ -120,7 +117,7 @@ public:
                 const auto full_path = pfd::save_file("Choose destination file").result();
 
                 if (!full_path.empty()) {
-                    std::ofstream output_file{full_path};
+                    std::ofstream output_file { full_path };
 
                     root_tree.visit([&](const auto& name, auto depth) {
                         output_file << std::string(depth * 2, ' ');
@@ -158,7 +155,7 @@ public:
                         std::vector<std::uint8_t> file_data;
                         archive_array.get_file_data(filename, file_data);
 
-                        std::ofstream output_file{full_path, std::ios::trunc};
+                        std::ofstream output_file { full_path, std::ios::trunc };
                         output_file.write(reinterpret_cast<const char*>(file_data.data()), file_data.size());
 
                         std::cout << "File was exported to: " << full_path << "\n";
@@ -180,7 +177,7 @@ public:
 
                     file_names.clear();
 
-                    for (auto&[_, path] : archive_array.hash_to_name) {
+                    for (auto& [_, path] : archive_array.hash_to_name) {
                         if (filter.PassFilter(path.c_str())) {
                             file_names.push_back(path.c_str());
                         }
@@ -237,7 +234,6 @@ public:
                         selection_info.preview_file = selection_info.selected_file;
                         archive_array.get_file_data(filename, selection_info.file_data);
                     }
-
                     file_viewer.DrawContents(selection_info.file_data.data(), selection_info.file_data.size());
                 } else {
                     ImGui::Text("No file selected");

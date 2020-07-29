@@ -19,7 +19,7 @@ add_executable(ProjectDS
 
 
 target_include_directories(ProjectDS PUBLIC include ${HASHLIB_INC} ${OOZLIB_INC} ${LGLE_INCLUDE} ${LGLE_LIB_INCLUDE})
-
+target_compile_options(ProjectDS PUBLIC -g -fno-omit-frame-pointer -gdwarf-2)
 target_link_libraries(ProjectDS PUBLIC
         HashLib oozLib LGLE
         -static-libgcc -static-libstdc++ -static
