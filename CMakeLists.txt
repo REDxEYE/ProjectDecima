@@ -15,13 +15,16 @@ add_executable(ProjectDS
         src/utils.cpp
         src/file_types/prefetch.cpp
         src/memory_stream.cpp
-        ${LGLE_SRC}
         src/file_tree.cpp)
 
 
 target_include_directories(ProjectDS PUBLIC include ${HASHLIB_INC} ${OOZLIB_INC} ${LGLE_INCLUDE} ${LGLE_LIB_INCLUDE})
 
 target_link_libraries(ProjectDS PUBLIC
-        HashLib oozLib ${LGLE_LINK_OPTS} -fuse-ld=lld)
+        HashLib oozLib LGLE
+        -static-libgcc -static-libstdc++ -static
+        -Wl,-Bstatic -lstdc++ -lpthread
+        -Wl,-Bdynamic
+        -fuse-ld=lld)
 
 

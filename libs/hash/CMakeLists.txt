@@ -10,3 +10,4 @@ set(HASHLIB_INC
         )
 
 add_library(HashLib md5.c MurmurHash3.cpp)
+target_link_libraries(HashLib -static)
