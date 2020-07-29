@@ -1,14 +1,6 @@
-#define STB_IMAGE_IMPLEMENTATION
-
 #include <stb_image.h>
 
-#define STB_PERLIN_IMPLEMENTATION
-
 #include <stb_perlin.h>
-
-#define IMGUI_IMPL_OPENGL_LOADER_GLAD
-
-#define IMGUI_IMPL_OPENGL_LOADER_GLAD
 
 #include <imgui.h>
 
