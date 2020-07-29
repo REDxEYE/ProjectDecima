@@ -13,6 +13,13 @@
 #include <string>
 #include <vector>
 
+struct SelectionInfo {
+    std::uint32_t preview_file { 0 };
+    std::uint32_t selected_file { 0 };
+    std::unordered_set<std::uint32_t> selected_files;
+    std::vector<std::uint8_t> file_data;
+};
+
 template<class T>
 using FileTreeToggleable = std::pair<T, bool>;
 
@@ -41,7 +48,7 @@ public:
         }
     }
 
-    void draw(std::unordered_set<uint32_t>& selected_files, std::uint32_t& current_selected_file, Decima::ArchiveArray &archive_array);
+    void draw(SelectionInfo& selection, Decima::ArchiveArray &archive_array);
 };
 
 
