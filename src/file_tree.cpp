@@ -4,8 +4,8 @@
 
 #include "file_tree.h"
 #include "imgui.h"
+#include "utils.h"
 #include <filesystem>
-#include <utils.h>
 
 FileTree* FileTree::add_folder(const std::string &name) {
     if (folders.find(name) == folders.end())
@@ -57,7 +57,7 @@ void FileTree::reset_filter(bool state) {
     }
 }
 
-void FileTree::draw(uint32_t &selected_file_hash, Decima::ArchiveArray &archive_array) {
+void FileTree::draw(std::unordered_set<std::uint32_t>& selected_files, std::uint32_t& current_selected_file, Decima::ArchiveArray &archive_array) {
     for (auto&[name, data] : folders) {
         const std::string tree_name = name + "##" + std::to_string(folders.size());
         const auto show = ImGui::TreeNode(tree_name.c_str());
@@ -67,12 +67,13 @@ void FileTree::draw(uint32_t &selected_file_hash, Decima::ArchiveArray &archive_
         ImGui::NextColumn();
         ImGui::Text("Folder");
         ImGui::NextColumn();
-        ImGui::Text("%llu file%c / %llu folder%c", files_count, files_count == 1 ? ' ' : 's', folders_count,
-                    folders_count == 1 ? ' ' : 's');
+        ImGui::Text("%llu file%c / %llu folder%c",
+            files_count, files_count == 1 ? ' ' : 's',
+            folders_count, folders_count == 1 ? ' ' : 's');
         ImGui::NextColumn();
 
         if (data.second && show) {
-            data.first->draw(selected_file_hash, archive_array);
+            data.first->draw(selected_files, current_selected_file, archive_array);
             ImGui::TreePop();
         }
     }
@@ -81,11 +82,22 @@ void FileTree::draw(uint32_t &selected_file_hash, Decima::ArchiveArray &archive_
         if (!data.second)
             continue;
 
-        if (ImGui::Selectable(name.c_str()))
-            selected_file_hash = data.first;
+        auto is_selected = selected_files.find(data.first) != selected_files.end();
+
+        if (ImGui::Selectable(name.c_str(), is_selected)) {
+            current_selected_file = data.first;
+
+            if (ImGui::GetIO().KeyCtrl) {
+                if (is_selected) {
+                    selected_files.erase(data.first);
+                } else {
+                    selected_files.insert(data.first);
+                }
+            }
+        }
 
         auto filename = sanitize_name(archive_array.hash_to_name[data.first]);
-        auto* file_entry = archive_array.get_file_entry(filename);
+        auto file_entry = archive_array.get_file_entry(filename);
         auto size = file_entry->size;
 
         ImGui::NextColumn();

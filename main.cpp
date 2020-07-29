@@ -15,6 +15,7 @@
 #include <utility>
 #include <iostream>
 #include <filesystem>
+#include <unordered_set>
 
 #include "archive/decima_archive.h"
 #include "archive_array.h"
@@ -31,10 +32,9 @@ class MainLayer : public omc::layer {
     Decima::ArchiveArray archive_array;
     std::vector<const char*> file_names;
     FileTree root_tree;
-    uint32_t selected_file_hash = 0;
-    uint32_t current_open_file_hash = 0;
-    std::string output_folder = "./";
-    std::vector<uint8_t> current_open_file_data;
+    std::unordered_set<std::uint32_t> selected_files;
+    std::uint32_t current_selected_file = 0;
+    std::vector<uint8_t> current_selected_file_data;
 
     int32_t file_id = 0;
     ImGuiTextFilter filter;
@@ -88,28 +88,8 @@ public:
                 }
             }
 
-            if (ImGui::Button("Select output directory")) {
-                auto folder = pfd::select_folder("Select Death Stranding data folder!").result();
-
-                if (!folder.empty()) {
-                    output_folder = folder;
-                } else {
-                    output_folder = "./";
-                }
-            }
-            if (ImGui::Button("Export current file")) {
-                if (current_open_file_hash != 0 && !current_open_file_data.empty()) {
-                    std::filesystem::path full_path = std::filesystem::path(output_folder) /
-                                                      sanitize_name(archive_array.hash_to_name[selected_file_hash]);
-                    std::filesystem::create_directories(full_path.parent_path());
-                    std::ofstream output_file(full_path);
-                    output_file.write(reinterpret_cast<const char*>(current_open_file_data.data()),
-                                      current_open_file_data.size());
-                }
-            }
-
             if (ImGui::Button("Dump tree of files")) {
-                auto full_path = pfd::save_file("Choose destination file").result();
+                const auto full_path = pfd::save_file("Choose destination file").result();
 
                 if (!full_path.empty()) {
                     std::ofstream output_file { full_path };
@@ -124,8 +104,42 @@ public:
                 }
             }
 
-            if (selected_file_hash != 0) {
-                ImGui::Button(archive_array.hash_to_name[selected_file_hash].c_str());
+            ImGui::Separator();
+
+            if (ImGui::ListBoxHeader("Selected files")) {
+                for (const auto selected_file : selected_files) {
+                    ImGui::Text("%s", archive_array.hash_to_name[selected_file].c_str());
+                }
+
+                ImGui::ListBoxFooter();
+            }
+
+            if (ImGui::Button("Export selected file(-s)") && !selected_files.empty()) {
+                const auto base_folder = pfd::select_folder("Choose destination folder").result();
+
+                if (base_folder.empty()) {
+                    for (const auto selected_file : selected_files) {
+                        namespace fs = std::filesystem;
+
+                        const auto filename = sanitize_name(archive_array.hash_to_name.at(selected_file));
+
+                        fs::path full_path = fs::path(base_folder) / filename;
+                        fs::create_directories(full_path.parent_path());
+
+                        std::vector<std::uint8_t> file_data;
+                        archive_array.get_file_data(filename, file_data);
+
+                        std::ofstream output_file { full_path, std::ios::trunc };
+                        output_file.write(reinterpret_cast<const char*>(file_data.data()), file_data.size());
+
+                        std::cout << "File was exported to: " << full_path << "\n";
+                    }
+                }
+            }
+
+            if (selected_files.empty()) {
+                ImGui::SameLine();
+                ImGui::Text("No files selected");
             }
 
             ImGui::End();
@@ -136,52 +150,56 @@ public:
                     root_tree.update_filter(filter);
 
                     file_names.clear();
-                    for (auto&[_, path] : archive_array.hash_to_name)
-                        if (filter.PassFilter(path.c_str()))
+
+                    for (auto&[_, path] : archive_array.hash_to_name) {
+                        if (filter.PassFilter(path.c_str())) {
                             file_names.push_back(path.c_str());
+                        }
+                    }
                 }
 
                 ImGui::BeginTabBar("Tabs");
-                if (ImGui::BeginTabItem("ListView")) {
-                    ImGui::PushItemWidth(-1);
-                    if (ImGui::ListBox("TREE", &file_id, file_names.data(), file_names.size(), 50)) {
-                        selected_file_hash = hash_string(sanitize_name(file_names[file_id]), Decima::seed);
+                {
+                    if (ImGui::BeginTabItem("ListView")) {
+                        ImGui::PushItemWidth(-1);
+                        ImGui::ListBox("TREE", &file_id, file_names.data(), file_names.size(), 50);
+                        ImGui::EndTabItem();
                     }
-                    ImGui::EndTabItem();
-                }
-                if (ImGui::BeginTabItem("TreeView")) {
-                    ImGui::Columns(3);
 
-                    ImGui::Separator();
-                    ImGui::Text("Name");
-                    ImGui::NextColumn();
-                    ImGui::Text("Type");
-                    ImGui::NextColumn();
-                    ImGui::Text("Size");
-                    ImGui::NextColumn();
-                    ImGui::Separator();
+                    if (ImGui::BeginTabItem("TreeView")) {
+                        ImGui::Columns(3);
 
-                    root_tree.draw(selected_file_hash, archive_array);
+                        ImGui::Separator();
+                        ImGui::Text("Name");
+                        ImGui::NextColumn();
+                        ImGui::Text("Type");
+                        ImGui::NextColumn();
+                        ImGui::Text("Size");
+                        ImGui::NextColumn();
+                        ImGui::Separator();
 
-                    ImGui::Columns(1);
+                        root_tree.draw(selected_files, current_selected_file, archive_array);
 
-                    ImGui::EndTabItem();
+                        ImGui::Columns(1);
+
+                        ImGui::EndTabItem();
+                    }
                 }
                 ImGui::EndTabBar();
             }
             ImGui::End();
 
-
             ImGui::Begin("File preview");
             {
-                if (selected_file_hash != 0) {
-                    if (selected_file_hash != current_open_file_hash) {
-                        auto filename = sanitize_name(archive_array.hash_to_name[selected_file_hash]);
-                        archive_array.get_file_data(filename, current_open_file_data);
-                        current_open_file_hash = selected_file_hash;
-                    }
-                    file_viewer.DrawContents(current_open_file_data.data(), current_open_file_data.size());
+                if (current_selected_file > 0) {
+                    const auto filename = sanitize_name(archive_array.hash_to_name.at(current_selected_file));
 
+                    ImGui::Text("%s", filename.c_str());
+
+                    archive_array.get_file_data(filename, current_selected_file_data);
+                    file_viewer.DrawContents(current_selected_file_data.data(), current_selected_file_data.size());
+                } else {
+                    ImGui::Text("No file selected");
                 }
             }
             ImGui::End();

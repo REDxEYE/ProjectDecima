@@ -6,6 +6,7 @@
 #define PROJECTDS_FILE_TREE_H
 
 #include "archive_array.h"
+#include <unordered_set>
 #include <imgui.h>
 #include <map>
 #include <memory>
@@ -40,7 +41,7 @@ public:
         }
     }
 
-    void draw(uint32_t &selected_file_hash, Decima::ArchiveArray &archive_array);
+    void draw(std::unordered_set<uint32_t>& selected_files, std::uint32_t& current_selected_file, Decima::ArchiveArray &archive_array);
 };
 
 
