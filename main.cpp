@@ -108,6 +108,22 @@ public:
                 }
             }
 
+            if (ImGui::Button("Dump tree of files")) {
+                auto full_path = pfd::save_file("Choose destination file").result();
+
+                if (!full_path.empty()) {
+                    std::ofstream output_file { full_path };
+
+                    root_tree.visit([&](const auto& name, auto depth) {
+                        output_file << std::string(depth * 2, ' ');
+                        output_file << name;
+                        output_file << '\n';
+                    });
+
+                    std::cout << "File was saved to: " << full_path << "\n";
+                }
+            }
+
             if (selected_file_hash != 0) {
                 ImGui::Button(archive_array.hash_to_name[selected_file_hash].c_str());
             }

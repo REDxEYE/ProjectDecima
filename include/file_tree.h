@@ -28,6 +28,18 @@ public:
 
     void reset_filter(bool state);
 
+    template <typename Visitor>
+    void visit(const Visitor& visitor, std::size_t depth = 0) const {
+        for (const auto& [name, data] : folders) {
+            visitor(name, depth);
+            data.first->visit(visitor, depth + 1);
+        }
+
+        for(const auto& [name, _] : files) {
+            visitor(name, depth);
+        }
+    }
+
     void draw(uint32_t &selected_file_hash, Decima::ArchiveArray &archive_array);
 };
 
