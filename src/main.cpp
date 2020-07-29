@@ -1,6 +1,14 @@
+#define STB_IMAGE_IMPLEMENTATION
+
 #include <stb_image.h>
 
+#define STB_PERLIN_IMPLEMENTATION
+
 #include <stb_perlin.h>
+
+#define IMGUI_IMPL_OPENGL_LOADER_GLAD
+
+#define IMGUI_IMPL_OPENGL_LOADER_GLAD
 
 #include <imgui.h>
 
@@ -35,6 +43,7 @@ public:
 
     void on_attach() override {
         layer::on_attach();
+        ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     }
 
     void on_detach() override {
@@ -43,40 +52,70 @@ public:
 
     void on_update(double ts) override {
         omc::opengl_backend::imgui_new_frame();
+
+        ImGuiViewport* viewport = ImGui::GetMainViewport();
+        ImGui::SetNextWindowPos(viewport->GetWorkPos());
+        ImGui::SetNextWindowSize(viewport->GetWorkSize());
+        ImGui::SetNextWindowViewport(viewport->ID);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0.0f, 0.0f });
+
+        const auto dock_flags = ImGuiWindowFlags_MenuBar
+            | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar
+            | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove
+            | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus
+            | ImGuiWindowFlags_NoBackground;
+
+        ImGui::Begin("DockSpace", nullptr, dock_flags);
+        {
+            ImGui::PopStyleVar(3);
+            ImGui::DockSpace(ImGui::GetID("Dock"));
+
+            if (ImGui::BeginMenuBar()) {
+                if (ImGui::BeginMenu("File")) {
+                    if (ImGui::MenuItem("Open archive", "Ctrl+O")) {
+                        auto folder = pfd::select_folder("Select Death Stranding data folder!").result();
+
+                        if (!folder.empty()) {
+                            archive_array.open(folder);
+                            archive_array.read_content_table();
+                            archive_array.read_prefetch_file();
+                            file_names.clear();
+                            file_names.reserve(archive_array.hash_to_name.size());
+
+                            for (auto& [hash, path] : archive_array.hash_to_name) {
+                                file_names.push_back(path.c_str());
+                                auto* current_root = &root_tree;
+
+                                std::vector<std::string> split_path;
+                                split(path, split_path, '/');
+
+                                for (auto it = split_path.cbegin(); it != split_path.end() - 1; it++)
+                                    current_root = current_root->add_folder(*it);
+
+                                if (archive_array.hash_to_archive.find(hash) != archive_array.hash_to_archive.end())
+                                    current_root->add_file(split_path.back(), hash);
+                            }
+                        }
+                    }
+
+                    ImGui::EndMenu();
+                }
+
+                ImGui::EndMenuBar();
+            }
+
+        }
+        ImGui::End();
+
         {
             ImGui::Begin("DEBUG");
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
-                        ImGui::GetIO().Framerate);
-
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
+                1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
             ImGui::End();
 
             ImGui::Begin("Test");
-            if (ImGui::Button("Open archives")) {
-                auto folder = pfd::select_folder("Select Death Stranding data folder!").result();
-
-                if (!folder.empty()) {
-                    archive_array.open(folder);
-                    archive_array.read_content_table();
-                    archive_array.read_prefetch_file();
-                    file_names.clear();
-                    file_names.reserve(archive_array.hash_to_name.size());
-
-                    for (auto&[hash, path] : archive_array.hash_to_name) {
-                        file_names.push_back(path.c_str());
-                        auto* current_root = &root_tree;
-
-                        std::vector<std::string> split_path;
-                        split(path, split_path, '/');
-
-                        for (auto it = split_path.cbegin(); it != split_path.end() - 1; it++)
-                            current_root = current_root->add_folder(*it);
-
-                        if (archive_array.hash_to_archive.find(hash) != archive_array.hash_to_archive.end())
-                            current_root->add_file(split_path.back(), hash);
-                    }
-                }
-            }
-
             if (ImGui::Button("Dump tree of files")) {
                 const auto full_path = pfd::save_file("Choose destination file").result();
 
@@ -107,7 +146,7 @@ public:
             if (ImGui::Button("Export selected file(-s)") && !selection_info.selected_files.empty()) {
                 const auto base_folder = pfd::select_folder("Choose destination folder").result();
 
-                if (base_folder.empty()) {
+                if (!base_folder.empty()) {
                     for (const auto selected_file : selection_info.selected_files) {
                         namespace fs = std::filesystem;
 
