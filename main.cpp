@@ -108,7 +108,8 @@ public:
 
             if (ImGui::ListBoxHeader("Selected files")) {
                 for (const auto selected_file : selected_files) {
-                    ImGui::Text("%s", archive_array.hash_to_name[selected_file].c_str());
+                    if (ImGui::Selectable(archive_array.hash_to_name[selected_file].c_str()))
+                        current_selected_file = selected_file;
                 }
 
                 ImGui::ListBoxFooter();
@@ -162,7 +163,8 @@ public:
                 {
                     if (ImGui::BeginTabItem("ListView")) {
                         ImGui::PushItemWidth(-1);
-                        ImGui::ListBox("TREE", &file_id, file_names.data(), file_names.size(), 50);
+                        if (ImGui::ListBox("TREE", &file_id, file_names.data(), file_names.size(), 50))
+                            current_selected_file = hash_string(sanitize_name(file_names[file_id]), Decima::seed);
                         ImGui::EndTabItem();
                     }
 
