@@ -34,6 +34,7 @@ class MainLayer : public omc::layer {
     FileTree root_tree;
     std::unordered_set<std::uint32_t> selected_files;
     std::uint32_t current_selected_file = 0;
+    std::uint32_t current_open_file = 0;
     std::vector<uint8_t> current_selected_file_data;
 
     int32_t file_id = 0;
@@ -198,7 +199,11 @@ public:
 
                     ImGui::Text("%s", filename.c_str());
 
-                    archive_array.get_file_data(filename, current_selected_file_data);
+                    if (current_open_file != current_selected_file) {
+                        current_open_file = current_selected_file;
+                        archive_array.get_file_data(filename, current_selected_file_data);
+                    }
+
                     file_viewer.DrawContents(current_selected_file_data.data(), current_selected_file_data.size());
                 } else {
                     ImGui::Text("No file selected");
