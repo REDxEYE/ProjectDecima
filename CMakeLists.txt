@@ -8,7 +8,7 @@ add_subdirectory(libs/LGLE)
 set(CMAKE_CXX_STANDARD 17)
 
 add_executable(ProjectDS
-        main.cpp
+        src/main.cpp
         src/archive/decima_archive.cpp
         src/file_types/prefetch.cpp
         src/archive_array.cpp

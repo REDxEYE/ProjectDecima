@@ -8,5 +8,7 @@ set(OOZLIB_INC
 
         PARENT_SCOPE
         )
+set(GCC_COVERAGE_COMPILE_FLAGS -Wpsabi)
 
+SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}")
 add_library(oozLib Kraken.cpp)

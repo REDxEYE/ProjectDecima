@@ -28,14 +28,20 @@
 
 #include "portable-file-dialogs.h"
 
+
+struct SelectInfo {
+    std::uint32_t preview_file{0};
+    std::uint32_t selected_file{0};
+    std::unordered_set<std::uint32_t> selected_files;
+    std::vector<std::uint8_t> file_data;
+};
+
 class MainLayer : public omc::layer {
     Decima::ArchiveArray archive_array;
     std::vector<const char*> file_names;
     FileTree root_tree;
-    std::unordered_set<std::uint32_t> selected_files;
-    std::uint32_t current_selected_file = 0;
-    std::uint32_t current_open_file = 0;
-    std::vector<uint8_t> current_selected_file_data;
+
+    SelectInfo select_info;
 
     int32_t file_id = 0;
     ImGuiTextFilter filter;
@@ -93,7 +99,7 @@ public:
                 const auto full_path = pfd::save_file("Choose destination file").result();
 
                 if (!full_path.empty()) {
-                    std::ofstream output_file { full_path };
+                    std::ofstream output_file{full_path};
 
                     root_tree.visit([&](const auto& name, auto depth) {
                         output_file << std::string(depth * 2, ' ');
@@ -108,19 +114,19 @@ public:
             ImGui::Separator();
 
             if (ImGui::ListBoxHeader("Selected files")) {
-                for (const auto selected_file : selected_files) {
+                for (const auto selected_file : select_info.selected_files) {
                     if (ImGui::Selectable(archive_array.hash_to_name[selected_file].c_str()))
-                        current_selected_file = selected_file;
+                        select_info.selected_file = selected_file;
                 }
 
                 ImGui::ListBoxFooter();
             }
 
-            if (ImGui::Button("Export selected file(-s)") && !selected_files.empty()) {
+            if (ImGui::Button("Export selected file(-s)") && !select_info.selected_files.empty()) {
                 const auto base_folder = pfd::select_folder("Choose destination folder").result();
 
                 if (base_folder.empty()) {
-                    for (const auto selected_file : selected_files) {
+                    for (const auto selected_file : select_info.selected_files) {
                         namespace fs = std::filesystem;
 
                         const auto filename = sanitize_name(archive_array.hash_to_name.at(selected_file));
@@ -131,7 +137,7 @@ public:
                         std::vector<std::uint8_t> file_data;
                         archive_array.get_file_data(filename, file_data);
 
-                        std::ofstream output_file { full_path, std::ios::trunc };
+                        std::ofstream output_file{full_path, std::ios::trunc};
                         output_file.write(reinterpret_cast<const char*>(file_data.data()), file_data.size());
 
                         std::cout << "File was exported to: " << full_path << "\n";
@@ -139,7 +145,7 @@ public:
                 }
             }
 
-            if (selected_files.empty()) {
+            if (select_info.selected_files.empty()) {
                 ImGui::SameLine();
                 ImGui::Text("No files selected");
             }
@@ -165,7 +171,7 @@ public:
                     if (ImGui::BeginTabItem("ListView")) {
                         ImGui::PushItemWidth(-1);
                         if (ImGui::ListBox("TREE", &file_id, file_names.data(), file_names.size(), 50))
-                            current_selected_file = hash_string(sanitize_name(file_names[file_id]), Decima::seed);
+                            select_info.selected_file = hash_string(sanitize_name(file_names[file_id]), Decima::seed);
                         ImGui::EndTabItem();
                     }
 
@@ -181,7 +187,7 @@ public:
                         ImGui::NextColumn();
                         ImGui::Separator();
 
-                        root_tree.draw(selected_files, current_selected_file, archive_array);
+                        root_tree.draw(select_info.selected_files, select_info.selected_file, archive_array);
 
                         ImGui::Columns(1);
 
@@ -192,19 +198,37 @@ public:
             }
             ImGui::End();
 
+            ImGui::Begin("File info");
+            {
+
+                if (select_info.selected_file != 0) {
+                    std::string full_path = archive_array.hash_to_name[select_info.selected_file];
+                    auto filename = sanitize_name(full_path);
+                    auto* file_entry = archive_array.get_file_entry(filename);
+                    std::vector<std::string> parts;
+                    split(full_path, parts, '/');
+                    ImGui::Text("%s", parts[0].c_str());
+                    ImGui::LabelText("Size", "%u bytes", file_entry->size);
+                    ImGui::LabelText("Hash", "%llu", file_entry->hash);
+                    ImGui::LabelText("Entry ID", "%u", file_entry->entry_num);
+                    ImGui::LabelText("Offset", "%llu", file_entry->offset);
+                }
+            }
+            ImGui::End();
+
             ImGui::Begin("File preview");
             {
-                if (current_selected_file > 0) {
-                    const auto filename = sanitize_name(archive_array.hash_to_name.at(current_selected_file));
+                if (select_info.selected_file > 0) {
+                    const auto filename = sanitize_name(archive_array.hash_to_name.at(select_info.selected_file));
 
                     ImGui::Text("%s", filename.c_str());
 
-                    if (current_open_file != current_selected_file) {
-                        current_open_file = current_selected_file;
-                        archive_array.get_file_data(filename, current_selected_file_data);
+                    if (select_info.preview_file != select_info.selected_file) {
+                        select_info.preview_file = select_info.selected_file;
+                        archive_array.get_file_data(filename, select_info.file_data);
                     }
 
-                    file_viewer.DrawContents(current_selected_file_data.data(), current_selected_file_data.size());
+                    file_viewer.DrawContents(select_info.file_data.data(), select_info.file_data.size());
                 } else {
                     ImGui::Text("No file selected");
                 }
