@@ -1,0 +1,3 @@
+[submodule "libs/LGLE"]
+	path = libs/LGLE
+	url = https://github.com/REDxEYE/LGLE
