@@ -106,7 +106,7 @@ namespace pfd {
     protected:
         explicit settings(bool resync = false);
 
-        bool check_program(std::string const &program);
+        bool check_program(std::string const& program);
 
         inline bool is_osascript() const;
 
@@ -128,10 +128,10 @@ namespace pfd {
         };
 
         // Static array of flags for internal state
-        bool const &flags(flag in_flag) const;
+        bool const& flags(flag in_flag) const;
 
         // Non-const getter for the static array of flags
-        bool &flags(flag in_flag);
+        bool& flags(flag in_flag);
     };
 
 // Internal classes, not to be used by client applications
@@ -152,7 +152,7 @@ namespace pfd {
 
 #if _WIN32
 
-            void start_func(std::function<std::string(int*)> const &fun);
+            void start_func(std::function<std::string(int*)> const& fun);
 
             static BOOL CALLBACK enum_windows_callback(HWND hwnd, LPARAM lParam);
 
@@ -194,14 +194,14 @@ namespace pfd {
             // Helper class around LoadLibraryA() and GetProcAddress() with some safety
             class dll {
             public:
-                dll(std::string const &name);
+                dll(std::string const& name);
 
                 ~dll();
 
                 template<typename T>
                 class proc {
                 public:
-                    proc(dll const &lib, std::string const &sym)
+                    proc(dll const& lib, std::string const& sym)
                             : m_proc(reinterpret_cast<T*>(::GetProcAddress(lib.handle, sym.c_str()))) {}
 
                     operator bool() const { return m_proc != nullptr; }
@@ -247,11 +247,11 @@ namespace pfd {
 
             std::string get_icon_name(icon _icon) const;
 
-            std::string powershell_quote(std::string const &str) const;
+            std::string powershell_quote(std::string const& str) const;
 
-            std::string osascript_quote(std::string const &str) const;
+            std::string osascript_quote(std::string const& str) const;
 
-            std::string shell_quote(std::string const &str) const;
+            std::string shell_quote(std::string const& str) const;
 
             // Keep handle to executing command
             std::shared_ptr<executor> m_async;
@@ -266,9 +266,9 @@ namespace pfd {
             };
 
             file_dialog(type in_type,
-                        std::string const &title,
-                        std::string const &default_path = "",
-                        std::vector<std::string> const &filters = {},
+                        std::string const& title,
+                        std::string const& default_path = "",
+                        std::vector<std::string> const& filters = {},
                         opt options = opt::none);
 
         protected:
@@ -297,8 +297,8 @@ namespace pfd {
 
     class notify : public internal::dialog {
     public:
-        notify(std::string const &title,
-               std::string const &message,
+        notify(std::string const& title,
+               std::string const& message,
                icon _icon = icon::info);
     };
 
@@ -308,8 +308,8 @@ namespace pfd {
 
     class message : public internal::dialog {
     public:
-        message(std::string const &title,
-                std::string const &text,
+        message(std::string const& title,
+                std::string const& text,
                 choice _choice = choice::ok_cancel,
                 icon _icon = icon::info);
 
@@ -326,9 +326,9 @@ namespace pfd {
 
     class open_file : public internal::file_dialog {
     public:
-        open_file(std::string const &title,
-                  std::string const &default_path = "",
-                  std::vector<std::string> const &filters = {"All Files", "*"},
+        open_file(std::string const& title,
+                  std::string const& default_path = "",
+                  std::vector<std::string> const& filters = {"All Files", "*"},
                   opt options = opt::none);
 
 #if defined(__has_cpp_attribute)
@@ -338,9 +338,9 @@ namespace pfd {
 #endif
 #endif
 
-        open_file(std::string const &title,
-                  std::string const &default_path,
-                  std::vector<std::string> const &filters,
+        open_file(std::string const& title,
+                  std::string const& default_path,
+                  std::vector<std::string> const& filters,
                   bool allow_multiselect);
 
         std::vector<std::string> result();
@@ -348,9 +348,9 @@ namespace pfd {
 
     class save_file : public internal::file_dialog {
     public:
-        save_file(std::string const &title,
-                  std::string const &default_path = "",
-                  std::vector<std::string> const &filters = {"All Files", "*"},
+        save_file(std::string const& title,
+                  std::string const& default_path = "",
+                  std::vector<std::string> const& filters = {"All Files", "*"},
                   opt options = opt::none);
 
 #if defined(__has_cpp_attribute)
@@ -360,9 +360,9 @@ namespace pfd {
 #endif
 #endif
 
-        save_file(std::string const &title,
-                  std::string const &default_path,
-                  std::vector<std::string> const &filters,
+        save_file(std::string const& title,
+                  std::string const& default_path,
+                  std::vector<std::string> const& filters,
                   bool confirm_overwrite);
 
         std::string result();
@@ -370,8 +370,8 @@ namespace pfd {
 
     class select_folder : public internal::file_dialog {
     public:
-        select_folder(std::string const &title,
-                      std::string const &default_path = "",
+        select_folder(std::string const& title,
+                      std::string const& default_path = "",
                       opt options = opt::none);
 
         std::string result();
@@ -391,14 +391,14 @@ namespace pfd {
 
 #if _WIN32
 
-        static inline std::wstring str2wstr(std::string const &str) {
+        static inline std::wstring str2wstr(std::string const& str) {
             int len = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), (int) str.size(), nullptr, 0);
             std::wstring ret(len, '\0');
             MultiByteToWideChar(CP_UTF8, 0, str.c_str(), (int) str.size(), (LPWSTR) ret.data(), (int) ret.size());
             return ret;
         }
 
-        static inline std::string wstr2str(std::wstring const &str) {
+        static inline std::string wstr2str(std::wstring const& str) {
             int len = WideCharToMultiByte(CP_UTF8, 0, str.c_str(), (int) str.size(), nullptr, 0, nullptr, nullptr);
             std::string ret(len, '\0');
             WideCharToMultiByte(CP_UTF8, 0, str.c_str(), (int) str.size(), (LPSTR) ret.data(), (int) ret.size(),
@@ -427,12 +427,12 @@ namespace pfd {
 
 // This is necessary until C++20 which will have std::string::ends_with() etc.
 
-        static inline bool ends_with(std::string const &str, std::string const &suffix) {
+        static inline bool ends_with(std::string const& str, std::string const& suffix) {
             return suffix.size() <= str.size() &&
                    str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
         }
 
-        static inline bool starts_with(std::string const &str, std::string const &prefix) {
+        static inline bool starts_with(std::string const& str, std::string const& prefix) {
             return prefix.size() <= str.size() &&
                    str.compare(0, prefix.size(), prefix) == 0;
         }
@@ -492,7 +492,7 @@ namespace pfd {
     }
 
 // Check whether a program is present using “which”.
-    inline bool settings::check_program(std::string const &program) {
+    inline bool settings::check_program(std::string const& program) {
 #if _WIN32
         (void) program;
         return false;
@@ -526,13 +526,13 @@ namespace pfd {
         return flags(flag::has_kdialog);
     }
 
-    inline bool const &settings::flags(flag in_flag) const {
+    inline bool const& settings::flags(flag in_flag) const {
         static bool flags[size_t(flag::max_flag)];
         return flags[size_t(in_flag)];
     }
 
-    inline bool &settings::flags(flag in_flag) {
-        return const_cast<bool &>(static_cast<const settings*>(this)->flags(in_flag));
+    inline bool& settings::flags(flag in_flag) {
+        return const_cast<bool&>(static_cast<const settings*>(this)->flags(in_flag));
     }
 
 // executor implementation
@@ -581,7 +581,7 @@ namespace pfd {
 
 #if _WIN32
 
-    inline void internal::executor::start_func(std::function<std::string(int*)> const &fun) {
+    inline void internal::executor::start_func(std::function<std::string(int*)> const& fun) {
         stop();
 
         auto trampoline = [fun, this]() {
@@ -717,7 +717,7 @@ namespace pfd {
 
 #if _WIN32
 
-    inline internal::platform::dll::dll(std::string const &name)
+    inline internal::platform::dll::dll(std::string const& name)
             : handle(::LoadLibraryA(name.c_str())) {}
 
     inline internal::platform::dll::~dll() {
@@ -835,9 +835,9 @@ namespace pfd {
     }
 
 // THis is only used for debugging purposes
-    inline std::ostream &operator<<(std::ostream &s, std::vector<std::string> const &v) {
+    inline std::ostream& operator<<(std::ostream& s, std::vector<std::string> const& v) {
         int not_first = 0;
-        for (auto &e : v)
+        for (auto& e : v)
             s << (not_first++ ? " " : "") << e;
         return s;
     }
@@ -846,29 +846,29 @@ namespace pfd {
 // FIXME: we should probably get rid of newlines!
 // FIXME: the \" sequence seems unsafe, too!
 // XXX: this is no longer used but I would like to keep it around just in case
-    inline std::string internal::dialog::powershell_quote(std::string const &str) const {
+    inline std::string internal::dialog::powershell_quote(std::string const& str) const {
         return "'" + std::regex_replace(str, std::regex("['\"]"), "$&$&") + "'";
     }
 
 // Properly quote a string for osascript: replace \ or " with \\ or \"
 // XXX: this also used to replace ' with \' when popen was used, but it would be
 // smarter to do shell_quote(osascript_quote(...)) if this is needed again.
-    inline std::string internal::dialog::osascript_quote(std::string const &str) const {
+    inline std::string internal::dialog::osascript_quote(std::string const& str) const {
         return "\"" + std::regex_replace(str, std::regex("[\\\\\"]"), "\\$&") + "\"";
     }
 
 // Properly quote a string for the shell: just replace ' with '\''
 // XXX: this is no longer used but I would like to keep it around just in case
-    inline std::string internal::dialog::shell_quote(std::string const &str) const {
+    inline std::string internal::dialog::shell_quote(std::string const& str) const {
         return "'" + std::regex_replace(str, std::regex("'"), "'\\''") + "'";
     }
 
 // file_dialog implementation
 
     inline internal::file_dialog::file_dialog(type in_type,
-                                              std::string const &title,
-                                              std::string const &default_path /* = "" */,
-                                              std::vector<std::string> const &filters /* = {} */,
+                                              std::string const& title,
+                                              std::string const& default_path /* = "" */,
+                                              std::vector<std::string> const& filters /* = {} */,
                                               opt options /* = opt::none */) {
 #if _WIN32
         std::string filter_list;
@@ -895,7 +895,8 @@ namespace pfd {
                 if (flags(flag::is_vista)) {
                     // On Vista and higher we should be able to use IFileDialog for folder selection
                     IFileDialog* ifd;
-                    HRESULT hr = dll::proc < HRESULT WINAPI(
+                    HRESULT
+                    hr = dll::proc < HRESULT WINAPI(
                     REFCLSID, LPUNKNOWN, DWORD,
                     REFIID, LPVOID *)>(ole32, "CoCreateInstance")
                             (CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&ifd));
@@ -1232,8 +1233,8 @@ namespace pfd {
 
 // notify implementation
 
-    inline notify::notify(std::string const &title,
-                          std::string const &message,
+    inline notify::notify(std::string const& title,
+                          std::string const& message,
                           icon _icon /* = icon::info */) {
         if (_icon == icon::question) // Not supported by notifications
             _icon = icon::info;
@@ -1339,8 +1340,8 @@ namespace pfd {
 
 // message implementation
 
-    inline message::message(std::string const &title,
-                            std::string const &text,
+    inline message::message(std::string const& title,
+                            std::string const& text,
                             choice _choice /* = choice::ok_cancel */,
                             icon _icon /* = icon::info */) {
 #if _WIN32
@@ -1581,16 +1582,16 @@ namespace pfd {
 
 // open_file implementation
 
-    inline open_file::open_file(std::string const &title,
-                                std::string const &default_path /* = "" */,
-                                std::vector<std::string> const &filters /* = { "All Files", "*" } */,
+    inline open_file::open_file(std::string const& title,
+                                std::string const& default_path /* = "" */,
+                                std::vector<std::string> const& filters /* = { "All Files", "*" } */,
                                 opt options /* = opt::none */)
             : file_dialog(type::open, title, default_path, filters, options) {
     }
 
-    inline open_file::open_file(std::string const &title,
-                                std::string const &default_path,
-                                std::vector<std::string> const &filters,
+    inline open_file::open_file(std::string const& title,
+                                std::string const& default_path,
+                                std::vector<std::string> const& filters,
                                 bool allow_multiselect)
             : open_file(title, default_path, filters,
                         (allow_multiselect ? opt::multiselect : opt::none)) {
@@ -1602,16 +1603,16 @@ namespace pfd {
 
 // save_file implementation
 
-    inline save_file::save_file(std::string const &title,
-                                std::string const &default_path /* = "" */,
-                                std::vector<std::string> const &filters /* = { "All Files", "*" } */,
+    inline save_file::save_file(std::string const& title,
+                                std::string const& default_path /* = "" */,
+                                std::vector<std::string> const& filters /* = { "All Files", "*" } */,
                                 opt options /* = opt::none */)
             : file_dialog(type::save, title, default_path, filters, options) {
     }
 
-    inline save_file::save_file(std::string const &title,
-                                std::string const &default_path,
-                                std::vector<std::string> const &filters,
+    inline save_file::save_file(std::string const& title,
+                                std::string const& default_path,
+                                std::vector<std::string> const& filters,
                                 bool confirm_overwrite)
             : save_file(title, default_path, filters,
                         (confirm_overwrite ? opt::none : opt::force_overwrite)) {
@@ -1623,8 +1624,8 @@ namespace pfd {
 
 // select_folder implementation
 
-    inline select_folder::select_folder(std::string const &title,
-                                        std::string const &default_path /* = "" */,
+    inline select_folder::select_folder(std::string const& title,
+                                        std::string const& default_path /* = "" */,
                                         opt options /* = opt::none */)
             : file_dialog(type::folder, title, default_path, {}, options) {
     }

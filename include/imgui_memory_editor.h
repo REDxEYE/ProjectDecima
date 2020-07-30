@@ -148,8 +148,8 @@ struct MemoryEditor {
         float WindowWidth;
     };
 
-    void CalcSizes(Sizes &s, size_t mem_size, size_t base_display_addr) {
-        ImGuiStyle &style = ImGui::GetStyle();
+    void CalcSizes(Sizes& s, size_t mem_size, size_t base_display_addr) {
+        ImGuiStyle& style = ImGui::GetStyle();
         s.AddrDigitsCount = OptAddrDigitsCount;
         if (s.AddrDigitsCount == 0)
             for (size_t n = base_display_addr + mem_size - 1; n > 0; n >>= 4)
@@ -196,7 +196,7 @@ struct MemoryEditor {
         ImU8* mem_data = (ImU8*) mem_data_void_ptr;
         Sizes s;
         CalcSizes(s, mem_size, base_display_addr);
-        ImGuiStyle &style = ImGui::GetStyle();
+        ImGuiStyle& style = ImGui::GetStyle();
 
         // We begin into our scrolling region with the 'ImGuiWindowFlags_NoMove' in order to prevent click from moving the window.
         // This is used as a facility since our main click detection code doesn't assign an ActiveId so the click would normally be caught as a window-move.
@@ -234,16 +234,14 @@ struct MemoryEditor {
             if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_UpArrow)) && DataEditingAddr >= (size_t) Cols) {
                 data_editing_addr_next = DataEditingAddr - Cols;
                 DataEditingTakeFocus = true;
-            }
-            else if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_DownArrow)) && DataEditingAddr < mem_size - Cols) {
+            } else if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_DownArrow)) &&
+                       DataEditingAddr < mem_size - Cols) {
                 data_editing_addr_next = DataEditingAddr + Cols;
                 DataEditingTakeFocus = true;
-            }
-            else if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_LeftArrow)) && DataEditingAddr > 0) {
+            } else if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_LeftArrow)) && DataEditingAddr > 0) {
                 data_editing_addr_next = DataEditingAddr - 1;
                 DataEditingTakeFocus = true;
-            }
-            else if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_RightArrow)) && DataEditingAddr < mem_size - 1) {
+            } else if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_RightArrow)) && DataEditingAddr < mem_size - 1) {
                 data_editing_addr_next = DataEditingAddr + 1;
                 DataEditingTakeFocus = true;
             }

@@ -22,19 +22,19 @@ namespace Decima {
 
         std::vector<Archive> archives;
 
-        explicit ArchiveArray(const std::string &_workdir);
+        explicit ArchiveArray(const std::string& _workdir);
 
         ArchiveArray() = default;
 
-        void open(const std::string &_workdir);
+        void open(const std::string& _workdir);
 
         void read_content_table();
 
-        void get_file_data(uint64_t file_hash, std::vector<uint8_t> &data_out);
+        void get_file_data(uint64_t file_hash, std::vector<uint8_t>& data_out);
 
-        void get_file_data(const std::string &file_id, std::vector<uint8_t> &data_out);
+        void get_file_data(const std::string& file_id, std::vector<uint8_t>& data_out);
 
-        FileEntry* get_file_entry(const std::string &file_name);
+        FileEntry* get_file_entry(const std::string& file_name);
 
         FileEntry* get_file_entry(uint64_t file_hash);
 

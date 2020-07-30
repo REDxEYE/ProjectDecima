@@ -17,9 +17,13 @@ add_executable(ProjectDS
         src/memory_stream.cpp
         src/file_tree.cpp)
 
-
 target_include_directories(ProjectDS PUBLIC include ${HASHLIB_INC} ${OOZLIB_INC} ${LGLE_INCLUDE} ${LGLE_LIB_INCLUDE})
-target_compile_options(ProjectDS PUBLIC -g -fno-omit-frame-pointer -gdwarf-2)
+
+if (DEBUG_MODE)
+    target_compile_options(ProjectDS PUBLIC -g -fno-omit-frame-pointer -gdwarf-2)
+    message("debug mode")
+endif (DEBUG_MODE)
+
 target_link_libraries(ProjectDS PUBLIC
         HashLib oozLib LGLE
         -static-libgcc -static-libstdc++ -static

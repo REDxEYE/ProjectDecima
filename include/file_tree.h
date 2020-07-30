@@ -14,8 +14,8 @@
 #include <vector>
 
 struct SelectionInfo {
-    std::uint32_t preview_file { 0 };
-    std::uint32_t selected_file { 0 };
+    std::uint32_t preview_file{0};
+    std::uint32_t selected_file{0};
     std::unordered_set<std::uint32_t> selected_files;
     std::vector<std::uint8_t> file_data;
 };
@@ -28,27 +28,27 @@ public:
     std::map<std::string, FileTreeToggleable<std::unique_ptr<FileTree>>> folders;
     std::map<std::string, FileTreeToggleable<uint32_t>> files;
 
-    FileTree* add_folder(const std::string &name);
+    FileTree* add_folder(const std::string& name);
 
-    void add_file(const std::string &filename, uint32_t hash);
+    void add_file(const std::string& filename, uint32_t hash);
 
-    void update_filter(const ImGuiTextFilter &filter);
+    void update_filter(const ImGuiTextFilter& filter);
 
     void reset_filter(bool state);
 
-    template <typename Visitor>
+    template<typename Visitor>
     void visit(const Visitor& visitor, std::size_t depth = 0) const {
-        for (const auto& [name, data] : folders) {
+        for (const auto&[name, data] : folders) {
             visitor(name, depth);
             data.first->visit(visitor, depth + 1);
         }
 
-        for(const auto& [name, _] : files) {
+        for (const auto&[name, _] : files) {
             visitor(name, depth);
         }
     }
 
-    void draw(SelectionInfo& selection, Decima::ArchiveArray &archive_array);
+    void draw(SelectionInfo& selection, Decima::ArchiveArray& archive_array);
 };
 
 

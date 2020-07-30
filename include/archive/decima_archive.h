@@ -54,9 +54,9 @@ namespace Decima {
         std::string filepath;
         Header header = {0};
 
-        Archive(const std::string &workdir, const std::string &filename);
+        Archive(const std::string& workdir, const std::string& filename);
 
-        Archive(const std::string &workdir, uint64_t filehash);
+        Archive(const std::string& workdir, uint64_t filehash);
 
         bool open();
 
@@ -68,22 +68,22 @@ namespace Decima {
 
         bool is_valid() const;
 
-        void get_file_data(uint32_t file_id, std::vector<uint8_t> &data_out);
+        void get_file_data(uint32_t file_id, std::vector<uint8_t>& data_out);
 
-        void get_file_data(const std::string &file_id, std::vector<uint8_t> &data_out);
+        void get_file_data(const std::string& file_id, std::vector<uint8_t>& data_out);
 
         uint64_t get_file_id(uint64_t file_hash) const;
 
-        uint64_t get_file_id(const std::string &file_name) const;
+        uint64_t get_file_id(const std::string& file_name) const;
 
     private:
         static void decrypt(uint32_t key_1, uint32_t key_2, uint32_t* data);
 
         uint64_t find_chunk_by_offset(uint64_t offset);
 
-        void get_chunk_data(ChunkEntry &chunk, std::vector<uint8_t> &data);
+        void get_chunk_data(ChunkEntry& chunk, std::vector<uint8_t>& data);
 
-        void decrypt_chunk(uint32_t chunk_id, std::vector<uint8_t> &src);
+        void decrypt_chunk(uint32_t chunk_id, std::vector<uint8_t>& src);
 
         friend ArchiveArray;
     };

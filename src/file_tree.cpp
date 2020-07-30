@@ -7,17 +7,17 @@
 #include "utils.h"
 #include <filesystem>
 
-FileTree* FileTree::add_folder(const std::string &name) {
+FileTree* FileTree::add_folder(const std::string& name) {
     if (folders.find(name) == folders.end())
         folders.emplace(name, std::make_pair(std::make_unique<FileTree>(), true));
     return folders.at(name).first.get();
 }
 
-void FileTree::add_file(const std::string &filename, uint32_t hash) {
+void FileTree::add_file(const std::string& filename, uint32_t hash) {
     files.emplace(filename, std::make_pair(hash, true));
 }
 
-bool is_filter_matches(FileTree* root, const ImGuiTextFilter &filter) {
+bool is_filter_matches(FileTree* root, const ImGuiTextFilter& filter) {
     bool result = false;
 
     for (auto&[name, data] : root->files) {
@@ -37,7 +37,7 @@ bool is_filter_matches(FileTree* root, const ImGuiTextFilter &filter) {
     return result;
 }
 
-void FileTree::update_filter(const ImGuiTextFilter &filter) {
+void FileTree::update_filter(const ImGuiTextFilter& filter) {
     if (filter.IsActive()) {
         reset_filter(false);
         is_filter_matches(this, filter);
@@ -57,7 +57,7 @@ void FileTree::reset_filter(bool state) {
     }
 }
 
-void FileTree::draw(SelectionInfo& selection, Decima::ArchiveArray &archive_array) {
+void FileTree::draw(SelectionInfo& selection, Decima::ArchiveArray& archive_array) {
     for (auto&[name, data] : folders) {
         const std::string tree_name = name + "##" + std::to_string(folders.size());
         const auto show = ImGui::TreeNode(tree_name.c_str());
@@ -68,8 +68,8 @@ void FileTree::draw(SelectionInfo& selection, Decima::ArchiveArray &archive_arra
         ImGui::Text("Folder");
         ImGui::NextColumn();
         ImGui::Text("%llu file%c / %llu folder%c",
-            files_count, files_count == 1 ? ' ' : 's',
-            folders_count, folders_count == 1 ? ' ' : 's');
+                    files_count, files_count == 1 ? ' ' : 's',
+                    folders_count, folders_count == 1 ? ' ' : 's');
         ImGui::NextColumn();
 
         if (data.second && show) {
@@ -83,7 +83,6 @@ void FileTree::draw(SelectionInfo& selection, Decima::ArchiveArray &archive_arra
             continue;
 
         auto is_selected = selection.selected_files.find(data.first) != selection.selected_files.end();
-
         if (ImGui::Selectable(name.c_str(), is_selected)) {
             selection.selected_file = data.first;
 

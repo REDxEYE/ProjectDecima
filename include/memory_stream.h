@@ -14,17 +14,10 @@ class MemoryStream : public std::streambuf {
 public:
     std::vector<uint8_t> memory;
 
-    explicit MemoryStream(std::vector<uint8_t> mem) : memory(std::move(mem)) {
-        setg(reinterpret_cast<char*>(memory.data()), reinterpret_cast<char*>(memory.data()),
-             reinterpret_cast<char*>(memory.data() + memory.size()));
-        setp(reinterpret_cast<char*>(memory.data()), reinterpret_cast<char*>(memory.data() + memory.size()));
-    }
+    explicit MemoryStream(std::vector<uint8_t> mem);
 
-    virtual pos_type
-    seekoff(off_type off, std::ios_base::seekdir dir, std::ios_base::openmode which = std::ios_base::in) {
-        if (dir == std::ios_base::cur) gbump(off);
-        return gptr() - eback();
-    }
+    pos_type
+    seekoff(off_type off, std::ios_base::seekdir dir, std::ios_base::openmode which = std::ios_base::in) override;
 
     std::istream as_stream() {
         return std::istream(this);

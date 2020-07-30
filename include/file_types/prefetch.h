@@ -37,9 +37,9 @@ namespace Decima {
 
         Prefetch() = default;
 
-        void parse(MemoryStream &buffer);
+        void parse(MemoryStream& buffer);
 
-        void parse(std::vector<uint8_t> &buffer);
+        void parse(std::vector<uint8_t>& buffer);
     };
 }
 #endif //PROJECTDS_CORE_H
