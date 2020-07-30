@@ -15,7 +15,7 @@ add_executable(ProjectDS
         src/utils.cpp
         src/file_types/prefetch.cpp
         src/memory_stream.cpp
-        src/file_tree.cpp)
+        src/file_tree.cpp src/file_types/core.cpp)
 
 target_include_directories(ProjectDS PUBLIC include ${HASHLIB_INC} ${OOZLIB_INC} ${LGLE_INCLUDE} ${LGLE_LIB_INCLUDE})
 

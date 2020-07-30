@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 
+#include "file_types/core.h"
 #include "memory_stream.h"
 
 namespace Decima {

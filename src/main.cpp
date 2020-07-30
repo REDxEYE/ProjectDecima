@@ -227,12 +227,31 @@ public:
                     const auto file_entry = archive_array.get_file_entry(filename);
 
                     ImGui::Text("%s", filename.c_str());
+
+                    ImGui::Columns(2);
                     ImGui::Separator();
-                    ImGui::LabelText("Size", "%u bytes", file_entry->size);
-                    ImGui::LabelText("Hash", "%llu", file_entry->hash);
-                    ImGui::LabelText("Entry ID", "%u", file_entry->entry_num);
-                    ImGui::LabelText("Offset", "%llu", file_entry->offset);
+                    ImGui::Text("Size");
+                    ImGui::NextColumn();
+                    ImGui::Text("%u bytes", file_entry->size);
                     ImGui::Separator();
+                    ImGui::NextColumn();
+                    ImGui::Text("Hash");
+                    ImGui::NextColumn();
+                    ImGui::Text("%llX", file_entry->hash);
+                    ImGui::Separator();
+                    ImGui::NextColumn();
+                    ImGui::Text("Entry ID");
+                    ImGui::NextColumn();
+                    ImGui::Text("%u", file_entry->entry_num);
+                    ImGui::Separator();
+                    ImGui::NextColumn();
+                    ImGui::Text("Offset");
+                    ImGui::NextColumn();
+                    ImGui::Text("%llu", file_entry->offset);
+                    ImGui::Separator();
+                    ImGui::NextColumn();
+                    ImGui::Separator();
+                    ImGui::Columns(1);
 
                     if (selection_info.preview_file != selection_info.selected_file) {
                         selection_info.preview_file = selection_info.selected_file;
