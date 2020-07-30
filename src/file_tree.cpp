@@ -13,8 +13,8 @@ FileTree* FileTree::add_folder(const std::string& name) {
     return folders.at(name).first.get();
 }
 
-void FileTree::add_file(const std::string& filename, uint32_t hash) {
-    files.emplace(filename, std::make_pair(hash, true));
+void FileTree::add_file(const std::string& filename, uint32_t hash, Decima::CoreHeader header) {
+    files.emplace(filename, std::make_pair(FileInfo{hash, header}, true));
 }
 
 bool is_filter_matches(FileTree* root, const ImGuiTextFilter& filter) {
@@ -82,25 +82,30 @@ void FileTree::draw(SelectionInfo& selection, Decima::ArchiveArray& archive_arra
         if (!data.second)
             continue;
 
-        auto is_selected = selection.selected_files.find(data.first) != selection.selected_files.end();
+        auto is_selected = selection.selected_files.find(data.first.hash) != selection.selected_files.end();
         if (ImGui::Selectable(name.c_str(), is_selected)) {
-            selection.selected_file = data.first;
+            selection.selected_file = data.first.hash;
 
             if (ImGui::GetIO().KeyCtrl) {
                 if (is_selected) {
-                    selection.selected_files.erase(data.first);
+                    selection.selected_files.erase(data.first.hash);
                 } else {
-                    selection.selected_files.insert(data.first);
+                    selection.selected_files.insert(data.first.hash);
                 }
             }
         }
 
-        auto filename = sanitize_name(archive_array.hash_to_name[data.first]);
+        auto filename = sanitize_name(archive_array.hash_to_name[data.first.hash]);
         auto file_entry = archive_array.get_file_entry(filename);
         auto size = file_entry->size;
 
         ImGui::NextColumn();
-        ImGui::Text("Unknown");
+        auto& file_info = data.first.header;
+        if (Decima::known_file_types.find(file_info.filetype) != Decima::known_file_types.end()) {
+            ImGui::Text("%s",Decima::known_file_types.at(file_info.filetype).c_str());
+        } else {
+            ImGui::Text("Unknown");
+        }
         ImGui::NextColumn();
         ImGui::Text("%dB", size);
         ImGui::NextColumn();

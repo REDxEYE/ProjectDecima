@@ -5,9 +5,12 @@
 #ifndef PROJECTDS_FILE_TREE_H
 #define PROJECTDS_FILE_TREE_H
 
-#include "archive_array.h"
-#include <unordered_set>
 #include <imgui.h>
+#include "archive_array.h"
+
+#include "file_types/core.h"
+
+#include <unordered_set>
 #include <map>
 #include <memory>
 #include <string>
@@ -20,17 +23,22 @@ struct SelectionInfo {
     std::vector<std::uint8_t> file_data;
 };
 
+struct FileInfo {
+    uint32_t hash{0};
+    Decima::CoreHeader header{0};
+};
+
 template<class T>
 using FileTreeToggleable = std::pair<T, bool>;
 
 class FileTree {
 public:
     std::map<std::string, FileTreeToggleable<std::unique_ptr<FileTree>>> folders;
-    std::map<std::string, FileTreeToggleable<uint32_t>> files;
+    std::map<std::string, FileTreeToggleable<FileInfo>> files;
 
     FileTree* add_folder(const std::string& name);
 
-    void add_file(const std::string& filename, uint32_t hash);
+    void add_file(const std::string& filename, uint32_t hash, Decima::CoreHeader header);
 
     void update_filter(const ImGuiTextFilter& filter);
 

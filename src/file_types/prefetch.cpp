@@ -9,7 +9,7 @@
 
 void Decima::Prefetch::parse(MemoryStream& buffer) {
     auto reader = buffer.as_stream();
-    reader.read(reinterpret_cast<char*>(&header), sizeof(header));
+    CoreFile::parse(buffer);
     reader.read(reinterpret_cast<char*>(&string_count), sizeof(string_count));
     strings.resize(string_count);
 
@@ -33,8 +33,6 @@ void Decima::Prefetch::parse(MemoryStream& buffer) {
 }
 
 void Decima::Prefetch::parse(std::vector<uint8_t>& buffer) {
-    MemoryStream mem_buff(buffer);
-    parse(mem_buff);
-
-
+    CoreFile::parse(buffer);
 }
+

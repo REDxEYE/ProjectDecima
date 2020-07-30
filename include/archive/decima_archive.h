@@ -18,7 +18,7 @@ namespace Decima {
     static uint32_t murmur_salt[4] = {0x0FA3A9443, 0x0F41CAB62, 0x0F376811C, 0x0D2A89E3E};
     static uint32_t murmur_salt2[4] = {0x06C084A37, 0x07E159D95, 0x03D5AF7E8, 0x018AA7D3F};
 
-    struct Header {
+    struct ArchiveHeader {
         uint32_t magic; //0x20304050
         uint32_t key;
         uint64_t file_size;
@@ -52,7 +52,7 @@ namespace Decima {
     public:
         std::vector<FileEntry> content_table;
         std::string filepath;
-        Header header = {0};
+        ArchiveHeader header = {0};
 
         Archive(const std::string& workdir, const std::string& filename);
 
@@ -70,7 +70,7 @@ namespace Decima {
 
         void get_file_data(uint32_t file_id, std::vector<uint8_t>& data_out);
 
-        void get_file_data(const std::string& file_id, std::vector<uint8_t>& data_out);
+        void get_file_data(const std::string& file_name, std::vector<uint8_t>& data_out);
 
         uint64_t get_file_id(uint64_t file_hash) const;
 

@@ -92,8 +92,13 @@ public:
                                 for (auto it = split_path.cbegin(); it != split_path.end() - 1; it++)
                                     current_root = current_root->add_folder(*it);
 
-                                if (archive_array.hash_to_archive.find(hash) != archive_array.hash_to_archive.end())
-                                    current_root->add_file(split_path.back(), hash);
+                                if (archive_array.hash_to_archive.find(hash) != archive_array.hash_to_archive.end()) {
+                                    std::vector<uint8_t> tmp_vector;
+                                    archive_array.get_file_data(hash, tmp_vector);
+                                    Decima::CoreHeader header{0};
+                                    if (!tmp_vector.empty()) memcpy(&header, tmp_vector.data(), sizeof(header));
+                                    current_root->add_file(split_path.back(), hash,header);
+                                }
                             }
                         }
                     }

@@ -111,8 +111,8 @@ void Decima::Archive::get_file_data(uint32_t file_id, std::vector<uint8_t>& data
 
 }
 
-void Decima::Archive::get_file_data(const std::string& file_id, std::vector<uint8_t>& data_out) {
-    uint64_t id = get_file_id(file_id);
+void Decima::Archive::get_file_data(const std::string& file_name, std::vector<uint8_t>& data_out) {
+    uint64_t id = get_file_id(file_name);
     if (id != -1) {
         get_file_data(id, data_out);
     }
