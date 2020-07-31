@@ -10,6 +10,17 @@ set(OOZLIB_INC
         )
 set(GCC_COVERAGE_COMPILE_FLAGS -Wpsabi)
 
+
+
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}")
 add_library(oozLib Kraken.cpp)
+
+#if (DEBUG_MODE)
+#    target_compile_options(oozLib PUBLIC -g -fno-omit-frame-pointer -gdwarf-2)
+#    message("${PROJECT_NAME} debug mode")
+#else()
+#    target_compile_options(oozLib PUBLIC -ftree-vectorize -ftree-vectorizer-verbose=2)
+#    message("${PROJECT_NAME} release mode")
+#endif (DEBUG_MODE)
+
 target_link_libraries(oozLib -static)
