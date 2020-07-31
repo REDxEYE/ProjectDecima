@@ -17,8 +17,8 @@ namespace Decima {
         Prefetch prefetch;
 
     public:
-        std::unordered_map<uint32_t, uint32_t> hash_to_archive;
-        std::unordered_map<uint32_t, std::string> hash_to_name;
+        std::unordered_map<uint64_t, uint32_t> hash_to_archive;
+        std::unordered_map<uint64_t, std::string> hash_to_name;
 
         std::vector<Archive> archives;
 
@@ -28,7 +28,6 @@ namespace Decima {
 
         void open(const std::string& _workdir);
 
-        void read_content_table();
 
         std::vector<uint8_t> query_file(uint64_t file_hash);
         std::vector<uint8_t> query_file(const std::string& file_name);

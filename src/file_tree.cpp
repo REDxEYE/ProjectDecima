@@ -13,21 +13,21 @@ FileTree* FileTree::add_folder(const std::string& name) {
     return folders.at(name).first.get();
 }
 
-void FileTree::add_file(const std::string& filename, uint32_t hash, Decima::CoreHeader header) {
-    files.emplace(filename, std::make_pair(FileInfo{hash, header}, true));
+void FileTree::add_file(const std::string& filename, uint64_t hash, Decima::CoreHeader header) {
+    files.emplace(filename, std::make_pair(FileInfo { hash, header }, true));
 }
 
 bool is_filter_matches(FileTree* root, const ImGuiTextFilter& filter) {
     bool result = false;
 
-    for (auto&[name, data] : root->files) {
+    for (auto& [name, data] : root->files) {
         if (filter.PassFilter(name.c_str())) {
             data.second = true;
             result = true;
         }
     }
 
-    for (auto&[name, data] : root->folders) {
+    for (auto& [name, data] : root->folders) {
         if (is_filter_matches(data.first.get(), filter)) {
             data.second = true;
             result = true;
@@ -47,18 +47,18 @@ void FileTree::update_filter(const ImGuiTextFilter& filter) {
 }
 
 void FileTree::reset_filter(bool state) {
-    for (auto&[_, data] : folders) {
+    for (auto& [_, data] : folders) {
         data.first->reset_filter(state);
         data.second = state;
     }
 
-    for (auto&[_, data] : files) {
+    for (auto& [_, data] : files) {
         data.second = state;
     }
 }
 
 void FileTree::draw(SelectionInfo& selection, Decima::ArchiveArray& archive_array) {
-    for (auto&[name, data] : folders) {
+    for (auto& [name, data] : folders) {
         const std::string tree_name = name + "##" + std::to_string(folders.size());
         const auto show = ImGui::TreeNode(tree_name.c_str());
         const auto files_count = data.first->files.size();
@@ -68,8 +68,8 @@ void FileTree::draw(SelectionInfo& selection, Decima::ArchiveArray& archive_arra
         ImGui::Text("Folder");
         ImGui::NextColumn();
         ImGui::Text("%llu file%c / %llu folder%c",
-                    files_count, files_count == 1 ? ' ' : 's',
-                    folders_count, folders_count == 1 ? ' ' : 's');
+            files_count, files_count == 1 ? ' ' : 's',
+            folders_count, folders_count == 1 ? ' ' : 's');
         ImGui::NextColumn();
 
         if (data.second && show) {
@@ -78,7 +78,7 @@ void FileTree::draw(SelectionInfo& selection, Decima::ArchiveArray& archive_arra
         }
     }
 
-    for (auto&[name, data] : files) {
+    for (auto& [name, data] : files) {
         if (!data.second)
             continue;
 
@@ -97,8 +97,17 @@ void FileTree::draw(SelectionInfo& selection, Decima::ArchiveArray& archive_arra
 
         auto filename = sanitize_name(archive_array.hash_to_name[data.first.hash]);
         auto file_entry = archive_array.get_file_entry(filename);
-        if(file_entry.has_value()) {
+        if (file_entry.has_value()) {
             auto size = file_entry.value().get().size;
+
+            if (data.first.header.filetype == 0) {
+                auto file_data = archive_array.query_file(data.first.hash);
+                if (file_data.empty()) {
+                    data.first.header.filetype=-1;
+                } else {
+                    memcpy(&data.first.header,file_data.data(),sizeof(Decima::CoreHeader));
+                }
+            }
 
             ImGui::NextColumn();
             auto& file_info = data.first.header;
@@ -110,7 +119,8 @@ void FileTree::draw(SelectionInfo& selection, Decima::ArchiveArray& archive_arra
             ImGui::NextColumn();
             ImGui::Text("%dB", size);
             ImGui::NextColumn();
-        }else{
+        } else {
+            ImGui::NextColumn();
             ImGui::Text("Unknown");
             ImGui::NextColumn();
             ImGui::Text("ERROR");

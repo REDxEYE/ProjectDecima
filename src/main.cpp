@@ -77,8 +77,6 @@ public:
 
                         if (!folder.empty()) {
                             archive_array.open(folder);
-                            archive_array.read_content_table();
-                            archive_array.read_prefetch_file();
                             file_names.clear();
                             file_names.reserve(archive_array.hash_to_name.size());
 
@@ -93,10 +91,11 @@ public:
                                     current_root = current_root->add_folder(*it);
 
                                 if (archive_array.hash_to_archive.find(hash) != archive_array.hash_to_archive.end()) {
-                                    std::vector<uint8_t> tmp_vector = archive_array.query_file(hash);
+//                                    std::vector<uint8_t> tmp_vector = archive_array.query_file(hash);
                                     Decima::CoreHeader header{0};
-                                    if (!tmp_vector.empty()) memcpy(&header, tmp_vector.data(), sizeof(header));
+//                                    if (!tmp_vector.empty()) memcpy(&header, tmp_vector.data(), sizeof(header));
                                     current_root->add_file(split_path.back(), hash, header);
+//                                    tmp_vector.clear();
                                 }
                             }
                         }
@@ -265,7 +264,7 @@ public:
                         }
                         file_viewer.DrawContents(selection_info.file_data.data(), selection_info.file_data.size());
                     }else{
-                        ImGui::Text("Error getting file info1");
+                        ImGui::Text("Error getting file info!");
                     }
                 } else {
                     ImGui::Text("No file selected");

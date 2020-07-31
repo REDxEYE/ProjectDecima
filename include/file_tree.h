@@ -17,14 +17,14 @@
 #include <vector>
 
 struct SelectionInfo {
-    std::uint32_t preview_file{0};
-    std::uint32_t selected_file{0};
-    std::unordered_set<std::uint32_t> selected_files;
+    std::uint64_t preview_file{0};
+    std::uint64_t selected_file{0};
+    std::unordered_set<std::uint64_t> selected_files;
     std::vector<std::uint8_t> file_data;
 };
 
 struct FileInfo {
-    uint32_t hash{0};
+    uint64_t hash{0};
     Decima::CoreHeader header{0};
 };
 
@@ -33,12 +33,13 @@ using FileTreeToggleable = std::pair<T, bool>;
 
 class FileTree {
 public:
+
     std::map<std::string, FileTreeToggleable<std::unique_ptr<FileTree>>> folders;
     std::map<std::string, FileTreeToggleable<FileInfo>> files;
 
     FileTree* add_folder(const std::string& name);
 
-    void add_file(const std::string& filename, uint32_t hash, Decima::CoreHeader header);
+    void add_file(const std::string& filename, uint64_t hash, Decima::CoreHeader header);
 
     void update_filter(const ImGuiTextFilter& filter);
 

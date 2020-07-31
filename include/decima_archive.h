@@ -5,6 +5,7 @@
 #ifndef PROJECTDS_DECIMA_ARCHIVE_H
 #define PROJECTDS_DECIMA_ARCHIVE_H
 
+#include "mio.hpp"
 #include <vector>
 #include <fstream>
 
@@ -52,9 +53,8 @@ namespace Decima {
 
 
     class Archive {
-        std::ifstream filebuffer;
+        mio::mmap_source filebuffer;
         std::vector<structs::ChunkEntry> chunk_table;
-        std::vector<uint64_t> file_hashes;
     public:
         std::vector<structs::FileEntry> content_table;
         std::string filepath;
@@ -65,10 +65,6 @@ namespace Decima {
         Archive(const std::string& workdir, uint64_t filehash);
 
         bool open();
-
-        void read_content_table();
-
-        void read_chunk_table();
 
         bool is_encrypted() const;
 
@@ -84,7 +80,7 @@ namespace Decima {
 
         uint64_t find_chunk_by_offset(uint64_t offset);
 
-        void get_chunk_data(structs::ChunkEntry& chunk, std::vector<uint8_t>& data);
+        std::vector<uint8_t> get_chunk_data(structs::ChunkEntry& chunk);
 
         void decrypt_chunk(uint32_t chunk_id, std::vector<uint8_t>& src);
 
