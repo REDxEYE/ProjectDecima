@@ -26,22 +26,10 @@ void Decima::ArchiveArray::read_content_table() {
     }
 }
 
-void Decima::ArchiveArray::get_file_data(uint64_t file_hash, std::vector<uint8_t>& data_out) {
-    auto archive_id = hash_to_archive.find(file_hash);
-    if (archive_id != hash_to_archive.end()) {
-        auto& archive = archives[archive_id->second];
-        archive.get_file_data(archive.get_file_id(file_hash), data_out);
-    }
-}
-
-void Decima::ArchiveArray::get_file_data(const std::string& file_id, std::vector<uint8_t>& data_out) {
-    uint64_t hash = hash_string(sanitize_name(file_id), seed);
-    get_file_data(hash, data_out);
-}
 
 void Decima::ArchiveArray::read_prefetch_file() {
-    std::vector<uint8_t> prefetch_data;
-    get_file_data("prefetch/fullgame.prefetch", prefetch_data);
+    std::vector<uint8_t> prefetch_data = query_file("prefetch/fullgame.prefetch");
+
     prefetch.parse(prefetch_data);
 
     for (auto& string:prefetch.strings) {
@@ -63,18 +51,33 @@ void Decima::ArchiveArray::open(const std::string& _workdir) {
     }
 }
 
-Decima::FileEntry* Decima::ArchiveArray::get_file_entry(const std::string& file_name) {
+std::optional<std::reference_wrapper<Decima::structs::FileEntry>>
+Decima::ArchiveArray::get_file_entry(const std::string& file_name) {
     auto hash = hash_string(sanitize_name(file_name), seed);
     return get_file_entry(hash);
 }
 
-Decima::FileEntry* Decima::ArchiveArray::get_file_entry(uint64_t file_hash) {
+std::optional<std::reference_wrapper<Decima::structs::FileEntry>>
+Decima::ArchiveArray::get_file_entry(uint64_t file_hash) {
     if (hash_to_archive.find(file_hash) != hash_to_archive.end()) {
         uint64_t archive_id = hash_to_archive.at(file_hash);
         auto& archive = archives[archive_id];
-        uint64_t file_id = archive.get_file_id(file_hash);
-        return &archive.content_table[file_id];
+        uint64_t file_id = archive.get_file_index(file_hash);
+        return std::optional<std::reference_wrapper<Decima::structs::FileEntry>>{archive.content_table[file_id]};
+    }
+    return std::nullopt;
+}
+
+std::vector<uint8_t> Decima::ArchiveArray::query_file(uint64_t file_hash) {
+    auto archive_id = hash_to_archive.find(file_hash);
+    if (archive_id != hash_to_archive.end()) {
+        auto& archive = archives[archive_id->second];
+        return std::move(archive.extract_file_data(archive.get_file_index(file_hash)));
     }
     return {};
 }
 
+std::vector<uint8_t> Decima::ArchiveArray::query_file(const std::string& file_name) {
+    uint64_t hash = hash_string(sanitize_name(file_name), seed);
+    return std::move(query_file(hash));
+}

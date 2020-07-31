@@ -97,17 +97,24 @@ void FileTree::draw(SelectionInfo& selection, Decima::ArchiveArray& archive_arra
 
         auto filename = sanitize_name(archive_array.hash_to_name[data.first.hash]);
         auto file_entry = archive_array.get_file_entry(filename);
-        auto size = file_entry->size;
+        if(file_entry.has_value()) {
+            auto size = file_entry.value().get().size;
 
-        ImGui::NextColumn();
-        auto& file_info = data.first.header;
-        if (Decima::known_file_types.find(file_info.filetype) != Decima::known_file_types.end()) {
-            ImGui::Text("%s",Decima::known_file_types.at(file_info.filetype).c_str());
-        } else {
+            ImGui::NextColumn();
+            auto& file_info = data.first.header;
+            if (Decima::known_file_types.find(file_info.filetype) != Decima::known_file_types.end()) {
+                ImGui::Text("%s", Decima::known_file_types.at(file_info.filetype).c_str());
+            } else {
+                ImGui::Text("Unknown");
+            }
+            ImGui::NextColumn();
+            ImGui::Text("%dB", size);
+            ImGui::NextColumn();
+        }else{
             ImGui::Text("Unknown");
+            ImGui::NextColumn();
+            ImGui::Text("ERROR");
+            ImGui::NextColumn();
         }
-        ImGui::NextColumn();
-        ImGui::Text("%dB", size);
-        ImGui::NextColumn();
     }
 }

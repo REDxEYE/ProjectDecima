@@ -30,13 +30,12 @@ namespace Decima {
 
         void read_content_table();
 
-        void get_file_data(uint64_t file_hash, std::vector<uint8_t>& data_out);
+        std::vector<uint8_t> query_file(uint64_t file_hash);
+        std::vector<uint8_t> query_file(const std::string& file_name);
 
-        void get_file_data(const std::string& file_id, std::vector<uint8_t>& data_out);
+        std::optional<std::reference_wrapper<Decima::structs::FileEntry>> get_file_entry(const std::string& file_name);
 
-        FileEntry* get_file_entry(const std::string& file_name);
-
-        FileEntry* get_file_entry(uint64_t file_hash);
+        std::optional<std::reference_wrapper<Decima::structs::FileEntry>> get_file_entry(uint64_t file_hash);
 
         void read_prefetch_file();
     };

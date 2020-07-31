@@ -9,6 +9,37 @@
 #include <fstream>
 
 namespace Decima {
+
+    namespace structs{
+        struct ArchiveHeader {
+            uint32_t magic; //0x20304050
+            uint32_t key;
+            uint64_t file_size;
+            uint64_t data_size;
+            uint64_t content_table_size;
+            uint32_t chunk_table_size;
+            uint32_t max_chunk_size;
+        };
+
+        struct FileEntry {
+            uint32_t entry_num;
+            uint32_t key;
+            uint64_t hash;
+            uint64_t offset;
+            uint32_t size;
+            uint32_t key2;
+        };
+
+        struct ChunkEntry {
+            uint64_t uncompressed_offset; //relative offset once uncompressed
+            uint32_t uncompressed_size;
+            uint32_t key_1;
+            uint64_t compressed_offset;
+            uint32_t compressed_size;
+            uint32_t key_2;
+        };
+    }
+
     class ArchiveArray;
 
     static uint32_t magic = 0x20304050;
@@ -18,41 +49,16 @@ namespace Decima {
     static uint32_t murmur_salt[4] = {0x0FA3A9443, 0x0F41CAB62, 0x0F376811C, 0x0D2A89E3E};
     static uint32_t murmur_salt2[4] = {0x06C084A37, 0x07E159D95, 0x03D5AF7E8, 0x018AA7D3F};
 
-    struct ArchiveHeader {
-        uint32_t magic; //0x20304050
-        uint32_t key;
-        uint64_t file_size;
-        uint64_t data_size;
-        uint64_t content_table_size;
-        uint32_t chunk_table_size;
-        uint32_t max_chunk_size;
-    };
 
-    struct FileEntry {
-        uint32_t entry_num;
-        uint32_t key;
-        uint64_t hash;
-        uint64_t offset;
-        uint32_t size;
-        uint32_t key2;
-    };
-
-    struct ChunkEntry {
-        uint64_t uncompressed_offset; //relative offset once uncompressed
-        uint32_t uncompressed_size;
-        uint32_t key_1;
-        uint64_t compressed_offset;
-        uint32_t compressed_size;
-        uint32_t key_2;
-    };
 
     class Archive {
         std::ifstream filebuffer;
-        std::vector<ChunkEntry> chunk_table;
+        std::vector<structs::ChunkEntry> chunk_table;
+        std::vector<uint64_t> file_hashes;
     public:
-        std::vector<FileEntry> content_table;
+        std::vector<structs::FileEntry> content_table;
         std::string filepath;
-        ArchiveHeader header = {0};
+        structs::ArchiveHeader header = {0};
 
         Archive(const std::string& workdir, const std::string& filename);
 
@@ -68,22 +74,27 @@ namespace Decima {
 
         bool is_valid() const;
 
-        void get_file_data(uint32_t file_id, std::vector<uint8_t>& data_out);
+        std::vector<uint8_t> query_file(uint32_t file_hash);
+        std::vector<uint8_t> query_file(const std::string& file_name);
 
-        void get_file_data(const std::string& file_name, std::vector<uint8_t>& data_out);
 
-        uint64_t get_file_id(uint64_t file_hash) const;
-
-        uint64_t get_file_id(const std::string& file_name) const;
 
     private:
         static void decrypt(uint32_t key_1, uint32_t key_2, uint32_t* data);
 
         uint64_t find_chunk_by_offset(uint64_t offset);
 
-        void get_chunk_data(ChunkEntry& chunk, std::vector<uint8_t>& data);
+        void get_chunk_data(structs::ChunkEntry& chunk, std::vector<uint8_t>& data);
 
         void decrypt_chunk(uint32_t chunk_id, std::vector<uint8_t>& src);
+
+        std::vector<uint8_t> extract_file_data(int32_t file_id);
+
+//        void get_file_data(const std::string& file_name, std::vector<uint8_t>& data_out);
+
+        uint64_t get_file_index(uint64_t file_hash) const;
+
+        uint64_t get_file_index(const std::string& file_name) const;
 
         friend ArchiveArray;
     };

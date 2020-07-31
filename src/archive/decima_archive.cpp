@@ -61,11 +61,13 @@ void Decima::Archive::decrypt(uint32_t key_1, uint32_t key_2, uint32_t* data) {
 
 void Decima::Archive::read_content_table() {
     content_table.resize(header.content_table_size);
+    file_hashes.resize(header.content_table_size);
     bool encrypted = is_encrypted();
     for (uint64_t i = 0; i < header.content_table_size; i++) {
-        filebuffer.read((char*) &content_table.at(i), sizeof(FileEntry));
+        filebuffer.read((char*) &content_table.at(i), sizeof(Decima::structs::FileEntry));
         auto& file_entry = content_table.at(i);
         if (encrypted) decrypt(file_entry.key, file_entry.key2, (uint32_t*) &file_entry);
+        file_hashes.push_back(file_entry.hash);
     }
 }
 
@@ -73,7 +75,7 @@ void Decima::Archive::read_chunk_table() {
     chunk_table.resize(header.chunk_table_size);
     bool encrypted = is_encrypted();
     for (uint64_t i = 0; i < header.chunk_table_size; i++) {
-        filebuffer.read((char*) &chunk_table.at(i), sizeof(ChunkEntry));
+        filebuffer.read((char*) &chunk_table.at(i), sizeof(Decima::structs::ChunkEntry));
         auto& chunk = chunk_table.at(i);
         auto saved_key = chunk.key_1;
         if (encrypted) decrypt(chunk.key_1, chunk.key_2, (uint32_t*) &chunk);
@@ -81,8 +83,8 @@ void Decima::Archive::read_chunk_table() {
     }
 }
 
-void Decima::Archive::get_file_data(uint32_t file_id, std::vector<uint8_t>& data_out) {
-    if (file_id == -1)return;
+std::vector<uint8_t> Decima::Archive::extract_file_data(int32_t file_id) {
+    if (file_id == -1)return {};
     auto& file_entry = content_table.at(file_id);
     uint64_t file_offset = file_entry.offset;
     uint32_t file_size = file_entry.size;
@@ -94,7 +96,7 @@ void Decima::Archive::get_file_data(uint32_t file_id, std::vector<uint8_t>& data
     uint64_t last_chunk_row = find_chunk_by_offset(last_chunk);
     uint64_t max_needed_size = ((last_chunk_row - first_chunk_row) + 1) * header.max_chunk_size;
 
-    std::vector<uint8_t> tmp(max_needed_size);
+    std::vector<uint8_t> out_data(max_needed_size);
 
     uint64_t pos = 0;
     for (uint32_t i = first_chunk_row; i <= last_chunk_row; i++) {
@@ -102,23 +104,24 @@ void Decima::Archive::get_file_data(uint32_t file_id, std::vector<uint8_t>& data
         std::vector<uint8_t> chunk_data;
         get_chunk_data(chunk, chunk_data);
         if (is_encrypted())decrypt_chunk(i, chunk_data);
-        decompress_chunk_data(chunk_data, chunk.uncompressed_size, &tmp.at(pos));
+        decompress_chunk_data(chunk_data, chunk.uncompressed_size, &out_data.at(pos));
         pos += chunk.uncompressed_size;
     }
     uint64_t file_position = file_offset % header.max_chunk_size;
-    data_out.resize(file_size);
-    memcpy(data_out.data(), &tmp.at(file_position), file_size);
+    out_data.erase(out_data.begin(),out_data.begin()+file_position);
+    out_data.erase(out_data.begin()+file_size,out_data.begin()+out_data.size());
+    return std::move(out_data);
 
 }
 
-void Decima::Archive::get_file_data(const std::string& file_name, std::vector<uint8_t>& data_out) {
-    uint64_t id = get_file_id(file_name);
-    if (id != -1) {
-        get_file_data(id, data_out);
-    }
-}
+//void Decima::Archive::get_file_data(const std::string& file_name, std::vector<uint8_t>& data_out) {
+//    uint64_t id = get_file_index(file_name);
+//    if (id != -1) {
+//        extract_file_data(id, data_out);
+//    }
+//}
 
-void Decima::Archive::get_chunk_data(Decima::ChunkEntry& chunk, std::vector<uint8_t>& data) {
+void Decima::Archive::get_chunk_data(Decima::structs::ChunkEntry& chunk, std::vector<uint8_t>& data) {
     uint64_t chunk_offset = chunk.compressed_offset;
     uint64_t chunk_size = chunk.compressed_size;
 
@@ -143,12 +146,12 @@ void Decima::Archive::decrypt_chunk(uint32_t chunk_id, std::vector<uint8_t>& src
     }
 }
 
-uint64_t Decima::Archive::get_file_id(const std::string& file_name) const {
+uint64_t Decima::Archive::get_file_index(const std::string& file_name) const {
     uint64_t hash = hash_string(sanitize_name(file_name), seed);
-    return get_file_id(hash);
+    return get_file_index(hash);
 }
 
-uint64_t Decima::Archive::get_file_id(uint64_t file_hash) const {
+uint64_t Decima::Archive::get_file_index(uint64_t file_hash) const {
     for (uint64_t i = 0; i < content_table.size(); i++) {
         if (content_table[i].hash == file_hash)return i;
     }
@@ -161,5 +164,13 @@ uint64_t Decima::Archive::find_chunk_by_offset(uint64_t offset) {
             return i;
     }
     return -1;
+}
+
+std::vector<uint8_t> Decima::Archive::query_file(uint32_t file_hash) {
+    return std::move(extract_file_data(get_file_index(file_hash)));
+}
+
+std::vector<uint8_t> Decima::Archive::query_file(const std::string& file_name) {
+    return std::move(extract_file_data(get_file_index(file_name)));
 }
 

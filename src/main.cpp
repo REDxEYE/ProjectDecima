@@ -93,11 +93,10 @@ public:
                                     current_root = current_root->add_folder(*it);
 
                                 if (archive_array.hash_to_archive.find(hash) != archive_array.hash_to_archive.end()) {
-                                    std::vector<uint8_t> tmp_vector;
-                                    archive_array.get_file_data(hash, tmp_vector);
+                                    std::vector<uint8_t> tmp_vector = archive_array.query_file(hash);
                                     Decima::CoreHeader header{0};
                                     if (!tmp_vector.empty()) memcpy(&header, tmp_vector.data(), sizeof(header));
-                                    current_root->add_file(split_path.back(), hash,header);
+                                    current_root->add_file(split_path.back(), hash, header);
                                 }
                             }
                         }
@@ -160,8 +159,8 @@ public:
                         fs::path full_path = fs::path(base_folder) / filename;
                         fs::create_directories(full_path.parent_path());
 
-                        std::vector<std::uint8_t> file_data;
-                        archive_array.get_file_data(filename, file_data);
+                        std::vector<std::uint8_t> file_data = archive_array.query_file(filename);
+
 
                         std::ofstream output_file{full_path, std::ios::trunc};
                         output_file.write(reinterpret_cast<const char*>(file_data.data()), file_data.size());
@@ -229,40 +228,45 @@ public:
             {
                 if (selection_info.selected_file > 0) {
                     const auto filename = sanitize_name(archive_array.hash_to_name.at(selection_info.selected_file));
-                    const auto file_entry = archive_array.get_file_entry(filename);
+                    const auto file_entry_opt = archive_array.get_file_entry(filename);
 
-                    ImGui::Text("%s", filename.c_str());
+                    if (file_entry_opt.has_value()) {
+                        const auto& file_entry = file_entry_opt.value().get();
+                        ImGui::Text("%s", filename.c_str());
 
-                    ImGui::Columns(2);
-                    ImGui::Separator();
-                    ImGui::Text("Size");
-                    ImGui::NextColumn();
-                    ImGui::Text("%u bytes", file_entry->size);
-                    ImGui::Separator();
-                    ImGui::NextColumn();
-                    ImGui::Text("Hash");
-                    ImGui::NextColumn();
-                    ImGui::Text("%llX", file_entry->hash);
-                    ImGui::Separator();
-                    ImGui::NextColumn();
-                    ImGui::Text("Entry ID");
-                    ImGui::NextColumn();
-                    ImGui::Text("%u", file_entry->entry_num);
-                    ImGui::Separator();
-                    ImGui::NextColumn();
-                    ImGui::Text("Offset");
-                    ImGui::NextColumn();
-                    ImGui::Text("%llu", file_entry->offset);
-                    ImGui::Separator();
-                    ImGui::NextColumn();
-                    ImGui::Separator();
-                    ImGui::Columns(1);
+                        ImGui::Columns(2);
+                        ImGui::Separator();
+                        ImGui::Text("Size");
+                        ImGui::NextColumn();
+                        ImGui::Text("%u bytes", file_entry.size);
+                        ImGui::Separator();
+                        ImGui::NextColumn();
+                        ImGui::Text("Hash");
+                        ImGui::NextColumn();
+                        ImGui::Text("%llX", file_entry.hash);
+                        ImGui::Separator();
+                        ImGui::NextColumn();
+                        ImGui::Text("Entry ID");
+                        ImGui::NextColumn();
+                        ImGui::Text("%u", file_entry.entry_num);
+                        ImGui::Separator();
+                        ImGui::NextColumn();
+                        ImGui::Text("Offset");
+                        ImGui::NextColumn();
+                        ImGui::Text("%llu", file_entry.offset);
+                        ImGui::Separator();
+                        ImGui::NextColumn();
+                        ImGui::Separator();
+                        ImGui::Columns(1);
 
-                    if (selection_info.preview_file != selection_info.selected_file) {
-                        selection_info.preview_file = selection_info.selected_file;
-                        archive_array.get_file_data(filename, selection_info.file_data);
+                        if (selection_info.preview_file != selection_info.selected_file) {
+                            selection_info.preview_file = selection_info.selected_file;
+                            selection_info.file_data = archive_array.query_file(filename);
+                        }
+                        file_viewer.DrawContents(selection_info.file_data.data(), selection_info.file_data.size());
+                    }else{
+                        ImGui::Text("Error getting file info1");
                     }
-                    file_viewer.DrawContents(selection_info.file_data.data(), selection_info.file_data.size());
                 } else {
                     ImGui::Text("No file selected");
                 }
