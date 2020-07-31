@@ -26,7 +26,7 @@ namespace Decima {
 
         Prefetch() = default;
 
-        void parse(MemoryStream& buffer) override ;
+        void parse(std::istream& buffer) override ;
         void parse(std::vector<uint8_t>& buffer) override ;
 
     };

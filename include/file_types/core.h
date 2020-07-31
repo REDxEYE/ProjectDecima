@@ -6,6 +6,7 @@
 #define PROJECTDS_CORE_H
 
 #include <cstdint>
+#include <fstream>
 #include "file_types/shared.hpp"
 #include "memory_stream.h"
 
@@ -15,8 +16,9 @@ namespace Decima {
 
     class CoreFile {
         CoreHeader header = {};
+        uint64_t guid[2]={0,0};
     public:
-        virtual void parse(MemoryStream& buffer);
+        virtual void parse(std::istream& buffer);
 
         virtual void parse(std::vector<uint8_t>& buffer);
 

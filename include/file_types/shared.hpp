@@ -11,7 +11,7 @@
 namespace Decima {
 
     static std::unordered_map<uint64_t, std::string> known_file_types = {
-            {0x382BFD694D1664A6, "Texture"}
+            {0xA664164D69FD2B38, "Texture"}
     };
 
     struct __attribute__((packed)) CoreHeader {
