@@ -3,7 +3,7 @@
 //
 
 #include <file_types/prefetch.h>
-#include "archive/decima_archive.h"
+#include "decima_archive.h"
 #include <utils.h>
 
 

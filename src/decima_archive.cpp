@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include <filesystem>
-#include "archive/decima_archive.h"
+#include "decima_archive.h"
 #include "utils.h"
 #include "MurmurHash3.h"
 #include <windows.h>

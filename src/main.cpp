@@ -16,7 +16,7 @@
 #include <iostream>
 
 
-#include "archive/decima_archive.h"
+#include "decima_archive.h"
 #include "archive_array.h"
 #include "file_tree.h"
 #include "imgui_memory_editor.h"
