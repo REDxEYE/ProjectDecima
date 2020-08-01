@@ -15,7 +15,6 @@
 #include <filesystem>
 #include <iostream>
 
-
 #include "decima_archive.h"
 #include "archive_array.h"
 #include "file_tree.h"
@@ -37,7 +36,9 @@ class MainLayer : public omc::layer {
 
 public:
     explicit MainLayer(omc::application* app)
-        : layer(app) {};
+        : layer(app) {
+        file_viewer.ReadOnly = true;
+    }
 
     void on_attach() override {
         layer::on_attach();
@@ -80,7 +81,7 @@ public:
                             file_names.clear();
                             file_names.reserve(archive_array.hash_to_name.size());
 
-                            for (auto&[hash, path] : archive_array.hash_to_name) {
+                            for (auto& [hash, path] : archive_array.hash_to_name) {
                                 file_names.push_back(path.c_str());
                                 auto* current_root = &root_tree;
 
@@ -91,11 +92,11 @@ public:
                                     current_root = current_root->add_folder(*it);
 
                                 if (archive_array.hash_to_archive.find(hash) != archive_array.hash_to_archive.end()) {
-//                                    std::vector<uint8_t> tmp_vector = archive_array.query_file(hash);
-                                    Decima::CoreHeader header{0};
-//                                    if (!tmp_vector.empty()) memcpy(&header, tmp_vector.data(), sizeof(header));
+                                    //                                    std::vector<uint8_t> tmp_vector = archive_array.query_file(hash);
+                                    Decima::CoreHeader header { 0 };
+                                    //                                    if (!tmp_vector.empty()) memcpy(&header, tmp_vector.data(), sizeof(header));
                                     current_root->add_file(split_path.back(), hash, header);
-//                                    tmp_vector.clear();
+                                    //                                    tmp_vector.clear();
                                 }
                             }
                         }
@@ -159,7 +160,6 @@ public:
                         fs::create_directories(full_path.parent_path());
 
                         std::vector<std::uint8_t> file_data = archive_array.query_file(filename);
-
 
                         std::ofstream output_file { full_path, std::ios::trunc };
                         output_file.write(reinterpret_cast<const char*>(file_data.data()), file_data.size());
@@ -263,7 +263,7 @@ public:
                             selection_info.file_data = archive_array.query_file(filename);
                         }
                         file_viewer.DrawContents(selection_info.file_data.data(), selection_info.file_data.size());
-                    }else{
+                    } else {
                         ImGui::Text("Error getting file info!");
                     }
                 } else {
