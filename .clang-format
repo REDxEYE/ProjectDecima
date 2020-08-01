@@ -106,8 +106,8 @@ PenaltyExcessCharacter: 1000000
 PenaltyReturnTypeOnItsOwnLine: 60
 PointerAlignment: Left
 ReflowComments:  true
-SortIncludes:    true
-SortUsingDeclarations: true
+SortIncludes:    false
+SortUsingDeclarations: false
 SpaceAfterCStyleCast: false
 SpaceAfterLogicalNot: false
 SpaceAfterTemplateKeyword: true
