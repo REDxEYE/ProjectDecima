@@ -24,7 +24,6 @@ AlwaysBreakBeforeMultilineStrings: false
 AlwaysBreakTemplateDeclarations: MultiLine
 BinPackArguments: true
 BinPackParameters: true
-BreakBeforeBraces: 'Custom'
 BraceWrapping:
   AfterCaseLabel:  false
   AfterClass:      false
@@ -43,7 +42,7 @@ BraceWrapping:
   SplitEmptyRecord: true
   SplitEmptyNamespace: true
 BreakBeforeBinaryOperators: All
-#BreakBeforeBraces: Stroustrup
+BreakBeforeBraces: 'Custom'
 BreakBeforeInheritanceComma: false
 BreakInheritanceList: BeforeColon
 BreakBeforeTernaryOperators: true

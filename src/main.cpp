@@ -37,7 +37,10 @@ class MainLayer : public omc::layer {
 public:
     explicit MainLayer(omc::application* app)
         : layer(app) {
-        file_viewer.ReadOnly = true;
+        file_viewer.WriteFn = [](auto, auto, auto) {
+            /* Dummy write function because
+             * ReadOnly forbids any selection. */
+        };
     }
 
     void on_attach() override {
@@ -91,13 +94,8 @@ public:
                                 for (auto it = split_path.cbegin(); it != split_path.end() - 1; it++)
                                     current_root = current_root->add_folder(*it);
 
-                                if (archive_array.hash_to_archive.find(hash) != archive_array.hash_to_archive.end()) {
-                                    //                                    std::vector<uint8_t> tmp_vector = archive_array.query_file(hash);
-                                    Decima::CoreHeader header { 0 };
-                                    //                                    if (!tmp_vector.empty()) memcpy(&header, tmp_vector.data(), sizeof(header));
-                                    current_root->add_file(split_path.back(), hash, header);
-                                    //                                    tmp_vector.clear();
-                                }
+                                if (archive_array.hash_to_archive.find(hash) != archive_array.hash_to_archive.end())
+                                    current_root->add_file(split_path.back(), hash, { 0 });
                             }
                         }
                     }
@@ -152,12 +150,10 @@ public:
 
                 if (!base_folder.empty()) {
                     for (const auto selected_file : selection_info.selected_files) {
-                        namespace fs = std::filesystem;
-
                         const auto filename = sanitize_name(archive_array.hash_to_name.at(selected_file));
 
-                        fs::path full_path = fs::path(base_folder) / filename;
-                        fs::create_directories(full_path.parent_path());
+                        std::filesystem::path full_path = std::filesystem::path(base_folder) / filename;
+                        std::filesystem::create_directories(full_path.parent_path());
 
                         std::vector<std::uint8_t> file_data = archive_array.query_file(filename);
 
