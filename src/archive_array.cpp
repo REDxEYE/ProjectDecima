@@ -2,26 +2,16 @@
 // Created by MED45 on 26.07.2020.
 //
 
-#include "archive_array.h"
-
-#include <utility>
 #include <filesystem>
 #include <iostream>
 #include <optional>
-#include <utils.h>
+
+#include "utils.h"
+#include "archive_array.h"
 
 Decima::ArchiveArray::ArchiveArray(const std::string& _workdir) {
     open(_workdir);
 }
-
-//void Decima::ArchiveArray::read_content_table() {
-//
-//    for (auto& archive:archives) {
-//        archive.read_content_table();
-//        archive.read_chunk_table();
-//
-//    }
-//}
 
 void Decima::ArchiveArray::read_prefetch_file() {
     std::vector<uint8_t> prefetch_data = query_file("prefetch/fullgame.prefetch");

@@ -2,14 +2,14 @@
 // Created by MED45 on 25.07.2020.
 //
 
-#ifndef PROJECTDS_DECIMA_ARCHIVE_H
-#define PROJECTDS_DECIMA_ARCHIVE_H
+#ifndef PROJECTDS_ARCHIVE_H
+#define PROJECTDS_ARCHIVE_H
 
-#include "constatns.hpp"
-
-#include "mio.hpp"
 #include <vector>
 #include <fstream>
+
+#include "mio.hpp"
+#include "constatns.hpp"
 
 namespace Decima {
 
@@ -45,8 +45,6 @@ namespace Decima {
 
     class ArchiveArray;
 
-
-
     class Archive {
         mio::mmap_source filebuffer;
         std::vector<structs::ChunkEntry> chunk_table;
@@ -62,9 +60,9 @@ namespace Decima {
 
         bool open();
 
-        bool is_encrypted() const;
+        [[nodiscard]] bool is_encrypted() const;
 
-        bool is_valid() const;
+        [[nodiscard]] bool is_valid() const;
 
         std::vector<uint8_t> query_file(uint32_t file_hash);
         std::vector<uint8_t> query_file(const std::string& file_name);
@@ -80,14 +78,12 @@ namespace Decima {
 
         std::vector<uint8_t> extract_file_data(int32_t file_id);
 
-        //        void get_file_data(const std::string& file_name, std::vector<uint8_t>& data_out);
+        [[nodiscard]] uint64_t get_file_index(uint64_t file_hash) const;
 
-        uint64_t get_file_index(uint64_t file_hash) const;
-
-        uint64_t get_file_index(const std::string& file_name) const;
+        [[nodiscard]] uint64_t get_file_index(const std::string& file_name) const;
 
         friend ArchiveArray;
     };
 
 };
-#endif //PROJECTDS_DECIMA_ARCHIVE_H
+#endif //PROJECTDS_ARCHIVE_H

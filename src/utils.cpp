@@ -1,9 +1,10 @@
 //
 // Created by MED45 on 26.07.2020.
 //
+#include <filesystem>
+
 #include "utils.h"
 
-#include <filesystem>
 
 std::string uint64_to_hex(uint64_t value) {
     char hash[32];

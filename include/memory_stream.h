@@ -22,7 +22,6 @@ public:
     std::istream as_stream() {
         return std::istream(this);
     }
-
 };
 
 #endif //PROJECTDS_MEMORY_STREAM_H

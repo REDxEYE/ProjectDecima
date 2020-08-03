@@ -7,21 +7,25 @@
 
 #include <cstdint>
 #include <fstream>
+
 #include "file_types/shared.hpp"
 #include "memory_stream.h"
 
 namespace Decima {
 
-
+    struct __attribute__((packed)) CoreHeader {
+        std::uint64_t filetype;
+        std::uint32_t file_size;
+    };
 
     class CoreFile {
         CoreHeader header = {};
-        uint64_t guid[2]={0,0};
+        uint64_t guid[2] = { 0, 0 };
+
     public:
         virtual void parse(std::istream& buffer);
 
         virtual void parse(std::vector<uint8_t>& buffer);
-
     };
 }
 

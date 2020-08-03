@@ -6,8 +6,9 @@
 #define PROJECTDS_ARCHIVE_ARRAY_H
 
 #include <unordered_map>
+
 #include "file_types/prefetch.h"
-#include "decima_archive.h"
+#include "archive.h"
 
 namespace Decima {
     class ArchiveArray {

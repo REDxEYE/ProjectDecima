@@ -2,11 +2,13 @@
 // Created by MED45 on 25.07.2020.
 //
 
-#include "decima_archive.h"
-#include "MurmurHash3.h"
-#include "utils.h"
-#include <filesystem>
 #include <iostream>
+#include <filesystem>
+
+#include "archive.h"
+#include "utils.h"
+
+#include <MurmurHash3.h>
 #include <md5.h>
 
 template <class T>
@@ -68,8 +70,8 @@ bool Decima::Archive::is_encrypted() const {
 
 void Decima::Archive::decrypt(uint32_t key_1, uint32_t key_2, uint32_t* data) {
     const uint32_t inputKey[2][4] = {
-        { key_1, murmur_salt[1], murmur_salt[2], murmur_salt[3] },
-        { key_2, murmur_salt[1], murmur_salt[2], murmur_salt[3] }
+        { key_1, enctryption_key_1[1], enctryption_key_1[2], enctryption_key_1[3] },
+        { key_2, enctryption_key_1[1], enctryption_key_1[2], enctryption_key_1[3] }
     };
 
     uint32_t iv[4];
@@ -135,7 +137,7 @@ void Decima::Archive::decrypt_chunk(uint32_t chunk_id, std::vector<uint8_t>& src
     MurmurHash3_x64_128(&chunk_table[chunk_id].uncompressed_offset, 0x10, seed, iv);
 
     for (int i = 0; i < 4; i++) {
-        iv[i] ^= murmur_salt2[i];
+        iv[i] ^= enctryption_key_2[i];
     }
 
     uint8_t digest[16];

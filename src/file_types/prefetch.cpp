@@ -3,9 +3,6 @@
 //
 
 #include <file_types/prefetch.h>
-#include "decima_archive.h"
-#include <utils.h>
-
 
 void Decima::Prefetch::parse(std::istream& buffer) {
     CoreFile::parse(buffer);
@@ -17,7 +14,6 @@ void Decima::Prefetch::parse(std::istream& buffer) {
         buffer.read(reinterpret_cast<char*>(&string.size), 8);
         string.string.resize(string.size);
         buffer.read(string.string.data(), strings[i].size);
-
     }
 
     buffer.read(reinterpret_cast<char*>(&file_sizes_count), sizeof(file_sizes_count));
@@ -27,11 +23,8 @@ void Decima::Prefetch::parse(std::istream& buffer) {
     buffer.read(reinterpret_cast<char*>(&indices_count), sizeof(indices_count));
     indices.resize(indices_count);
     buffer.read(reinterpret_cast<char*>(indices.data()), 4 * indices_count);
-
-
 }
 
 void Decima::Prefetch::parse(std::vector<uint8_t>& buffer) {
     CoreFile::parse(buffer);
 }
-

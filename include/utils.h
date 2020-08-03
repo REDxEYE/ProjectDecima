@@ -5,11 +5,12 @@
 #ifndef PROJECTDS_UTILS_H
 #define PROJECTDS_UTILS_H
 
-#include <MurmurHash3.h>
-#include <Kraken.h>
 #include <string>
 #include <vector>
 #include <sstream>
+
+#include <Kraken.h>
+#include <MurmurHash3.h>
 
 std::string uint64_to_hex(uint64_t value);
 

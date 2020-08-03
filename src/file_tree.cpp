@@ -2,10 +2,12 @@
 // Created by MED45 on 27.07.2020.
 //
 
-#include "file_tree.h"
-#include "imgui.h"
-#include "utils.h"
 #include <filesystem>
+
+#include "file_tree.h"
+
+#include <imgui.h>
+#include "utils.h"
 
 FileTree* FileTree::add_folder(const std::string& name) {
     if (folders.find(name) == folders.end())
