@@ -9,7 +9,7 @@
 #include <fstream>
 
 #include "mio.hpp"
-#include "constatns.hpp"
+#include "constant.hpp"
 
 namespace Decima {
 

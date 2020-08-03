@@ -118,7 +118,6 @@ public:
 
                     std::cout << "File was saved to: " << full_path << "\n";
                 }
-                std::flush(std::cout);
             }
 
             ImGui::Separator();

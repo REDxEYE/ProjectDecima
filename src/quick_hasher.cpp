@@ -8,7 +8,7 @@
 #include <iomanip>
 
 #include "utils.h"
-#include "constatns.hpp"
+#include "constant.hpp"
 #include "MurmurHash3.h"
 #include "md5.h"
 
