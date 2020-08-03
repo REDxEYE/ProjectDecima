@@ -59,11 +59,11 @@ bool Decima::Archive::open() {
 }
 
 bool Decima::Archive::is_valid() const {
-    return (header.magic == magic || header.magic == encrypted_magic);
+    return (header.version == Decima::Version::default_version || header.version == Decima::Version::encrypted_version);
 }
 
 bool Decima::Archive::is_encrypted() const {
-    return header.magic == encrypted_magic;
+    return header.version == Decima::Version::encrypted_version;
 }
 
 void Decima::Archive::decrypt(uint32_t key_1, uint32_t key_2, uint32_t* data) {

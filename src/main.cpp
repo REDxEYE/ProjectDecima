@@ -136,14 +136,12 @@ public:
 
             ImGui::Separator();
 
-            if (ImGui::Button("Dump by name")) {
+            if (ImGui::Button("Dump by name")) ImGui::OpenPopup("By name");
 
-                ImGui::OpenPopup("By name");
-            }
             if (ImGui::BeginPopup("By name")) {
                 char path[512];
-                ImGui::InputText("File name",path,IM_ARRAYSIZE(path));
-                if(ImGui::Button("Extract!")){
+                ImGui::InputText("File name", path, IM_ARRAYSIZE(path));
+                if (ImGui::Button("Extract!")) {
                     const auto base_folder = pfd::select_folder("Choose destination folder").result();
                     std::filesystem::path full_path = std::filesystem::path(base_folder) / path;
                     std::filesystem::create_directories(full_path.parent_path());
