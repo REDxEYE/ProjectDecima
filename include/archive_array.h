@@ -29,7 +29,7 @@ namespace Decima {
 
         void open(const std::string& _workdir);
 
-
+        //TODO: replace std::vector<uint8_t> with Decima::File
         std::vector<uint8_t> query_file(uint64_t file_hash);
         std::vector<uint8_t> query_file(const std::string& file_name);
 

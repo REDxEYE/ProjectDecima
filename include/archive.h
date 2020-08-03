@@ -10,6 +10,7 @@
 
 #include "mio.hpp"
 #include "constant.hpp"
+#include "archive_file.h"
 
 namespace Decima {
 
@@ -64,6 +65,8 @@ namespace Decima {
 
         [[nodiscard]] bool is_valid() const;
 
+
+        //TODO: replace std::vector<uint8_t> with Decima::File
         std::vector<uint8_t> query_file(uint32_t file_hash);
         std::vector<uint8_t> query_file(const std::string& file_name);
 
