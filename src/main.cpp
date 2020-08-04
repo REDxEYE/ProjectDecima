@@ -316,9 +316,9 @@ public:
 };
 
 int main() {
-    auto app = std::make_shared<omc::application>("Death Standing explorer", 1280, 720, true);
+    auto app =omc::application("Death Standing explorer", 1280, 720, true);
+    MainLayer main_layer(&app);
+    app.push_layer(&main_layer);
 
-    app->push_layer(std::make_shared<MainLayer>(app.get()));
-
-    app->run();
+    app.run();
 }
