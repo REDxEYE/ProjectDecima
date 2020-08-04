@@ -104,7 +104,7 @@ public:
             ImGui::End();
 
             ImGui::Begin("Test");
-            if (ImGui::Button("Dump tree of files")) {
+            if (ImGui::Button("Dump all files` paths as a tree")) {
                 const auto full_path = pfd::save_file("Choose destination file").result();
 
                 if (!full_path.empty()) {
@@ -116,29 +116,35 @@ public:
                         output_file << '\n';
                     });
 
-                    std::cout << "File was saved to: " << full_path << "\n";
+                    std::cout << "File was saved to: " << full_path << '\n';
                 }
             }
 
-            ImGui::Separator();
-            if (ImGui::Button("Dump all hashes")) {
-                std::string output_file = pfd::save_file("Hash dump").result();
-                std::ofstream dump(output_file);
-                dump << "HASH DUMP" << std::endl
-                     << std::endl;
-                for (auto& archive : archive_array.archives) {
-                    dump << "ARCHIVE: " << archive.filepath << std::endl;
-                    for (auto& file_entry : archive.content_table) {
-                        if (archive_array.hash_to_name.find(file_entry.hash) != archive_array.hash_to_name.end()) {
-                            dump << "\tNAME: " << archive_array.hash_to_name.at(file_entry.hash) << std::endl;
+            if (ImGui::Button("Dump all files` hashes")) {
+                const auto full_path = pfd::save_file("Choose destination file").result();
+
+                if (!full_path.empty()) {
+                    std::ofstream output_file { full_path };
+
+                    for (const auto& archive : archive_array.archives) {
+                        output_file << archive.filepath << '\n';
+
+                        for (const auto& entry : archive.content_table) {
+                            const auto name = archive_array.hash_to_name.find(entry.hash);
+
+                            if (name != archive_array.hash_to_name.end())
+                                output_file << "  name: '" << name->second << "'\n";
+
+                            output_file << "  hash: '" << entry.hash << "'\n";
+                            output_file << "  size: '" << entry.size << "'\n";
+                            output_file << '\n';
                         }
-                        dump << "\tHASH: " << file_entry.hash << std::endl;
-                        dump << "\tSIZE: " << file_entry.size << std::endl;
-                        dump << std::endl
-                             << std::endl;
                     }
+
+                    std::cout << "File was saved to: " << full_path << '\n';
                 }
             }
+
             ImGui::Separator();
 
             if (ImGui::Button("Dump by name"))
