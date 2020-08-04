@@ -10,50 +10,23 @@
 
 #include "mio.hpp"
 #include "constant.hpp"
+#include "archive_structs.hpp"
 #include "archive_file.h"
 
 namespace Decima {
 
-    namespace structs {
-        struct ArchiveHeader {
-            Version version; //0x20304050
-            uint32_t key;
-            uint64_t file_size;
-            uint64_t data_size;
-            uint64_t content_table_size;
-            uint32_t chunk_table_size;
-            uint32_t max_chunk_size;
-        };
 
-        struct FileEntry {
-            uint32_t entry_num;
-            uint32_t key;
-            uint64_t hash;
-            uint64_t offset;
-            uint32_t size;
-            uint32_t key2;
-        };
-
-        struct ChunkEntry {
-            uint64_t uncompressed_offset; //relative offset once uncompressed
-            uint32_t uncompressed_size;
-            uint32_t key_1;
-            uint64_t compressed_offset;
-            uint32_t compressed_size;
-            uint32_t key_2;
-        };
-    }
 
     class ArchiveArray;
 
     class Archive {
         mio::mmap_source filebuffer;
-        std::vector<structs::ChunkEntry> chunk_table;
+        std::vector<Decima::ChunkEntry> chunk_table;
 
     public:
-        std::vector<structs::FileEntry> content_table;
+        std::vector<Decima::FileEntry> content_table;
         std::string filepath;
-        structs::ArchiveHeader header = {};
+        Decima::ArchiveHeader header = {};
 
         Archive(const std::string& workdir, const std::string& filename);
 
@@ -67,19 +40,19 @@ namespace Decima {
 
 
         //TODO: replace std::vector<uint8_t> with Decima::File
-        std::vector<uint8_t> query_file(uint32_t file_hash);
-        std::vector<uint8_t> query_file(const std::string& file_name);
+        Decima::CompressedFile query_file(uint32_t file_hash);
+        Decima::CompressedFile query_file(const std::string& file_name);
 
     private:
         static void decrypt(uint32_t key_1, uint32_t key_2, uint32_t* data);
 
-        uint64_t find_chunk_by_offset(uint64_t offset);
+        uint64_t chunk_id_by_offset(uint64_t offset);
 
-        std::vector<uint8_t> get_chunk_data(const structs::ChunkEntry& chunk);
+        std::vector<uint8_t> get_chunk_data(const Decima::ChunkEntry& chunk);
 
         void decrypt_chunk(uint32_t chunk_id, std::vector<uint8_t>& src);
 
-        std::vector<uint8_t> extract_file_data(int32_t file_id);
+        std::pair<ChunkEntry*, ChunkEntry*> get_mio_boundaries(int32_t file_id);
 
         [[nodiscard]] uint64_t get_file_index(uint64_t file_hash) const;
 
@@ -87,6 +60,7 @@ namespace Decima {
 
         friend ArchiveArray;
     };
+
 
 };
 #endif //PROJECTDS_ARCHIVE_H

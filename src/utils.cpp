@@ -33,6 +33,11 @@ bool decompress_chunk_data(const std::vector<uint8_t>& data, uint64_t decompress
     return res != -1;
 }
 
+bool decompress_chunk_data(const uint8_t* data, uint64_t data_size, uint64_t decompressed_size, uint8_t* output) {
+    int res = Kraken_Decompress(data, data_size, output, decompressed_size);
+    return res != -1;
+}
+
 
 //TODO:
 std::string sanitize_name(const std::string& filename) {

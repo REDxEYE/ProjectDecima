@@ -104,10 +104,11 @@ void FileTree::draw(SelectionInfo& selection, Decima::ArchiveArray& archive_arra
 
             if (data.first.header.filetype == 0) {
                 auto file_data = archive_array.query_file(data.first.hash);
-                if (file_data.empty()) {
+                if (!file_data.is_valid()) {
                     data.first.header.filetype=-1;
                 } else {
-                    memcpy(&data.first.header,file_data.data(),sizeof(Decima::CoreHeader));
+                    file_data.unpack(0);
+                    memcpy(&data.first.header,file_data.storage.data(),sizeof(Decima::CoreHeader));
                 }
             }
 

@@ -15,12 +15,13 @@
 
 #include "archive_array.h"
 #include "file_types/core.h"
+#include "archive_file.h"
 
 struct SelectionInfo {
     std::uint64_t preview_file { 0 };
     std::uint64_t selected_file { 0 };
     std::unordered_set<std::uint64_t> selected_files;
-    std::vector<std::uint8_t> file_data;
+    Decima::CompressedFile file;
 };
 
 struct FileInfo {

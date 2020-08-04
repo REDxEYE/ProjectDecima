@@ -29,7 +29,7 @@ add_executable(ProjectDS
         src/file_types/prefetch.cpp
         src/memory_stream.cpp
         src/file_tree.cpp
-        src/file_types/core.cpp)
+        src/file_types/core.cpp src/archive_file.cpp)
 
 add_executable(Quick_hash
         src/quick_hasher.cpp

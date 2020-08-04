@@ -6,19 +6,33 @@
 #define PROJECTDS_ARCHIVE_FILE_H
 
 #include <cstdint>
+#include <vector>
+
+#include "archive_structs.hpp"
+#include "mio.hpp"
 
 namespace Decima {
-    class File {
-    public:
-        std::uint8_t* mio_start;
-        std::uint8_t* mio_end;
-        std::uint64_t hash;
-        std::uint32_t size;
 
-        std::vector<std::uint8_t> unpack(uint32_t size); //TODO: size min = find minimal size
+    class CompressedFile {
+    public:
+
+        CompressedFile(FileEntry* file_entry_, mio::mmap_source* filebuffer_);
+
+        CompressedFile() = default;
+
+        std::pair<ChunkEntry*, ChunkEntry*> chunk_range = {nullptr, nullptr};
+        FileEntry* file_entry = nullptr;
+        mio::mmap_source* filebuffer = nullptr;
+
+        std::vector<uint8_t> storage;
+
+        [[nodiscard]] inline bool is_valid() const { return file_entry != nullptr; };
+        void unpack(uint32_t size); //TODO: size min = find minimal size
     private:
-        std::vector<std::uint8_t> decrypt(uint32_t size); //TODO: size = any
+        void decrypt(uint32_t size); //TODO: size = any
+
     };
+
 }
 
 #endif //PROJECTDS_ARCHIVE_FILE_H

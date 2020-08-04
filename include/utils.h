@@ -24,6 +24,8 @@ uint64_t calculate_last_containing_chunk(uint64_t file_offset, int32_t file_size
 
 bool decompress_chunk_data(const std::vector<uint8_t>& data, uint64_t decompressed_size, uint8_t* output);
 
+bool decompress_chunk_data(const uint8_t* data, uint64_t data_size, uint64_t decompressed_size, uint8_t* output);
+
 void split(const std::string& str, std::vector<std::string>& cont, char delim);
 
 #endif //PROJECTDS_UTILS_H

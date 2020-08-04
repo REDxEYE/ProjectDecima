@@ -8,15 +8,16 @@
 
 #include "utils.h"
 #include "archive_array.h"
+#include "archive.h"
 
 Decima::ArchiveArray::ArchiveArray(const std::string& _workdir) {
     open(_workdir);
 }
 
 void Decima::ArchiveArray::read_prefetch_file() {
-    std::vector<uint8_t> prefetch_data = query_file("prefetch/fullgame.prefetch");
-
-    prefetch.parse(prefetch_data);
+    auto prefetch_data = query_file("prefetch/fullgame.prefetch");
+    prefetch_data.unpack(0);
+    prefetch.parse(prefetch_data.storage);
 
     for (auto& string : prefetch.strings) {
         uint64_t hash = hash_string(sanitize_name(string.string), seed);
@@ -41,33 +42,33 @@ void Decima::ArchiveArray::open(const std::string& _workdir) {
     read_prefetch_file();
 }
 
-std::optional<std::reference_wrapper<Decima::structs::FileEntry>>
+std::optional<std::reference_wrapper<Decima::FileEntry>>
 Decima::ArchiveArray::get_file_entry(const std::string& file_name) {
     uint64_t hash = hash_string(sanitize_name(file_name), seed);
     return get_file_entry(hash);
 }
 
-std::optional<std::reference_wrapper<Decima::structs::FileEntry>>
+std::optional<std::reference_wrapper<Decima::FileEntry>>
 Decima::ArchiveArray::get_file_entry(uint64_t file_hash) {
     if (hash_to_archive.find(file_hash) != hash_to_archive.end()) {
         uint64_t archive_id = hash_to_archive.at(file_hash);
         auto& archive = archives[archive_id];
         uint64_t file_id = archive.get_file_index(file_hash);
-        return std::optional<std::reference_wrapper<Decima::structs::FileEntry>> { archive.content_table[file_id] };
+        return std::optional<std::reference_wrapper<FileEntry>> {archive.content_table[file_id] };
     }
     return std::nullopt;
 }
 
-std::vector<uint8_t> Decima::ArchiveArray::query_file(uint64_t file_hash) {
+Decima::CompressedFile Decima::ArchiveArray::query_file(uint64_t file_hash) {
     auto archive_id = hash_to_archive.find(file_hash);
     if (archive_id != hash_to_archive.end()) {
         auto& archive = archives[archive_id->second];
-        return std::move(archive.extract_file_data(archive.get_file_index(file_hash)));
+        return std::move(archive.query_file(file_hash));
     }
-    return {};
+    return Decima::CompressedFile(nullptr, nullptr);
 }
 
-std::vector<uint8_t> Decima::ArchiveArray::query_file(const std::string& file_name) {
+Decima::CompressedFile Decima::ArchiveArray::query_file(const std::string& file_name) {
     uint64_t hash = hash_string(sanitize_name(file_name), seed);
     return std::move(query_file(hash));
 }
