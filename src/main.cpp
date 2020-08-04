@@ -271,7 +271,14 @@ public:
 
                     if (file_entry_opt.has_value()) {
                         const auto& file_entry = file_entry_opt.value().get();
-                        ImGui::Text("%s", filename.c_str());
+                        ImGui::TextWrapped("%s", filename.c_str());
+
+                        if (ImGui::BeginPopupContextItem("File preview name")) {
+                            if (ImGui::Selectable("Copy path"))
+                                ImGui::SetClipboardText(filename.c_str());
+
+                            ImGui::EndPopup();
+                        }
 
                         ImGui::Columns(2);
                         ImGui::Separator();
