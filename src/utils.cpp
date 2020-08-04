@@ -42,6 +42,7 @@ bool decompress_chunk_data(const uint8_t* data, uint64_t data_size, uint64_t dec
 //TODO:
 std::string sanitize_name(const std::string& filename) {
     std::filesystem::path tmp(filename);
+    if (tmp.extension() ==".stream"){return filename;}
     if (tmp.extension() != ".core") { return filename + ".core"; }
     return std::string(filename);
 }

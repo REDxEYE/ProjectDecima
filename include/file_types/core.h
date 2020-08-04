@@ -7,9 +7,10 @@
 
 #include <cstdint>
 #include <fstream>
+#include <vector>
 
 #include "file_types/shared.hpp"
-#include "memory_stream.h"
+
 
 namespace Decima {
 
@@ -19,11 +20,11 @@ namespace Decima {
     };
 
     class CoreFile {
+    protected:
         CoreHeader header = {};
         uint64_t guid[2] = { 0, 0 };
 
     public:
-        virtual void parse(std::istream& buffer);
 
         virtual void parse(std::vector<uint8_t>& buffer);
     };

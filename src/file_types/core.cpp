@@ -6,14 +6,9 @@
 
 namespace Decima {
 
-    void CoreFile::parse(std::istream& buffer) {
-        buffer.read(reinterpret_cast<char*>(&header), sizeof(header));
-        buffer.read(reinterpret_cast<char*>(&guid), 16);
-    }
 
     void CoreFile::parse(std::vector<uint8_t>& buffer) {
-        MemoryStream mem_buff(buffer);
-        auto reader = mem_buff.as_stream();
-        parse(reader);
+        memcpy(&header,buffer.data(),sizeof(header));
+        memcpy(&guid,buffer.data()+sizeof(header),16);
     }
 }

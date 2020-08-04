@@ -40,7 +40,7 @@ namespace Decima {
 
 
         //TODO: replace std::vector<uint8_t> with Decima::File
-        Decima::CompressedFile query_file(uint32_t file_hash);
+        Decima::CompressedFile query_file(uint64_t file_hash);
         Decima::CompressedFile query_file(const std::string& file_name);
 
     private:

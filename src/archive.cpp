@@ -174,13 +174,13 @@ uint64_t Decima::Archive::chunk_id_by_offset(uint64_t offset) {
     return -1;
 }
 
-Decima::CompressedFile Decima::Archive::query_file(uint32_t file_hash) {
+Decima::CompressedFile Decima::Archive::query_file(uint64_t file_hash) {
     auto file_id = get_file_index(file_hash);
     if (file_id == -1) {
-        return Decima::CompressedFile(nullptr, nullptr);
+        return Decima::CompressedFile(nullptr, nullptr,nullptr);
     }
     auto& file_entry = content_table.at(file_id);
-    Decima::CompressedFile file(&file_entry, &filebuffer);
+    Decima::CompressedFile file(&file_entry, &filebuffer,this);
 
     file.chunk_range = get_mio_boundaries(file_id);
 
