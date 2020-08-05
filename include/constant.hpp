@@ -21,10 +21,11 @@ namespace Decima {
     static const uint32_t encryption_key_2[4] = { 0x06C084A37, 0x07E159D95, 0x03D5AF7E8, 0x018AA7D3F };
 
     static const std::unordered_map<uint64_t, std::string> known_file_types = {
-        { 0xA664164D69FD2B38, "Texture" },
-        { 11754932426750725422u, "TextureSet" },
-        { 1638019067902823838, "Model" },
-        { 1288541470903713382, "Armature" },
+        { 0xa664164d69fd2b38, "Texture" },
+        { 0xa321e8c307328d2e, "TextureSet" },
+        { 0x16bb69a9e5aa0d9e, "Model" },
+        { 0x11e1d1a40b933e66, "Armature" },
+        { 0x31be502435317445, "Localization" }
     };
 
 }
