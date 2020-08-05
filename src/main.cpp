@@ -147,34 +147,35 @@ public:
 
             ImGui::Separator();
 
-            if (ImGui::Button("Dump by name"))
+            if (ImGui::Button("Add by name"))
                 ImGui::OpenPopup("By name");
 
             if (ImGui::BeginPopup("By name")) {
                 static char path[512];
                 ImGui::InputText("File name", path, IM_ARRAYSIZE(path));
-                if (ImGui::Button("Extract!")) {
+                if (ImGui::Button("Add to selection!")) {
                     std::string str_path(path);
-                    if (str_path.find("work:") != str_path.npos) {
-                        str_path = str_path.substr(5, str_path.size() - 5);
-                    }
-                    const auto base_folder = pfd::select_folder("Choose destination folder").result();
-                    std::filesystem::path full_path = std::filesystem::path(base_folder) / str_path;
-                    std::filesystem::create_directories(full_path.parent_path());
+                    uint64_t file_hash = hash_string(sanitize_name(str_path), Decima::seed);
+                    if (archive_array.get_file_entry(file_hash).has_value())
+                        selection_info.selected_files.insert(file_hash);
 
-                    //                    auto sanitized_path = sanitize_name(path);
-
-                    auto file = archive_array.query_file(str_path);
-                    if (file.is_valid()) {
-                        file.unpack(0);
-                        std::ofstream output_file{full_path, std::ios::trunc};
-                        output_file.write(reinterpret_cast<const char*>(file.storage.data()), file.storage.size());
-
-                        std::cout << "File was exported to: " << full_path << "\n";
-                    } else {
-                        std::cout << "File  " << full_path << " wasn't found!"
-                                  << "\n";
-                    }
+//                    const auto base_folder = pfd::select_folder("Choose destination folder").result();
+//                    std::filesystem::path full_path = std::filesystem::path(base_folder) / str_path;
+//                    std::filesystem::create_directories(full_path.parent_path());
+//
+//                    //                    auto sanitized_path = sanitize_name(path);
+//
+//                    auto file = archive_array.query_file(str_path);
+//                    if (file.is_valid()) {
+//                        file.unpack(0);
+//                        std::ofstream output_file{full_path, std::ios::trunc};
+//                        output_file.write(reinterpret_cast<const char*>(file.storage.data()), file.storage.size());
+//
+//                        std::cout << "File was exported to: " << full_path << "\n";
+//                    } else {
+//                        std::cout << "File  " << full_path << " wasn't found!"
+//                                  << "\n";
+//                    }
                 }
 
                 ImGui::EndPopup();
@@ -182,8 +183,14 @@ public:
 
             if (ImGui::ListBoxHeader("Selected files")) {
                 for (const auto selected_file : selection_info.selected_files) {
-                    if (ImGui::Selectable(archive_array.hash_to_name[selected_file].c_str()))
-                        selection_info.selected_file = selected_file;
+                    if (archive_array.hash_to_name.find(selected_file) != archive_array.hash_to_name.end()) {
+                        if (ImGui::Selectable(archive_array.hash_to_name[selected_file].c_str()))
+                            selection_info.selected_file = selected_file;
+                    } else {
+                        std::string new_name = "Hash: " + uint64_to_hex(selected_file);
+                        if (ImGui::Selectable(new_name.c_str()))
+                            selection_info.selected_file = selected_file;
+                    }
                 }
 
                 ImGui::ListBoxFooter();
@@ -310,17 +317,18 @@ public:
                             selection_info.file = archive_array.query_file(filename);
                             selection_info.file.unpack(0);
                         }
-                        if(ImGui::Button("Raw view")){
+                        if (ImGui::Button("Raw view")) {
                             selection_info.file.get_raw();
                         }
-                        if(ImGui::Button("Decrypted view")){
+                        if (ImGui::Button("Decrypted view")) {
                             selection_info.file.decrypt(0);
                         }
-                        if(ImGui::Button("Decompressed view")){
+                        if (ImGui::Button("Decompressed view")) {
                             selection_info.file.unpack(0);
                         }
 
-                        file_viewer.DrawContents(selection_info.file.storage.data(), selection_info.file.storage.size());
+                        file_viewer.DrawContents(selection_info.file.storage.data(),
+                                                 selection_info.file.storage.size());
                     } else {
                         ImGui::Text("Error getting file info!");
                     }
