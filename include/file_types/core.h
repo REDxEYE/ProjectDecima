@@ -9,6 +9,7 @@
 #include <fstream>
 #include <vector>
 
+#include "membuf.hpp"
 #include "file_types/shared.hpp"
 
 
@@ -27,6 +28,7 @@ namespace Decima {
     public:
 
         virtual void parse(std::vector<uint8_t>& buffer);
+        virtual void parse(imemstream& stream);
     };
 }
 
