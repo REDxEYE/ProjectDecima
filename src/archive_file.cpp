@@ -11,11 +11,12 @@
 
 void Decima::CompressedFile::unpack(uint32_t size) {
     uint64_t required_size = 0;
-    auto [chunk_entry_begin, chunk_entry_end] = chunk_range;
+    auto[chunk_entry_begin, chunk_entry_end] = chunk_range;
     for (auto chunk_entry = chunk_entry_begin; chunk_entry != chunk_entry_end; ++chunk_entry) {
         required_size += chunk_entry->uncompressed_size;
     }
-    auto data_in = decrypt(size);
+    decrypt(size);
+    std::vector<uint8_t> data_in(storage);
     storage.clear();
     storage.resize(required_size);
     uint64_t in_pos = 0;
@@ -33,13 +34,9 @@ void Decima::CompressedFile::unpack(uint32_t size) {
     storage.erase(storage.begin() + file_entry->size, storage.begin() + storage.size());
 }
 
-std::vector<uint8_t> Decima::CompressedFile::decrypt(uint32_t size) {
-    uint64_t required_size = 0;
-    auto [chunk_entry_begin, chunk_entry_end] = chunk_range;
-    for (auto chunk_entry = chunk_entry_begin; chunk_entry != chunk_entry_end; ++chunk_entry) {
-        required_size += chunk_entry->compressed_size;
-    }
-    std::vector<std::uint8_t> output(required_size);
+void Decima::CompressedFile::decrypt(uint32_t size) {
+    auto[chunk_entry_begin, chunk_entry_end] = chunk_range;
+    get_raw();
     uint64_t out_pos = 0;
     for (auto chunk_entry = chunk_entry_begin; chunk_entry != chunk_entry_end; ++chunk_entry) {
         uint32_t iv[4];
@@ -52,11 +49,10 @@ std::vector<uint8_t> Decima::CompressedFile::decrypt(uint32_t size) {
         uint8_t digest[16];
         md5Hash((md5_byte_t*) iv, 16, digest);
         for (int i = 0; i < chunk_entry->compressed_size; i++) {
-            output[out_pos + i] = (filebuffer->data() + chunk_entry->compressed_offset)[i] ^ digest[i % 16];
+            storage[out_pos + i] ^= digest[i % 16];
         }
         out_pos += chunk_entry->compressed_size;
     }
-    return std::move(output);
 }
 
 Decima::CompressedFile::CompressedFile(FileEntry* file_entry_, mio::mmap_source* filebuffer_, Archive* archive_) {
@@ -66,5 +62,19 @@ Decima::CompressedFile::CompressedFile(FileEntry* file_entry_, mio::mmap_source*
 }
 
 void Decima::CompressedFile::get_raw() {
+    uint64_t required_size = 0;
+    auto[chunk_entry_begin, chunk_entry_end] = chunk_range;
+    for (auto chunk_entry = chunk_entry_begin; chunk_entry != chunk_entry_end; ++chunk_entry) {
+        required_size += chunk_entry->compressed_size;
+    }
+    storage.clear();
+    storage.resize(required_size);
+    uint64_t out_offset = 0;
+    for (auto chunk_entry = chunk_entry_begin; chunk_entry != chunk_entry_end; ++chunk_entry) {
+        memcpy(storage.data() + out_offset, filebuffer->data() + chunk_entry->compressed_offset,
+               chunk_entry->compressed_size);
+        out_offset += chunk_entry->compressed_size;
+    }
+
 
 }

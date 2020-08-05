@@ -32,10 +32,6 @@ struct imemstream : virtual membuf, std::istream {
 
     }
 
-//    std::ios::pos_type tellg() {
-//        te
-//    }
-
 
 };
 

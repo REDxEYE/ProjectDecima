@@ -30,8 +30,7 @@ namespace Decima {
 
         [[nodiscard]] inline bool is_valid() const { return file_entry != nullptr; };
         void unpack(uint32_t size); //TODO: size min = find minimal size
-        std::vector<uint8_t> decrypt(uint32_t size); //TODO: size = any
-
+        void decrypt(uint32_t size); //TODO: size = any
         void get_raw();
     private:
 
