@@ -5,7 +5,7 @@ add_executable(ProjectDS
         src/archive_array.cpp
         src/utils.cpp
         src/file_types/prefetch.cpp
-        src/file_tree.cpp
+        src/archive_tree.cpp
         src/file_types/core.cpp
         src/archive_file.cpp)
 

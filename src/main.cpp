@@ -7,7 +7,7 @@
 #include "utils.h"
 #include "archive.h"
 #include "archive_array.h"
-#include "file_tree.h"
+#include "archive_tree.h"
 #include "imgui_memory_editor.h"
 
 #include "portable-file-dialogs.h"
@@ -28,6 +28,17 @@ public:
             /* Dummy write function because
              * ReadOnly forbids any selection. */
         };
+
+        {
+            FileTypeHandler handler;
+            handler.name = "Localization";
+            handler.render_fn = [](imemstream& stream) {
+                ImGui::Text("Custom handler for localization goes here");
+                ImGui::TextDisabled("Someday...");
+            };
+
+            root_tree.file_type_handlers.insert(std::make_pair(0x31be502435317445, std::move(handler)));
+        }
     }
 
     void on_attach() override {
@@ -157,8 +168,8 @@ public:
                     std::string str_path(path);
                     uint64_t file_hash = hash_string(sanitize_name(str_path), Decima::seed);
                     if (archive_array.get_file_entry(file_hash).has_value()) {
-                        archive_array.hash_to_name[file_hash]=str_path;
-                            selection_info.selected_files.insert(file_hash);
+                        archive_array.hash_to_name[file_hash] = str_path;
+                        selection_info.selected_files.insert(file_hash);
                     }
 
                     //                    const auto base_folder = pfd::select_folder("Choose destination folder").result();
@@ -275,11 +286,11 @@ public:
             ImGui::Begin("File preview");
             {
                 if (selection_info.selected_file > 0) {
-
                     const auto file_entry_opt = archive_array.get_file_entry(selection_info.selected_file);
 
                     if (file_entry_opt.has_value()) {
                         const auto& file_entry = file_entry_opt.value().get();
+
                         std::string filename;
                         if (archive_array.hash_to_name.find(selection_info.selected_file) != archive_array.hash_to_name.end()) {
                             filename = sanitize_name(archive_array.hash_to_name.at(selection_info.selected_file));
@@ -291,7 +302,6 @@ public:
                         if (ImGui::BeginPopupContextItem("File preview name")) {
                             if (ImGui::Selectable("Copy path"))
                                 ImGui::SetClipboardText(filename.c_str());
-
                             ImGui::EndPopup();
                         }
 
@@ -325,18 +335,29 @@ public:
                             selection_info.file = archive_array.query_file(selection_info.selected_file);
                             selection_info.file.unpack(0);
                         }
-                        if (ImGui::Button("Raw view")) {
-                            selection_info.file.get_raw();
-                        }
-                        if (ImGui::Button("Decrypted view")) {
-                            selection_info.file.decrypt(0);
-                        }
-                        if (ImGui::Button("Decompressed view")) {
-                            selection_info.file.unpack(0);
+
+                        std::uint64_t file_type;
+                        std::memcpy(reinterpret_cast<std::uint8_t*>(&file_type), selection_info.file.storage.data(), 8);
+
+                        const auto type_handler = root_tree.file_type_handlers.find(file_type);
+
+                        if (type_handler == root_tree.file_type_handlers.end()) {
+                            if (ImGui::Button("Raw view")) {
+                                selection_info.file.get_raw();
+                            }
+                            if (ImGui::Button("Decrypted view")) {
+                                selection_info.file.decrypt(0);
+                            }
+                            if (ImGui::Button("Decompressed view")) {
+                                selection_info.file.unpack(0);
+                            }
+
+                            file_viewer.DrawContents(selection_info.file.storage.data(), selection_info.file.storage.size());
+                        } else {
+                            imemstream stream { selection_info.file.storage };
+                            type_handler->second.render_fn(stream);
                         }
 
-                        file_viewer.DrawContents(selection_info.file.storage.data(),
-                            selection_info.file.storage.size());
                     } else {
                         ImGui::Text("Error getting file info!");
                     }

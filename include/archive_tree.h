@@ -2,8 +2,8 @@
 // Created by MED45 on 27.07.2020.
 //
 
-#ifndef PROJECTDS_FILE_TREE_H
-#define PROJECTDS_FILE_TREE_H
+#ifndef PROJECTDS_ARCHIVE_TREE_H
+#define PROJECTDS_ARCHIVE_TREE_H
 
 #include <unordered_set>
 #include <map>
@@ -29,6 +29,12 @@ struct FileInfo {
     Decima::CoreHeader header { 0 };
 };
 
+struct FileTypeHandler {
+    std::string name;
+    std::function<void()> export_fn = nullptr;
+    std::function<void(imemstream&)> render_fn = nullptr;
+};
+
 template <class T>
 using FileTreeToggleable = std::pair<T, bool>;
 
@@ -36,6 +42,7 @@ class FileTree {
 public:
     std::map<std::string, FileTreeToggleable<std::unique_ptr<FileTree>>> folders;
     std::map<std::string, FileTreeToggleable<FileInfo>> files;
+    std::unordered_map<std::uint64_t, FileTypeHandler> file_type_handlers;
 
     FileTree* add_folder(const std::string& name);
 
@@ -60,4 +67,4 @@ public:
     void draw(SelectionInfo& selection, Decima::ArchiveArray& archive_array);
 };
 
-#endif //PROJECTDS_FILE_TREE_H
+#endif //PROJECTDS_ARCHIVE_TREE_H
