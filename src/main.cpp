@@ -310,6 +310,16 @@ public:
                             selection_info.file = archive_array.query_file(filename);
                             selection_info.file.unpack(0);
                         }
+                        if(ImGui::Button("Raw view")){
+                            selection_info.file.get_raw();
+                        }
+                        if(ImGui::Button("Decrypted view")){
+                            selection_info.file.decrypt(0);
+                        }
+                        if(ImGui::Button("Decompressed view")){
+                            selection_info.file.unpack(0);
+                        }
+
                         file_viewer.DrawContents(selection_info.file.storage.data(), selection_info.file.storage.size());
                     } else {
                         ImGui::Text("Error getting file info!");
