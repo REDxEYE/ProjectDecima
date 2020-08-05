@@ -86,9 +86,10 @@ void Decima::Archive::decrypt(uint32_t key_1, uint32_t key_2, uint32_t* data) {
     }
 }
 
-std::pair<Decima::ChunkEntry*, Decima::ChunkEntry*> Decima::Archive::get_mio_boundaries(int32_t file_id) {
+std::pair<std::vector<Decima::ChunkEntry>::iterator, std::vector<Decima::ChunkEntry>::iterator>
+Decima::Archive::get_mio_boundaries(int32_t file_id) {
     if (file_id == -1)
-        return {nullptr,nullptr};
+        return {chunk_table.end(), chunk_table.end()};
 
     const auto& file_entry = content_table.at(file_id);
 
@@ -102,7 +103,7 @@ std::pair<Decima::ChunkEntry*, Decima::ChunkEntry*> Decima::Archive::get_mio_bou
     const auto last_chunk_row = chunk_id_by_offset(last_chunk);
 //    const auto max_needed_size = (last_chunk_row - first_chunk_row + 1) * header.max_chunk_size;
 
-    return {&chunk_table.at(first_chunk_row),&chunk_table.at(last_chunk_row)};
+    return {chunk_table.begin() + first_chunk_row, chunk_table.begin() + last_chunk_row};
 
 //    std::vector<uint8_t> out_data(max_needed_size);
 //
@@ -177,10 +178,10 @@ uint64_t Decima::Archive::chunk_id_by_offset(uint64_t offset) {
 Decima::CompressedFile Decima::Archive::query_file(uint64_t file_hash) {
     auto file_id = get_file_index(file_hash);
     if (file_id == -1) {
-        return Decima::CompressedFile(nullptr, nullptr,nullptr);
+        return Decima::CompressedFile(nullptr, nullptr, nullptr);
     }
     auto& file_entry = content_table.at(file_id);
-    Decima::CompressedFile file(&file_entry, &filebuffer,this);
+    Decima::CompressedFile file(&file_entry, &filebuffer, this);
 
     file.chunk_range = get_mio_boundaries(file_id);
 

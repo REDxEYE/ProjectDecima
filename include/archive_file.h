@@ -21,7 +21,7 @@ namespace Decima {
 
         CompressedFile() = default;
 
-        std::pair<ChunkEntry*, ChunkEntry*> chunk_range = {nullptr, nullptr};
+        std::pair<std::vector<ChunkEntry>::iterator, std::vector<ChunkEntry>::iterator> chunk_range;
         FileEntry* file_entry = nullptr;
         mio::mmap_source* filebuffer = nullptr;
         Archive* archive = nullptr;
@@ -30,8 +30,10 @@ namespace Decima {
 
         [[nodiscard]] inline bool is_valid() const { return file_entry != nullptr; };
         void unpack(uint32_t size); //TODO: size min = find minimal size
-    private:
         std::vector<uint8_t> decrypt(uint32_t size); //TODO: size = any
+
+        void get_raw();
+    private:
 
     };
 

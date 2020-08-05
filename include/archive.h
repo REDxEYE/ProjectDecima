@@ -52,7 +52,7 @@ namespace Decima {
 
         void decrypt_chunk(uint32_t chunk_id, std::vector<uint8_t>& src);
 
-        std::pair<ChunkEntry*, ChunkEntry*> get_mio_boundaries(int32_t file_id);
+        std::pair<std::vector<ChunkEntry>::iterator, std::vector<ChunkEntry>::iterator> get_mio_boundaries(int32_t file_id);
 
         [[nodiscard]] uint64_t get_file_index(uint64_t file_hash) const;
 
