@@ -11,8 +11,8 @@
 
 void Decima::CompressedFile::unpack(uint32_t size) {
     uint64_t required_size = 0;
-    auto&[chunk_entry_begin, chunk_entry_end] = chunk_range;
-    for (auto& chunk_entry = chunk_entry_begin; chunk_entry != chunk_entry_end; ++chunk_entry) {
+    auto [chunk_entry_begin, chunk_entry_end] = chunk_range;
+    for (auto chunk_entry = chunk_entry_begin; chunk_entry != chunk_entry_end; ++chunk_entry) {
         required_size += chunk_entry->uncompressed_size;
     }
     auto data_in = decrypt(size);
@@ -21,7 +21,7 @@ void Decima::CompressedFile::unpack(uint32_t size) {
     uint64_t in_pos = 0;
     uint64_t out_pos = 0;
     const auto file_position = file_entry->offset % archive->header.max_chunk_size;
-    for (auto& chunk_entry = chunk_entry_begin; chunk_entry != chunk_entry_end; ++chunk_entry) {
+    for (auto chunk_entry = chunk_entry_begin; chunk_entry != chunk_entry_end; ++chunk_entry) {
         decompress_chunk_data(data_in.data() + in_pos,
                               chunk_entry->compressed_size,
                               chunk_entry->uncompressed_size,
@@ -35,13 +35,13 @@ void Decima::CompressedFile::unpack(uint32_t size) {
 
 std::vector<uint8_t> Decima::CompressedFile::decrypt(uint32_t size) {
     uint64_t required_size = 0;
-    auto&[chunk_entry_begin, chunk_entry_end] = chunk_range;
-    for (auto& chunk_entry = chunk_entry_begin; chunk_entry != chunk_entry_end; ++chunk_entry) {
+    auto [chunk_entry_begin, chunk_entry_end] = chunk_range;
+    for (auto chunk_entry = chunk_entry_begin; chunk_entry != chunk_entry_end; ++chunk_entry) {
         required_size += chunk_entry->compressed_size;
     }
     std::vector<std::uint8_t> output(required_size);
     uint64_t out_pos = 0;
-    for (auto& chunk_entry = chunk_entry_begin; chunk_entry != chunk_entry_end; ++chunk_entry) {
+    for (auto chunk_entry = chunk_entry_begin; chunk_entry != chunk_entry_end; ++chunk_entry) {
         uint32_t iv[4];
         MurmurHash3_x64_128(&chunk_entry->uncompressed_offset, 0x10, seed, iv);
 
