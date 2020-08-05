@@ -103,7 +103,7 @@ Decima::Archive::get_mio_boundaries(int32_t file_id) {
     const auto last_chunk_row = chunk_id_by_offset(last_chunk);
 //    const auto max_needed_size = (last_chunk_row - first_chunk_row + 1) * header.max_chunk_size;
 
-    return {chunk_table.begin() + first_chunk_row, chunk_table.begin() + last_chunk_row};
+    return {chunk_table.begin() + first_chunk_row, chunk_table.begin() + last_chunk_row+1};
 
 //    std::vector<uint8_t> out_data(max_needed_size);
 //
