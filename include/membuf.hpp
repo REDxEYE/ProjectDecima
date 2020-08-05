@@ -12,7 +12,12 @@ struct membuf : std::streambuf {
     membuf(char const* base, size_t size) {
         char* p(const_cast<char*>(base));
         this->setg(p, p, p + size);
-        this->setp(p, p + size);
+    }
+
+    virtual pos_type
+    seekoff(off_type off, std::ios_base::seekdir dir, std::ios_base::openmode which = std::ios_base::in) {
+        if (dir == std::ios_base::cur) gbump(off);
+        return gptr() - eback();
     }
 };
 
