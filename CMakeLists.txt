@@ -22,5 +22,6 @@ add_subdirectory(libs/LGLE)
 include(ProjectDS.cmake)
 include(QuickHash.cmake)
 include(ArchiveTest.cmake)
+include(no_lgle_ProjectDS.cmake)
 
 

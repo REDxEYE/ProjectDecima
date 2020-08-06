@@ -171,24 +171,6 @@ public:
                         archive_array.hash_to_name[file_hash] = str_path;
                         selection_info.selected_files.insert(file_hash);
                     }
-
-                    //                    const auto base_folder = pfd::select_folder("Choose destination folder").result();
-                    //                    std::filesystem::path full_path = std::filesystem::path(base_folder) / str_path;
-                    //                    std::filesystem::create_directories(full_path.parent_path());
-                    //
-                    //                    //                    auto sanitized_path = sanitize_name(path);
-                    //
-                    //                    auto file = archive_array.query_file(str_path);
-                    //                    if (file.is_valid()) {
-                    //                        file.unpack(0);
-                    //                        std::ofstream output_file{full_path, std::ios::trunc};
-                    //                        output_file.write(reinterpret_cast<const char*>(file.storage.data()), file.storage.size());
-                    //
-                    //                        std::cout << "File was exported to: " << full_path << "\n";
-                    //                    } else {
-                    //                        std::cout << "File  " << full_path << " wasn't found!"
-                    //                                  << "\n";
-                    //                    }
                 }
 
                 ImGui::EndPopup();
@@ -342,17 +324,7 @@ public:
                         const auto type_handler = root_tree.file_type_handlers.find(file_type);
 
                         if (type_handler == root_tree.file_type_handlers.end()) {
-                            if (ImGui::Button("Raw view")) {
-                                selection_info.file.get_raw();
-                            }
-                            if (ImGui::Button("Decrypted view")) {
-                                selection_info.file.decrypt(0);
-                            }
-                            if (ImGui::Button("Decompressed view")) {
-                                selection_info.file.unpack(0);
-                            }
-
-                            file_viewer.DrawContents(selection_info.file.storage.data(), selection_info.file.storage.size());
+                                file_viewer.DrawContents(selection_info.file.storage.data(), selection_info.file.storage.size());
                         } else {
                             imemstream stream { selection_info.file.storage };
                             type_handler->second.render_fn(stream);
