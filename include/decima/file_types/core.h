@@ -23,11 +23,10 @@ namespace Decima {
     class CoreFile {
     public:
         CoreHeader header = {};
-
         uint64_t guid[2] = {0, 0};
 
-        uint64_t peek_header(std::vector<uint8_t>& buffer);
-        uint64_t peek_header(std::istream& stream);
+        static uint64_t peek_header(std::vector<uint8_t>& buffer);
+        static uint64_t peek_header(std::istream& stream);
 
         virtual void parse(std::vector<uint8_t>& buffer);
 
