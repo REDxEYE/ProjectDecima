@@ -1,6 +1,6 @@
 add_executable(ProjectDS
         src/main.cpp
-        src/decima/archive.cpp
+        src/decima/archive/archive.cpp
         src/decima/file_types/prefetch.cpp
         src/decima/archive/archive_array.cpp
         src/utils.cpp

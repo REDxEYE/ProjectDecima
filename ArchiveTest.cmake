@@ -1,6 +1,6 @@
 add_executable(ArchiveTest
-        src/decima/archive/archive_test.cpp
-        src/decima/archive.cpp
+        src/archive_test.cpp
+        src/decima/archive/archive.cpp
         src/decima/file_types/prefetch.cpp
         src/decima/archive/archive_array.cpp
         src/utils.cpp
