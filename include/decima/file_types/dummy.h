@@ -7,11 +7,12 @@
 
 #include "decima/file_types/core.h"
 
-class Dummy: public Decima::CoreFile{
-public:
-    void parse(std::vector<uint8_t>& buffer) override;
-    void parse(std::istream& stream) override;
-};
-
+namespace Decima {
+    class Dummy : public Decima::CoreFile {
+    public:
+        void parse(std::vector<uint8_t>& buffer) override;
+        void parse(std::istream& stream) override;
+    };
+}
 
 #endif //PROJECTDS_DUMMY_H
