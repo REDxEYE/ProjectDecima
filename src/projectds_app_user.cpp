@@ -12,165 +12,83 @@
 void ProjectDS::update_user(double ts) {
     App::update_user(ts);
     draw_dockspace();
-    ImGui::Begin("DEBUG");
-    //            ImGui::PushStyleColor(ImGuiCol_Text,IM_COL32(0x80,0xFF,0x80,0xFF));
-    //            ImGui::PushStyleColor(ImGuiCol_Text,IM_COL32(0x80,0x80,0xFF,0xFF));
-    //            ImGui::PushStyleColor(ImGuiCol_Text,IM_COL32(0xF0,0x80,0xFF,0xFF));
-    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
-                1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-    ImGui::End();
+    draw_filepreview();
+    draw_debug();
+    draw_export();
+    draw_tree();
+}
 
-    ImGui::Begin("Test");
-    if (ImGui::Button("Dump all files` paths as a tree")) {
-        const auto full_path = pfd::save_file("Choose destination file").result();
 
-        if (!full_path.empty()) {
-            std::ofstream output_file{full_path};
-
-            root_tree.visit([&](const auto& name, auto depth) {
-                output_file << std::string(depth * 2, ' ');
-                output_file << name;
-                output_file << '\n';
-            });
-
-            std::cout << "File was saved to: " << full_path << '\n';
-        }
-    }
-
-    if (ImGui::Button("Dump all files` hashes")) {
-        const auto full_path = pfd::save_file("Choose destination file").result();
-
-        if (!full_path.empty()) {
-            std::ofstream output_file{full_path};
-
-            for (const auto& archive : archive_array.archives) {
-                output_file << archive.filepath << '\n';
-
-                for (const auto& entry : archive.content_table) {
-                    const auto name = archive_array.hash_to_name.find(entry.hash);
-
-                    if (name != archive_array.hash_to_name.end())
-                        output_file << "  name: '" << name->second << "'\n";
-
-                    output_file << "  hash: '" << entry.hash << "'\n";
-                    output_file << "  size: '" << entry.size << "'\n";
-                    output_file << '\n';
-                }
-            }
-
-            std::cout << "File was saved to: " << full_path << '\n';
-        }
-    }
-
-    ImGui::Separator();
-
-    if (ImGui::Button("Add by name"))
-        ImGui::OpenPopup("By name");
-
-    if (ImGui::BeginPopup("By name")) {
-        static char path[512];
-        ImGui::InputText("File name", path, IM_ARRAYSIZE(path));
-        if (ImGui::Button("Add to selection!")) {
-            std::string str_path(path);
-            uint64_t file_hash = hash_string(sanitize_name(str_path), Decima::seed);
-            if (archive_array.get_file_entry(file_hash).has_value()) {
-                archive_array.hash_to_name[file_hash] = str_path;
-                selection_info.selected_files.insert(file_hash);
-            }
-        }
-
-        ImGui::EndPopup();
-    }
-
-    if (ImGui::ListBoxHeader("Selected files")) {
-        for (const auto selected_file : selection_info.selected_files) {
-            if (archive_array.hash_to_name.find(selected_file) != archive_array.hash_to_name.end()) {
-                if (ImGui::Selectable(archive_array.hash_to_name[selected_file].c_str()))
-                    selection_info.selected_file = selected_file;
-            } else {
-                std::string new_name = "Hash: " + uint64_to_hex(selected_file);
-                if (ImGui::Selectable(new_name.c_str()))
-                    selection_info.selected_file = selected_file;
-            }
-        }
-
-        ImGui::ListBoxFooter();
-    }
-
-    if (ImGui::Button("Export selected file(-s)") && !selection_info.selected_files.empty()) {
-        const auto base_folder = pfd::select_folder("Choose destination folder").result();
-
-        if (!base_folder.empty()) {
-            for (const auto selected_file : selection_info.selected_files) {
-                const auto filename = sanitize_name(archive_array.hash_to_name.at(selected_file));
-
-                std::filesystem::path full_path = std::filesystem::path(base_folder) / filename;
-                std::filesystem::create_directories(full_path.parent_path());
-
-                auto file = archive_array.query_file(filename);
-                file.unpack(0);
-                std::ofstream output_file{full_path, std::ios::binary};
-                output_file.write(reinterpret_cast<const char*>(file.storage.data()), file.storage.size());
-
-                std::cout << "File was exported to: " << full_path << "\n";
-            }
-        }
-    }
-
-    if (selection_info.selected_files.empty()) {
-        ImGui::SameLine();
-        ImGui::Text("No files selected");
-    }
-
-    ImGui::End();
-
-    ImGui::Begin("Trees");
+void ProjectDS::draw_dockspace() {
+    ImGuiViewport* viewport = ImGui::GetMainViewport();
+    ImGui::SetNextWindowPos(viewport->GetWorkPos());
+    ImGui::SetNextWindowSize(viewport->GetWorkSize());
+    ImGui::SetNextWindowViewport(viewport->ID);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0.0f, 0.0f});
+    const auto dock_flags = ImGuiWindowFlags_MenuBar
+                            | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar
+                            | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove
+                            | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus
+                            | ImGuiWindowFlags_NoBackground;
+    ImGui::Begin("DockSpace", nullptr, dock_flags);
     {
-        if (filter.Draw()) {
-            root_tree.update_filter(filter);
+        ImGui::PopStyleVar(3);
+        ImGui::DockSpace(ImGui::GetID("Dock"));
 
-            file_names.clear();
+        if (ImGui::BeginMenuBar()) {
+            if (ImGui::BeginMenu("File")) {
+                if (ImGui::MenuItem("Open archive", "Ctrl+O")) {
+                    auto folder = pfd::select_folder("Select Death Stranding data folder!").result();
 
-            for (auto&[_, path] : archive_array.hash_to_name) {
-                if (filter.PassFilter(path.c_str())) {
-                    file_names.push_back(path.c_str());
+                    if (!folder.empty()) {
+                        archive_array.open(folder);
+                        file_names.clear();
+                        file_names.reserve(archive_array.hash_to_name.size());
+
+                        for (auto&[hash, path] : archive_array.hash_to_name) {
+                            file_names.push_back(path.c_str());
+                            auto* current_root = &root_tree;
+
+                            std::vector<std::string> split_path;
+                            split(path, split_path, '/');
+
+                            for (auto it = split_path.cbegin(); it != split_path.end() - 1; it++)
+                                current_root = current_root->add_folder(*it);
+
+                            if (archive_array.hash_to_archive.find(hash) != archive_array.hash_to_archive.end())
+                                current_root->add_file(split_path.back(), hash, {0});
+                        }
+                    }
                 }
+
+                ImGui::EndMenu();
             }
+
+            ImGui::EndMenuBar();
         }
-
-        ImGui::BeginTabBar("Tabs");
-        {
-            if (ImGui::BeginTabItem("ListView")) {
-                ImGui::PushItemWidth(-1);
-                if (ImGui::ListBox("TREE", &file_id, file_names.data(), file_names.size(), 50))
-                    selection_info.selected_file = hash_string(sanitize_name(file_names[file_id]),
-                                                               Decima::seed);
-                ImGui::EndTabItem();
-            }
-
-            if (ImGui::BeginTabItem("TreeView")) {
-                ImGui::Columns(3);
-
-                ImGui::Separator();
-                ImGui::Text("Name");
-                ImGui::NextColumn();
-                ImGui::Text("Type");
-                ImGui::NextColumn();
-                ImGui::Text("Size");
-                ImGui::NextColumn();
-                ImGui::Separator();
-
-                root_tree.draw(selection_info, archive_array);
-
-                ImGui::Columns(1);
-
-                ImGui::EndTabItem();
-            }
-        }
-        ImGui::EndTabBar();
     }
     ImGui::End();
 
+}
+
+void ProjectDS::init_filetype_handlers() {
+    {
+        FileTypeHandler handler;
+        handler.name = "Localization";
+        handler.render_fn = [](imemstream& stream) {
+            ImGui::Text("Custom handler for localization goes here");
+            ImGui::TextDisabled("Someday...");
+        };
+
+        root_tree.file_type_handlers.insert(
+                std::make_pair(Decima::DeathStranding_FileMagics::Localization, std::move(handler)));
+    }
+}
+
+
+void ProjectDS::draw_filepreview() {
     ImGui::Begin("File preview");
     {
         if (selection_info.selected_file > 0) {
@@ -248,72 +166,183 @@ void ProjectDS::update_user(double ts) {
     ImGui::End();
 }
 
-
-void ProjectDS::draw_dockspace() {
-    ImGuiViewport* viewport = ImGui::GetMainViewport();
-    ImGui::SetNextWindowPos(viewport->GetWorkPos());
-    ImGui::SetNextWindowSize(viewport->GetWorkSize());
-    ImGui::SetNextWindowViewport(viewport->ID);
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0.0f, 0.0f});
-    const auto dock_flags = ImGuiWindowFlags_MenuBar
-                            | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar
-                            | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove
-                            | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus
-                            | ImGuiWindowFlags_NoBackground;
-    ImGui::Begin("DockSpace", nullptr, dock_flags);
+void ProjectDS::draw_tree() {
+    ImGui::Begin("Trees");
     {
-        ImGui::PopStyleVar(3);
-        ImGui::DockSpace(ImGui::GetID("Dock"));
+        if (filter.Draw()) {
+            root_tree.update_filter(filter);
 
-        if (ImGui::BeginMenuBar()) {
-            if (ImGui::BeginMenu("File")) {
-                if (ImGui::MenuItem("Open archive", "Ctrl+O")) {
-                    auto folder = pfd::select_folder("Select Death Stranding data folder!").result();
+            file_names.clear();
 
-                    if (!folder.empty()) {
-                        archive_array.open(folder);
-                        file_names.clear();
-                        file_names.reserve(archive_array.hash_to_name.size());
+            for (auto&[_, path] : archive_array.hash_to_name) {
+                if (filter.PassFilter(path.c_str())) {
+                    file_names.push_back(path.c_str());
+                }
+            }
+        }
 
-                        for (auto&[hash, path] : archive_array.hash_to_name) {
-                            file_names.push_back(path.c_str());
-                            auto* current_root = &root_tree;
+        ImGui::BeginTabBar("Tabs");
+        {
+            if (ImGui::BeginTabItem("ListView")) {
+                ImGui::PushItemWidth(-1);
+                if (ImGui::ListBox("TREE", &file_id, file_names.data(), file_names.size(), 50))
+                    selection_info.selected_file = hash_string(sanitize_name(file_names[file_id]),
+                                                               Decima::seed);
+                ImGui::EndTabItem();
+            }
 
-                            std::vector<std::string> split_path;
-                            split(path, split_path, '/');
+            if (ImGui::BeginTabItem("TreeView")) {
+                ImGui::Columns(3);
 
-                            for (auto it = split_path.cbegin(); it != split_path.end() - 1; it++)
-                                current_root = current_root->add_folder(*it);
+                ImGui::Separator();
+                ImGui::Text("Name");
+                ImGui::NextColumn();
+                ImGui::Text("Type");
+                ImGui::NextColumn();
+                ImGui::Text("Size");
+                ImGui::NextColumn();
+                ImGui::Separator();
 
-                            if (archive_array.hash_to_archive.find(hash) != archive_array.hash_to_archive.end())
-                                current_root->add_file(split_path.back(), hash, {0});
-                        }
+                root_tree.draw(selection_info, archive_array);
+
+                ImGui::Columns(1);
+
+                ImGui::EndTabItem();
+            }
+        }
+        ImGui::EndTabBar();
+    }
+    ImGui::End();
+}
+
+void ProjectDS::draw_export() {
+    ImGui::Begin("Export");
+    {
+        if (ImGui::Button("Dump all files` paths as a tree")) {
+            const auto full_path = pfd::save_file("Choose destination file").result();
+
+            if (!full_path.empty()) {
+                std::ofstream output_file{full_path};
+
+                root_tree.visit([&](const auto& name, auto depth) {
+                    output_file << std::string(depth * 2, ' ');
+                    output_file << name;
+                    output_file << '\n';
+                });
+
+                std::cout << "File was saved to: " << full_path << '\n';
+            }
+        }
+
+        if (ImGui::Button("Dump all files` hashes")) {
+            const auto full_path = pfd::save_file("Choose destination file").result();
+
+            if (!full_path.empty()) {
+                std::ofstream output_file{full_path};
+
+                for (const auto& archive : archive_array.archives) {
+                    output_file << archive.filepath << '\n';
+
+                    for (const auto& entry : archive.content_table) {
+                        const auto name = archive_array.hash_to_name.find(entry.hash);
+
+                        if (name != archive_array.hash_to_name.end())
+                            output_file << "  name: '" << name->second << "'\n";
+
+                        output_file << "  hash: '" << entry.hash << "'\n";
+                        output_file << "  size: '" << entry.size << "'\n";
+                        output_file << '\n';
                     }
                 }
 
-                ImGui::EndMenu();
+                std::cout << "File was saved to: " << full_path << '\n';
+            }
+        }
+
+        ImGui::Separator();
+
+        if (ImGui::Button("Add file by name"))
+            ImGui::OpenPopup("By name");
+
+        if (ImGui::Button("Add file by hash"))
+            ImGui::OpenPopup("By hash");
+
+        if (ImGui::BeginPopup("By name")) {
+            static char path[512];
+            ImGui::InputText("File name", path, IM_ARRAYSIZE(path));
+            if (ImGui::Button("Add to selection!")) {
+                std::string str_path(path);
+                uint64_t file_hash = hash_string(sanitize_name(str_path), Decima::seed);
+                if (archive_array.get_file_entry(file_hash).has_value()) {
+                    archive_array.hash_to_name[file_hash] = str_path;
+                    selection_info.selected_files.insert(file_hash);
+                }
             }
 
-            ImGui::EndMenuBar();
+            ImGui::EndPopup();
+        }
+        if (ImGui::BeginPopup("By hash")) {
+            static uint64_t file_hash;
+            ImGui::InputScalar("File hash", ImGuiDataType_U64, &file_hash);
+            if (ImGui::Button("Add to selection!")) {
+                if (archive_array.get_file_entry(file_hash).has_value()) {
+                    archive_array.hash_to_name[file_hash] = "HASH: " + uint64_to_hex(file_hash);
+                    selection_info.selected_files.insert(file_hash);
+                }
+            }
+
+            ImGui::EndPopup();
+        }
+
+        if (ImGui::ListBoxHeader("Selected files")) {
+            for (const auto selected_file : selection_info.selected_files) {
+                if (archive_array.hash_to_name.find(selected_file) != archive_array.hash_to_name.end()) {
+                    if (ImGui::Selectable(archive_array.hash_to_name[selected_file].c_str()))
+                        selection_info.selected_file = selected_file;
+                } else {
+                    std::string new_name = "Hash: " + uint64_to_hex(selected_file);
+                    if (ImGui::Selectable(new_name.c_str()))
+                        selection_info.selected_file = selected_file;
+                }
+            }
+
+            ImGui::ListBoxFooter();
+        }
+
+        if (ImGui::Button("Export selected file(-s)") && !selection_info.selected_files.empty()) {
+            const auto base_folder = pfd::select_folder("Choose destination folder").result();
+
+            if (!base_folder.empty()) {
+                for (const auto selected_file : selection_info.selected_files) {
+                    const auto filename = sanitize_name(archive_array.hash_to_name.at(selected_file));
+
+                    std::filesystem::path full_path = std::filesystem::path(base_folder) / filename;
+                    std::filesystem::create_directories(full_path.parent_path());
+
+                    auto file = archive_array.query_file(filename);
+                    file.unpack(0);
+                    std::ofstream output_file{full_path, std::ios::binary};
+                    output_file.write(reinterpret_cast<const char*>(file.storage.data()), file.storage.size());
+
+                    std::cout << "File was exported to: " << full_path << "\n";
+                }
+            }
+        }
+
+        if (selection_info.selected_files.empty()) {
+            ImGui::SameLine();
+            ImGui::Text("No files selected");
         }
     }
     ImGui::End();
-
 }
 
-void ProjectDS::init_filetype_handlers() {
-    {
-        FileTypeHandler handler;
-        handler.name = "Localization";
-        handler.render_fn = [](imemstream& stream) {
-            ImGui::Text("Custom handler for localization goes here");
-            ImGui::TextDisabled("Someday...");
-        };
-
-        root_tree.file_type_handlers.insert(
-                std::make_pair(Decima::DeathStranding_FileMagics::Localization, std::move(handler)));
-    }
+void ProjectDS::draw_debug() {
+    ImGui::Begin("DEBUG");
+    //            ImGui::PushStyleColor(ImGuiCol_Text,IM_COL32(0x80,0xFF,0x80,0xFF));
+    //            ImGui::PushStyleColor(ImGuiCol_Text,IM_COL32(0x80,0x80,0xFF,0xFF));
+    //            ImGui::PushStyleColor(ImGuiCol_Text,IM_COL32(0xF0,0x80,0xFF,0xFF));
+    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
+                1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+    ImGui::End();
 }
-

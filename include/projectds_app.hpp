@@ -39,6 +39,11 @@ protected:
     void update_user(double ts) override;
     void draw_dockspace();
 
+    void draw_filepreview();
+    void draw_tree();
+    void draw_export();
+    void draw_debug();
+
     void begin_frame_user() override;
 
     void end_frame_user() override;
