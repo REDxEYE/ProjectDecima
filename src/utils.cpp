@@ -47,3 +47,10 @@ std::string sanitize_name(const std::string& filename) {
     return std::string(filename);
 }
 
+void split(const std::string& str, std::vector<std::string>& cont, char delim) {
+    std::stringstream ss(str);
+    std::string token;
+    while (std::getline(ss, token, delim)) {
+        cont.push_back(token);
+    }
+}

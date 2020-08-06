@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "membuf.hpp"
-#include "file_types/shared.hpp"
+#include "shared.hpp"
 
 
 namespace Decima {

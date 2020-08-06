@@ -2,8 +2,8 @@
 // Created by i.getsman on 04.08.2020.
 //
 
-#include "archive_file.h"
-#include "archive.h"
+#include "decima/archive/archive_file.h"
+#include "decima/archive/archive.h"
 #include "utils.h"
 
 #include <md5.h>

@@ -7,7 +7,7 @@
 
 #include <unordered_map>
 
-#include "file_types/prefetch.h"
+#include "decima/file_types/prefetch.h"
 #include "archive.h"
 
 namespace Decima {

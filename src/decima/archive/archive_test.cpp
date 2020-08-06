@@ -2,8 +2,8 @@
 // Created by i.getsman on 05.08.2020.
 //
 
-#include "archive_array.h"
-#include "archive.h"
+#include "decima/archive/archive_array.h"
+#include "decima/archive/archive.h"
 
 int main() {
     Decima::ArchiveArray archive_array(R"(F:\SteamLibrary\steamapps\common\Death Stranding\data)");

@@ -5,7 +5,7 @@
 #ifndef PROJECTDS_ARCHIVE_STRUCTS_HPP
 #define PROJECTDS_ARCHIVE_STRUCTS_HPP
 
-#include "constant.hpp"
+#include "decima/constants.hpp"
 
 namespace Decima {
     struct ArchiveHeader {

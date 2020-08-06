@@ -1,13 +1,15 @@
 add_executable(ProjectDS
-        src/no_lgle_main.cpp
-        src/archive.cpp
-        src/file_types/prefetch.cpp
-        src/archive_array.cpp
+        src/main.cpp
+        src/decima/archive.cpp
+        src/decima/file_types/prefetch.cpp
+        src/decima/archive/archive_array.cpp
         src/utils.cpp
-        src/file_types/prefetch.cpp
-        src/archive_tree.cpp
-        src/file_types/core.cpp
-        src/archive_file.cpp src/imgui_backend_impl.cpp)
+        src/decima/file_types/prefetch.cpp
+        src/decima/archive/archive_tree.cpp
+        src/decima/file_types/core.cpp
+        src/decima/archive/archive_file.cpp
+        src/imgui_backend_impl.cpp
+        src/app.cpp src/projectds_app.cpp include/projectds_app.hpp src/projectds_app_user.cpp)
 
 target_include_directories(ProjectDS PUBLIC include ${HASHLIB_INC} ${OOZLIB_INC})
 

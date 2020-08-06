@@ -7,8 +7,8 @@
 #include <optional>
 
 #include "utils.h"
-#include "archive_array.h"
-#include "archive.h"
+#include "decima/archive/archive_array.h"
+#include "decima/archive/archive.h"
 
 Decima::ArchiveArray::ArchiveArray(const std::string& _workdir) {
     open(_workdir);

@@ -2,7 +2,7 @@
 // Created by MED45 on 26.07.2020.
 //
 
-#include <file_types/prefetch.h>
+#include <decima/file_types/prefetch.h>
 
 void Decima::Prefetch::parse(std::vector<uint8_t>& buffer) {
     imemstream imembuffer(buffer);

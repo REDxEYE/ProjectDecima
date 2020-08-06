@@ -9,7 +9,7 @@
 #include <fstream>
 
 #include "mio.hpp"
-#include "constant.hpp"
+#include "decima/constants.hpp"
 #include "archive_structs.hpp"
 #include "archive_file.h"
 

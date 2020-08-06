@@ -1,12 +1,12 @@
 add_executable(ArchiveTest
-        src/archive_test.cpp
-        src/archive.cpp
-        src/file_types/prefetch.cpp
-        src/archive_array.cpp
+        src/decima/archive/archive_test.cpp
+        src/decima/archive.cpp
+        src/decima/file_types/prefetch.cpp
+        src/decima/archive/archive_array.cpp
         src/utils.cpp
-        src/file_types/prefetch.cpp
-        src/file_types/core.cpp
-        src/archive_file.cpp)
+        src/decima/file_types/prefetch.cpp
+        src/decima/file_types/core.cpp
+        src/decima/archive/archive_file.cpp)
 
 target_include_directories(ArchiveTest PUBLIC include ${HASHLIB_INC} ${OOZLIB_INC})
 
