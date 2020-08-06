@@ -157,7 +157,7 @@ public:
 
                         std::vector<std::uint8_t> file_data = archive_array.query_file(filename);
 
-                        std::ofstream output_file { full_path, std::ios::trunc };
+                        std::ofstream output_file { full_path, std::ios::binary };
                         output_file.write(reinterpret_cast<const char*>(file_data.data()), file_data.size());
 
                         std::cout << "File was exported to: " << full_path << "\n";
