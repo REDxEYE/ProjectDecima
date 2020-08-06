@@ -16,12 +16,13 @@ endif (DEBUG_MODE)
 
 add_subdirectory(libs/hash)
 add_subdirectory(libs/ooz)
-add_subdirectory(libs/LGLE)
+add_subdirectory(libs/glfw)
+add_subdirectory(cmake_subprojects/glad)
+add_subdirectory(cmake_subprojects/stb)
+add_subdirectory(cmake_subprojects/imgui)
 
-
-include(ProjectDS.cmake)
 include(QuickHash.cmake)
 include(ArchiveTest.cmake)
-include(no_lgle_ProjectDS.cmake)
+include(ProjectDS.cmake)
 
 
