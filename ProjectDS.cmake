@@ -6,6 +6,7 @@ add_executable(ProjectDS
         src/utils.cpp
         src/decima/file_types/prefetch.cpp
         src/decima/archive/archive_tree.cpp
+        src/decima/file_types/localization.cpp
         src/decima/file_types/core.cpp
         src/decima/archive/archive_file.cpp
         src/imgui_backend_impl.cpp
