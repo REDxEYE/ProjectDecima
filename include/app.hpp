@@ -9,9 +9,7 @@
 #include <vector>
 #include <stdexcept>
 
-#define IMGUI_IMPL_OPENGL_LOADER_GLAD
-
-#include "glad/glad.h"
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 

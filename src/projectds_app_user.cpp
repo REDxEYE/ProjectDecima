@@ -9,6 +9,9 @@
 #include "utils.h"
 #include "portable-file-dialogs.h"
 
+#include "decima/file_types/localization.hpp"
+#include "decima/file_types/dummy.h"
+
 void ProjectDS::update_user(double ts) {
     App::update_user(ts);
     draw_dockspace();
@@ -22,9 +25,51 @@ void ProjectDS::init_filetype_handlers() {
     {
         FileTypeHandler handler;
         handler.name = "Localization";
-        handler.render_fn = [](std::istream& stream) {
-            ImGui::Text("Custom handler for localization goes here");
-            ImGui::TextDisabled("Someday...");
+        handler.render = [](Decima::CompressedFile& file, bool update) {
+            static std::vector<Decima::Localization> locals;
+
+            imemstream stream(file.storage);
+
+            if (update) {
+                locals.clear();
+
+                while (stream.tellg() < file.storage.size()) {
+                    uint64_t magic = Decima::CoreFile::peek_header(stream);
+
+                    if (magic == Decima::DeathStranding_FileMagics::Localization) {
+                        Decima::Localization localization;
+                        localization.parse(stream);
+                        locals.push_back(std::move(localization));
+                    } else {
+                        Decima::Dummy dummy;
+                        dummy.parse(stream);
+                    }
+                }
+            } else {
+                for (const auto& local : locals) {
+                    if(ImGui::TreeNode(local.translations[0].c_str())) {
+                        ImGui::Columns(2);
+                        ImGui::SetColumnWidth(-1, 200);
+                        ImGui::Text("Language");
+                        ImGui::NextColumn();
+                        ImGui::Text("Value");
+                        ImGui::NextColumn();
+
+                        for(std::size_t index = 0; index < Decima::Localization::languages.size(); index++) {
+                            ImGui::Separator();
+                            ImGui::Text("%s", Decima::Localization::languages[index]);
+                            ImGui::NextColumn();
+                            ImGui::Text("%s", local.translations[index].c_str());
+                            ImGui::NextColumn();
+                        }
+
+                        ImGui::Columns(1);
+                        ImGui::TreePop();
+                    }
+
+                    ImGui::Separator();
+                }
+            }
         };
 
         root_tree.file_type_handlers.insert(
@@ -133,25 +178,37 @@ void ProjectDS::draw_filepreview() {
                 ImGui::Separator();
                 ImGui::Columns(1);
 
-                if (selection_info.preview_file != selection_info.selected_file) {
+                const bool selected_file_changed = selection_info.preview_file != selection_info.selected_file;
+
+                if (selected_file_changed) {
                     selection_info.preview_file = selection_info.selected_file;
                     selection_info.file = archive_array.query_file(selection_info.selected_file);
                     selection_info.file.unpack(0);
                 }
 
-                std::uint64_t file_type;
-                std::memcpy(reinterpret_cast<std::uint8_t*>(&file_type), selection_info.file.storage.data(), 8);
+                const auto file_type = Decima::CoreFile::peek_header(selection_info.file.storage);
+                const auto file_handler = root_tree.file_type_handlers.find(file_type);
 
-                const auto type_handler = root_tree.file_type_handlers.find(file_type);
+                if (selected_file_changed && file_handler != root_tree.file_type_handlers.end())
+                    file_handler->second.render(selection_info.file, true);
 
-                if (type_handler == root_tree.file_type_handlers.end()) {
-                    file_viewer.DrawContents(selection_info.file.storage.data(),
-                        selection_info.file.storage.size());
-                } else {
-                    imemstream stream { selection_info.file.storage };
-                    type_handler->second.render_fn(stream);
+                ImGui::BeginTabBar("Data View");
+                {
+                    if (ImGui::BeginTabItem("Raw View")) {
+                        file_viewer.DrawContents(selection_info.file.storage.data(), selection_info.file.storage.size());
+                        ImGui::EndTabItem();
+                    }
+
+                    if (ImGui::BeginTabItem("Normal View")) {
+                        if (file_handler != root_tree.file_type_handlers.end()) {
+                            file_handler->second.render(selection_info.file, false);
+                        } else {
+                            ImGui::Text("No human-readable view is available for this file");
+                        }
+                        ImGui::EndTabItem();
+                    }
                 }
-
+                ImGui::EndTabBar();
             } else {
                 ImGui::Text("Error getting file info!");
             }

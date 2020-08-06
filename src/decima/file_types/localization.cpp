@@ -9,9 +9,15 @@ void Decima::Localization::parse(std::istream& stream) {
     for (uint32_t i = 0; i < 25; i++) {
         uint16_t str_len;
         stream.read(reinterpret_cast<char*>(&str_len), 2);
-        translations[i].resize(str_len);
-        stream.read(translations[i].data(), str_len);
-        stream.seekg(3,std::ios::cur);
+
+        if (str_len > 0) {
+            translations[i].resize(str_len);
+            stream.read(translations[i].data(), str_len);
+        } else {
+            translations[i] = "<empty>";
+        }
+
+        stream.seekg(3, std::ios::cur);
     }
 }
 

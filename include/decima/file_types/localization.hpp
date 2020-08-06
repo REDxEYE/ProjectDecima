@@ -7,11 +7,40 @@
 
 #include "decima/file_types/core.h"
 
+#include <array>
+
 namespace Decima {
     class Localization : public CoreFile {
     public:
-        std::string translations[25];
+        static constexpr std::array<const char*, 25> languages = {
+            "English",
+            "French",
+            "Spanish",
+            "German",
+            "Italian",
+            "Dutch",
+            "Portuguese",
+            "Chinese (Traditional)",
+            "Korean",
+            "Russian",
+            "Polish",
+            "Norwegian",
+            "Finnish",
+            "Swedish",
+            "Danish",
+            "Japanese",
+            "Spanish (Mexico)",
+            "Portuguese (Brazil)",
+            "Turkish",
+            "Arabic",
+            "Chinese (Simplified)",
+            "Unknown",
+            "Greek",
+            "Czech",
+            "Hungarian"
+        };
 
+        std::string translations[languages.size()];
 
         void parse(std::vector<uint8_t>& buffer) override;
 

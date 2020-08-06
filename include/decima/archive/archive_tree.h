@@ -31,8 +31,7 @@ struct FileInfo {
 
 struct FileTypeHandler {
     std::string name;
-    std::function<void()> export_fn = nullptr;
-    std::function<void(imemstream&)> render_fn = nullptr;
+    std::function<void(Decima::CompressedFile&, bool update)> render = nullptr;
 };
 
 template <class T>
