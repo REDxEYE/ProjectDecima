@@ -19,6 +19,22 @@ void ProjectDS::update_user(double ts) {
 }
 
 
+
+
+void ProjectDS::init_filetype_handlers() {
+    {
+        FileTypeHandler handler;
+        handler.name = "Localization";
+        handler.render_fn = [](imemstream& stream) {
+            ImGui::Text("Custom handler for localization goes here");
+            ImGui::TextDisabled("Someday...");
+        };
+
+        root_tree.file_type_handlers.insert(
+                std::make_pair(Decima::DeathStranding_FileMagics::Localization, std::move(handler)));
+    }
+}
+
 void ProjectDS::draw_dockspace() {
     ImGuiViewport* viewport = ImGui::GetMainViewport();
     ImGui::SetNextWindowPos(viewport->GetWorkPos());
@@ -72,21 +88,6 @@ void ProjectDS::draw_dockspace() {
     ImGui::End();
 
 }
-
-void ProjectDS::init_filetype_handlers() {
-    {
-        FileTypeHandler handler;
-        handler.name = "Localization";
-        handler.render_fn = [](imemstream& stream) {
-            ImGui::Text("Custom handler for localization goes here");
-            ImGui::TextDisabled("Someday...");
-        };
-
-        root_tree.file_type_handlers.insert(
-                std::make_pair(Decima::DeathStranding_FileMagics::Localization, std::move(handler)));
-    }
-}
-
 
 void ProjectDS::draw_filepreview() {
     ImGui::Begin("File preview");

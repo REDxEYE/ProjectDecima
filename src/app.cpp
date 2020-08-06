@@ -4,6 +4,7 @@
 
 #include <functional>
 #include <iostream>
+
 #include "app.hpp"
 
 App::App(std::pair<uint32_t, uint32_t> window_size, std::string title) {

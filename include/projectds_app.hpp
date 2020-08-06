@@ -6,8 +6,10 @@
 #define PROJECTDS_PROJECTDS_APP_HPP
 
 #include "app.hpp"
+
 #include "imgui.h"
 #include "imgui_memory_editor.h"
+
 #include "decima/archive/archive_array.h"
 #include "decima/archive/archive_tree.h"
 #include "decima/constants.hpp"

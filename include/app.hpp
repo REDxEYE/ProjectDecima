@@ -5,15 +5,13 @@
 #ifndef PROJECTDS_APP_HPP
 #define PROJECTDS_APP_HPP
 
-
-#define IMGUI_IMPL_OPENGL_LOADER_GLAD
-
-#include "glad/glad.h"
-
 #include <string>
 #include <vector>
 #include <stdexcept>
 
+#define IMGUI_IMPL_OPENGL_LOADER_GLAD
+
+#include "glad/glad.h"
 #include <GLFW/glfw3.h>
 
 
