@@ -12,7 +12,7 @@ add_executable(ProjectDS
         src/imgui_backend_impl.cpp
         src/app.cpp src/projectds_app.cpp
         include/projectds_app.hpp
-        src/projectds_app_user.cpp)
+        src/projectds_app_user.cpp src/decima/file_types/dummy.cpp)
 
 target_include_directories(ProjectDS PUBLIC include ${HASHLIB_INC} ${OOZLIB_INC})
 
