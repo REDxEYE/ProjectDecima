@@ -13,7 +13,7 @@ namespace Decima {
 //        parse();
     }
 
-    void CoreFile::parse(imemstream& stream) {
+    void CoreFile::parse(std::istream& stream) {
         stream.read(reinterpret_cast<char*>(&header), sizeof(header));
         stream.read(reinterpret_cast<char*>(&guid), 16);
 

@@ -21,14 +21,14 @@ namespace Decima {
     };
 
     class CoreFile {
-    protected:
-        CoreHeader header = {};
-        uint64_t guid[2] = { 0, 0 };
-
     public:
+        CoreHeader header = {};
+
+        uint64_t guid[2] = {0, 0};
 
         virtual void parse(std::vector<uint8_t>& buffer);
-        virtual void parse(imemstream& stream);
+
+        virtual void parse(std::istream& stream);
     };
 }
 

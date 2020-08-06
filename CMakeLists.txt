@@ -24,5 +24,6 @@ add_subdirectory(cmake_subprojects/imgui)
 include(QuickHash.cmake)
 include(ArchiveTest.cmake)
 include(ProjectDS.cmake)
+include(TestField.cmake)
 
 

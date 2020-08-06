@@ -10,7 +10,7 @@ void Decima::Prefetch::parse(std::vector<uint8_t>& buffer) {
     parse(imembuffer);
 }
 
-void Decima::Prefetch::parse(imemstream& stream) {
+void Decima::Prefetch::parse(std::istream& stream) {
     CoreFile::parse(stream);
     stream.read(reinterpret_cast<char*>(&string_count), sizeof(string_count));
 

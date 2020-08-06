@@ -12,13 +12,13 @@
 
 
 namespace Decima {
-    class Prefetch: public CoreFile {
+    class Prefetch : public CoreFile {
+    public:
 
         uint32_t string_count = 0;
         uint32_t file_sizes_count = 0;
         uint32_t indices_count = 0;
 
-    public:
 
         std::vector<HashedString> strings;
         std::vector<uint32_t> file_sizes;
@@ -26,8 +26,9 @@ namespace Decima {
 
         Prefetch() = default;
 
-        void parse(std::vector<uint8_t>& buffer) override ;
-        void parse(imemstream& stream) override ;
+        void parse(std::vector<uint8_t>& buffer) override;
+
+        void parse(std::istream& stream) override;
 
     };
 }
