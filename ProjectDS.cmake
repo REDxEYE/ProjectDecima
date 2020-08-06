@@ -1,4 +1,4 @@
-add_executable(NoLGLEProjectDS
+add_executable(ProjectDS
         src/no_lgle_main.cpp
         src/archive.cpp
         src/file_types/prefetch.cpp
@@ -9,14 +9,14 @@ add_executable(NoLGLEProjectDS
         src/file_types/core.cpp
         src/archive_file.cpp src/imgui_backend_impl.cpp)
 
-target_include_directories(NoLGLEProjectDS PUBLIC include ${HASHLIB_INC} ${OOZLIB_INC})
+target_include_directories(ProjectDS PUBLIC include ${HASHLIB_INC} ${OOZLIB_INC})
 
-target_include_directories(NoLGLEProjectDS PUBLIC
+target_include_directories(ProjectDS PUBLIC
         libs/glad/include
         libs/glfw/include
         )
 
-target_link_libraries(NoLGLEProjectDS PUBLIC
+target_link_libraries(ProjectDS PUBLIC
         HashLib oozLib glfw glad imgui
         -static-libgcc -static-libstdc++ -static
         -Wl,-Bstatic -lstdc++ -lpthread
