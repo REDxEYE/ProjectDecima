@@ -16,7 +16,6 @@
 namespace Decima {
 
 
-
     class ArchiveArray;
 
     class Archive {
@@ -38,29 +37,25 @@ namespace Decima {
 
         [[nodiscard]] bool is_valid() const;
 
+        [[maybe_unused]] Decima::CompressedFile query_file(uint64_t file_hash);
 
-        //TODO: replace std::vector<uint8_t> with Decima::File
-        Decima::CompressedFile query_file(uint64_t file_hash);
-        Decima::CompressedFile query_file(const std::string& file_name);
+        [[maybe_unused]] Decima::CompressedFile query_file(const std::string& file_name);
 
     private:
         static void decrypt(uint32_t key_1, uint32_t key_2, uint32_t* data);
 
         uint64_t chunk_id_by_offset(uint64_t offset);
 
-        std::vector<uint8_t> get_chunk_data(const Decima::ChunkEntry& chunk);
+        std::pair<std::vector<ChunkEntry>::iterator, std::vector<ChunkEntry>::iterator>
+        get_mio_boundaries(int32_t file_id);
 
-        void decrypt_chunk(uint32_t chunk_id, std::vector<uint8_t>& src);
+        [[maybe_unused]] [[nodiscard]] uint64_t get_file_index(uint64_t file_hash) const;
 
-        std::pair<std::vector<ChunkEntry>::iterator, std::vector<ChunkEntry>::iterator> get_mio_boundaries(int32_t file_id);
-
-        [[nodiscard]] uint64_t get_file_index(uint64_t file_hash) const;
-
-        [[nodiscard]] uint64_t get_file_index(const std::string& file_name) const;
+        [[maybe_unused]] [[nodiscard]] uint64_t get_file_index(const std::string& file_name) const;
 
         friend ArchiveArray;
     };
 
 
-};
+}
 #endif //PROJECTDS_ARCHIVE_H
