@@ -8,21 +8,22 @@
 #include "decima/archive/archive.h"
 #include "utils.h"
 
-
 #include <MurmurHash3.h>
 #include <md5.h>
 
-template<class T>
+template <class T>
 using slice = std::pair<std::decay_t<T>, std::decay_t<T>>;
 
 Decima::Archive::Archive(const std::string& workdir, const std::string& filename)
-        : filepath(workdir + "\\" + filename) {}
+    : filepath(workdir + "\\" + filename) { }
 
 Decima::Archive::Archive(const std::string& workdir, uint64_t filehash)
-        : Archive(workdir, uint64_to_hex(filehash) + ".bin") {}
+    : Archive(workdir, uint64_to_hex(filehash) + ".bin") { }
 
 bool Decima::Archive::open() {
     std::error_code error;
+
+    log("Archive", "Loading " + std::filesystem::path(filepath).stem().string() + " archive");
     filebuffer.map(filepath, error);
 
     if (error)
@@ -34,27 +35,29 @@ bool Decima::Archive::open() {
         return false;
 
     if (is_encrypted())
-        decrypt(header.key, header.key + 1, (uint32_t*) &header + 2);
+        decrypt(header.key, header.key + 1, (uint32_t*)&header + 2);
 
     std::size_t read_offset = sizeof(header);
 
     content_table.resize(header.content_table_size);
+    log("Archive", "Reading " + std::to_string(header.content_table_size) + " file entries");
     memcpy(content_table.data(), filebuffer.data() + read_offset,
-           sizeof(FileEntry) * header.content_table_size);
+        sizeof(FileEntry) * header.content_table_size);
 
     read_offset += sizeof(FileEntry) * header.content_table_size;
 
     chunk_table.resize(header.chunk_table_size);
+    log("Archive", "Reading " + std::to_string(header.chunk_table_size) + " chunks");
     memcpy(chunk_table.data(), filebuffer.data() + read_offset, sizeof(chunk_table.front()) * header.chunk_table_size);
 
     if (is_encrypted()) {
         for (auto& file_entry : content_table) {
-            decrypt(file_entry.key, file_entry.key2, (uint32_t*) &file_entry);
+            decrypt(file_entry.key, file_entry.key2, (uint32_t*)&file_entry);
         }
 
         for (auto& chunk : chunk_table) {
             auto saved_key = chunk.key_1;
-            decrypt(chunk.key_1, chunk.key_2, (uint32_t*) &chunk);
+            decrypt(chunk.key_1, chunk.key_2, (uint32_t*)&chunk);
             chunk.key_1 = saved_key;
         }
     }
@@ -72,8 +75,8 @@ bool Decima::Archive::is_encrypted() const {
 
 void Decima::Archive::decrypt(uint32_t key_1, uint32_t key_2, uint32_t* data) {
     const uint32_t inputKey[2][4] = {
-            {key_1, encryption_key_1[1], encryption_key_1[2], encryption_key_1[3]},
-            {key_2, encryption_key_1[1], encryption_key_1[2], encryption_key_1[3]}
+        { key_1, encryption_key_1[1], encryption_key_1[2], encryption_key_1[3] },
+        { key_2, encryption_key_1[1], encryption_key_1[2], encryption_key_1[3] }
     };
 
     uint32_t iv[4];
@@ -89,7 +92,7 @@ void Decima::Archive::decrypt(uint32_t key_1, uint32_t key_2, uint32_t* data) {
 std::pair<std::vector<Decima::ChunkEntry>::iterator, std::vector<Decima::ChunkEntry>::iterator>
 Decima::Archive::get_mio_boundaries(int32_t file_id) {
     if (file_id == -1)
-        return {chunk_table.end(), chunk_table.end()};
+        return { chunk_table.end(), chunk_table.end() };
 
     const auto& file_entry = content_table.at(file_id);
 
@@ -102,10 +105,8 @@ Decima::Archive::get_mio_boundaries(int32_t file_id) {
     const auto first_chunk_row = chunk_id_by_offset(first_chunk);
     const auto last_chunk_row = chunk_id_by_offset(last_chunk);
 
-    return {chunk_table.begin() + first_chunk_row, chunk_table.begin() + last_chunk_row+1};
-
+    return { chunk_table.begin() + first_chunk_row, chunk_table.begin() + last_chunk_row + 1 };
 }
-
 
 [[maybe_unused]] uint64_t Decima::Archive::get_file_index(const std::string& file_name) const {
     uint64_t hash = hash_string(sanitize_name(file_name), seed);
@@ -131,6 +132,7 @@ uint64_t Decima::Archive::chunk_id_by_offset(uint64_t offset) {
 }
 
 Decima::CompressedFile Decima::Archive::query_file(uint64_t file_hash) {
+    //    log("Archive", "Queried " + uint64_to_hex(file_hash) + " file");
     auto file_id = get_file_index(file_hash);
     if (file_id == -1) {
         return Decima::CompressedFile(nullptr, nullptr, nullptr);
@@ -144,5 +146,6 @@ Decima::CompressedFile Decima::Archive::query_file(uint64_t file_hash) {
 }
 
 [[maybe_unused]] Decima::CompressedFile Decima::Archive::query_file(const std::string& file_name) {
+    log("Archive", "Queried " + file_name + " file");
     return query_file(hash_string(sanitize_name(file_name), seed));
 }

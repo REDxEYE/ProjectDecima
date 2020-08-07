@@ -110,6 +110,8 @@ void Decima::Texture::draw(ArchiveArray& archive_array) {
         ImGui::NextColumn();
         ImGui::Separator();
 
+        ImGui::Columns(1);
+
         ImGui::TreePop();
     }
 }

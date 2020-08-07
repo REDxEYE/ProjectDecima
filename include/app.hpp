@@ -12,7 +12,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-
 struct WindowInfo {
     uint32_t m_win_width;
     uint32_t m_win_height;
@@ -42,10 +41,7 @@ private:
 
     void glfw_error_handler(int error, const char* message);
 
-    void log(std::string prefix, std::string info);
-
 protected:
-
     virtual void init_user();
 
     virtual void update_user(double ts);
@@ -54,9 +50,8 @@ protected:
 
     virtual void end_frame_user();
 
-
     inline void clear_window(float r = 0, float g = 0, float b = 0, float a = 1,
-                             uint32_t flags = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        uint32_t flags = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     WindowInfo m_win_info;
     GLFWwindow* m_window;

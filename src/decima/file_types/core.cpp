@@ -3,7 +3,9 @@
 //
 
 #include <iomanip>
+
 #include "decima/file_types/core.h"
+
 
 namespace Decima {
     std::ostream& operator<<(std::ostream& os, GUID guid) {

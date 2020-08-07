@@ -7,6 +7,8 @@
 
 #include "app.hpp"
 
+#include "utils.h"
+
 App::App(std::pair<uint32_t, uint32_t> window_size, std::string title) {
     m_win_info.m_win_width = window_size.first;
     m_win_info.m_win_height = window_size.second;
@@ -33,10 +35,10 @@ void App::init_glfw() {
     log("App::GLFW", "Initialization");
     glfwInit();
     m_window = glfwCreateWindow(m_win_info.m_win_width, m_win_info.m_win_height, m_win_info.m_title.c_str(),
-                                          nullptr, nullptr);
+        nullptr, nullptr);
     auto binded_error_callback = std::bind(&App::glfw_error_handler, this,
-                                           std::placeholders::_1,
-                                           std::placeholders::_2);
+        std::placeholders::_1,
+        std::placeholders::_2);
     glfwSetErrorCallback(reinterpret_cast<GLFWerrorfun>(&binded_error_callback));
     glfwMakeContextCurrent(m_window);
     glfwSetInputMode(m_window, GLFW_STICKY_KEYS, GLFW_FALSE);
@@ -53,8 +55,6 @@ void App::init_glfw() {
         glViewport(0, 0, width, height);
     });
     log("App::GLFW", "Done");
-
-
 }
 
 void App::glfw_error_handler(int error, const char* message) {
@@ -73,9 +73,7 @@ void App::init_opengl() {
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     log("App GLAD", "Done");
-
 }
-
 
 void App::update(double ts) {
     begin_frame();
@@ -97,32 +95,16 @@ void App::end_frame() {
     end_frame_user();
     glfwSwapBuffers(m_window);
     glfwPollEvents();
-
 }
-
-void App::log(std::string prefix, std::string info) {
-    std::cout << "[" << prefix << "] : " << info << '\n';
-
-}
-
 
 void App::init_user() {
-
 }
 
 void App::update_user(double ts) {
-
 }
 
 void App::begin_frame_user() {
-
 }
 
 void App::end_frame_user() {
-
 }
-
-
-
-
-

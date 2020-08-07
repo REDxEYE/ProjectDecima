@@ -28,5 +28,7 @@ bool decompress_chunk_data(const uint8_t* data, uint64_t data_size, uint64_t dec
 
 void split(const std::string& str, std::vector<std::string>& cont, char delim);
 
+void log(std::string prefix, std::string info);
+
 #endif //PROJECTDS_UTILS_H
 

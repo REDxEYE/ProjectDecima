@@ -21,6 +21,8 @@ namespace Decima {
 
     std::ostream& operator<<(std::ostream& os, GUID guid);
 
+
+
     class ArchiveArray;
     struct __attribute__((packed)) CoreHeader {
         std::uint64_t filetype;
@@ -43,5 +45,4 @@ namespace Decima {
         virtual void draw(ArchiveArray& archive_array);
     };
 }
-
 #endif //PROJECTDS_CORE_H
