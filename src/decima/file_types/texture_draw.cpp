@@ -8,7 +8,10 @@
 #include "imgui.h"
 
 void Decima::Texture::draw(ArchiveArray& archive_array) {
-    if (ImGui::TreeNode((uint64_to_hex(guid[0]) + uint64_to_hex(guid[1])).c_str())) {
+    std::stringstream buffer;
+    buffer << guid;
+
+    if (ImGui::TreeNode(buffer.str().c_str())) {
         ImGui::Columns(2);
         ImGui::SetColumnWidth(-1, 200);
         ImGui::Text("Prop");

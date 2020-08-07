@@ -11,5 +11,5 @@ void Decima::Dummy::parse(std::vector<uint8_t>& buffer) {
 
 void Decima::Dummy::parse(std::istream& stream) {
     CoreFile::parse(stream);
-    stream.seekg(header.file_size - 16 /*GUID*/, std::ios::cur); //Skipping bytes
+    stream.seekg(header.file_size - sizeof(Decima::GUID), std::ios::cur); //Skipping bytes
 }

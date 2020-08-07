@@ -15,6 +15,12 @@
 //#include "decima/archive/archive_array.h"
 
 namespace Decima {
+    struct GUID {
+        std::uint64_t data[2];
+    };
+
+    std::ostream& operator<<(std::ostream& os, GUID guid);
+
     class ArchiveArray;
     struct __attribute__((packed)) CoreHeader {
         std::uint64_t filetype;
@@ -23,8 +29,8 @@ namespace Decima {
 
     class CoreFile {
     public:
-        CoreHeader header = {};
-        uint64_t guid[2] = {0, 0};
+        CoreHeader header {};
+        GUID guid {};
 
         static uint64_t peek_header(std::vector<uint8_t>& buffer);
 
