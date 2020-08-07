@@ -45,6 +45,8 @@ namespace Decima {
         void parse(std::vector<uint8_t>& buffer) override;
 
         void parse(std::istream& stream) override;
+
+        void draw(ArchiveArray& archive_array) override;
     };
 
 }

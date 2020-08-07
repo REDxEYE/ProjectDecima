@@ -8,6 +8,7 @@
 
 
 void ProjectDS::parse_core_file() {
+    parsed_files.clear();
     imemstream stream(selection_info.file.storage);
 
     while (stream.tellg() < selection_info.file.storage.size()) {
@@ -18,11 +19,13 @@ void ProjectDS::parse_core_file() {
                 Decima::Localization localization;
                 localization.parse(stream);
                 parsed_files.push_back(std::make_shared<Decima::Localization>(localization));
+                break;
             }
             default:{
                 Decima::Dummy dummy;
                 dummy.parse(stream);
                 parsed_files.push_back(std::make_shared<Decima::Dummy>(dummy));
+                break;
             }
         }
 

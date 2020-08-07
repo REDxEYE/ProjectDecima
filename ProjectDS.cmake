@@ -11,12 +11,11 @@ add_executable(ProjectDS
         src/decima/archive/archive_file.cpp
         src/imgui_backend_impl.cpp
         src/app.cpp src/projectds_app.cpp
-        include/projectds_app.hpp
         src/projectds_app_draw.cpp
         src/decima/file_types/dummy.cpp
         src/decima/file_types/core_draw.cpp
         src/projectds_app_utils.cpp
-        )
+        src/decima/file_types/localization_draw.cpp)
 
 target_include_directories(ProjectDS PUBLIC include ${HASHLIB_INC} ${OOZLIB_INC})
 

@@ -22,59 +22,6 @@ void ProjectDS::update_user(double ts) {
 }
 
 void ProjectDS::init_filetype_handlers() {
-//    {
-//        FileTypeHandler handler;
-//        handler.name = "Localization";
-//        handler.render = [](Decima::CompressedFile& file, bool update) {
-//            static std::vector<Decima::Localization> locals;
-//
-//            imemstream stream(file.storage);
-//
-//            if (update) {
-//                locals.clear();
-//
-//                while (stream.tellg() < file.storage.size()) {
-//                    uint64_t magic = Decima::CoreFile::peek_header(stream);
-//
-//                    if (magic == Decima::DeathStranding_FileMagics::Localization) {
-//                        Decima::Localization localization;
-//                        localization.parse(stream);
-//                        locals.push_back(std::move(localization));
-//                    } else {
-//                        Decima::Dummy dummy;
-//                        dummy.parse(stream);
-//                    }
-//                }
-//            } else {
-//                for (const auto& local : locals) {
-//                    if(ImGui::TreeNode(local.translations[0].c_str())) {
-//                        ImGui::Columns(2);
-//                        ImGui::SetColumnWidth(-1, 200);
-//                        ImGui::Text("Language");
-//                        ImGui::NextColumn();
-//                        ImGui::Text("Value");
-//                        ImGui::NextColumn();
-//
-//                        for(std::size_t index = 0; index < Decima::Localization::languages.size(); index++) {
-//                            ImGui::Separator();
-//                            ImGui::Text("%s", Decima::Localization::languages[index]);
-//                            ImGui::NextColumn();
-//                            ImGui::Text("%s", local.translations[index].c_str());
-//                            ImGui::NextColumn();
-//                        }
-//
-//                        ImGui::Columns(1);
-//                        ImGui::TreePop();
-//                    }
-//
-//                    ImGui::Separator();
-//                }
-//            }
-//        };
-//
-//        root_tree.file_type_handlers.insert(
-//            std::make_pair(Decima::DeathStranding_FileMagics::Localization, std::move(handler)));
-//    }
 }
 
 void ProjectDS::draw_dockspace() {
