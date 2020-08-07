@@ -8,7 +8,7 @@
 #include "imgui.h"
 
 void Decima::Texture::draw(ArchiveArray& archive_array) {
-    if (ImGui::TreeNode((uint64_to_hex(guid[0]) + uint64_to_hex(guid[1])).c_str())) {
+    if (ImGui::TreeNode(("Texture "+uint64_to_hex(guid[0]) + uint64_to_hex(guid[1])).c_str())) {
         ImGui::Columns(2);
         ImGui::SetColumnWidth(-1, 200);
         ImGui::Text("Prop");
@@ -65,7 +65,7 @@ void Decima::Texture::draw(ArchiveArray& archive_array) {
         ImGui::NextColumn();
         ImGui::Separator();
 
-        ImGui::Text("unk3");
+        ImGui::Text("GUID");
         ImGui::NextColumn();
         ImGui::Text("%llX%llX",file_guid[0],file_guid[1]);
         ImGui::NextColumn();
