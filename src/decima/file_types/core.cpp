@@ -30,4 +30,5 @@ namespace Decima {
         stream.seekg(-8,std::ios::cur);
         return magic;
     }
+
 }

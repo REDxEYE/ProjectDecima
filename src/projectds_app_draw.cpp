@@ -22,59 +22,59 @@ void ProjectDS::update_user(double ts) {
 }
 
 void ProjectDS::init_filetype_handlers() {
-    {
-        FileTypeHandler handler;
-        handler.name = "Localization";
-        handler.render = [](Decima::CompressedFile& file, bool update) {
-            static std::vector<Decima::Localization> locals;
-
-            imemstream stream(file.storage);
-
-            if (update) {
-                locals.clear();
-
-                while (stream.tellg() < file.storage.size()) {
-                    uint64_t magic = Decima::CoreFile::peek_header(stream);
-
-                    if (magic == Decima::DeathStranding_FileMagics::Localization) {
-                        Decima::Localization localization;
-                        localization.parse(stream);
-                        locals.push_back(std::move(localization));
-                    } else {
-                        Decima::Dummy dummy;
-                        dummy.parse(stream);
-                    }
-                }
-            } else {
-                for (const auto& local : locals) {
-                    if(ImGui::TreeNode(local.translations[0].c_str())) {
-                        ImGui::Columns(2);
-                        ImGui::SetColumnWidth(-1, 200);
-                        ImGui::Text("Language");
-                        ImGui::NextColumn();
-                        ImGui::Text("Value");
-                        ImGui::NextColumn();
-
-                        for(std::size_t index = 0; index < Decima::Localization::languages.size(); index++) {
-                            ImGui::Separator();
-                            ImGui::Text("%s", Decima::Localization::languages[index]);
-                            ImGui::NextColumn();
-                            ImGui::Text("%s", local.translations[index].c_str());
-                            ImGui::NextColumn();
-                        }
-
-                        ImGui::Columns(1);
-                        ImGui::TreePop();
-                    }
-
-                    ImGui::Separator();
-                }
-            }
-        };
-
-        root_tree.file_type_handlers.insert(
-            std::make_pair(Decima::DeathStranding_FileMagics::Localization, std::move(handler)));
-    }
+//    {
+//        FileTypeHandler handler;
+//        handler.name = "Localization";
+//        handler.render = [](Decima::CompressedFile& file, bool update) {
+//            static std::vector<Decima::Localization> locals;
+//
+//            imemstream stream(file.storage);
+//
+//            if (update) {
+//                locals.clear();
+//
+//                while (stream.tellg() < file.storage.size()) {
+//                    uint64_t magic = Decima::CoreFile::peek_header(stream);
+//
+//                    if (magic == Decima::DeathStranding_FileMagics::Localization) {
+//                        Decima::Localization localization;
+//                        localization.parse(stream);
+//                        locals.push_back(std::move(localization));
+//                    } else {
+//                        Decima::Dummy dummy;
+//                        dummy.parse(stream);
+//                    }
+//                }
+//            } else {
+//                for (const auto& local : locals) {
+//                    if(ImGui::TreeNode(local.translations[0].c_str())) {
+//                        ImGui::Columns(2);
+//                        ImGui::SetColumnWidth(-1, 200);
+//                        ImGui::Text("Language");
+//                        ImGui::NextColumn();
+//                        ImGui::Text("Value");
+//                        ImGui::NextColumn();
+//
+//                        for(std::size_t index = 0; index < Decima::Localization::languages.size(); index++) {
+//                            ImGui::Separator();
+//                            ImGui::Text("%s", Decima::Localization::languages[index]);
+//                            ImGui::NextColumn();
+//                            ImGui::Text("%s", local.translations[index].c_str());
+//                            ImGui::NextColumn();
+//                        }
+//
+//                        ImGui::Columns(1);
+//                        ImGui::TreePop();
+//                    }
+//
+//                    ImGui::Separator();
+//                }
+//            }
+//        };
+//
+//        root_tree.file_type_handlers.insert(
+//            std::make_pair(Decima::DeathStranding_FileMagics::Localization, std::move(handler)));
+//    }
 }
 
 void ProjectDS::draw_dockspace() {
@@ -84,12 +84,12 @@ void ProjectDS::draw_dockspace() {
     ImGui::SetNextWindowViewport(viewport->ID);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0.0f, 0.0f });
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0.0f, 0.0f});
     const auto dock_flags = ImGuiWindowFlags_MenuBar
-        | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar
-        | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove
-        | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus
-        | ImGuiWindowFlags_NoBackground;
+                            | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar
+                            | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove
+                            | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus
+                            | ImGuiWindowFlags_NoBackground;
     ImGui::Begin("DockSpace", nullptr, dock_flags);
     {
         ImGui::PopStyleVar(3);
@@ -105,7 +105,7 @@ void ProjectDS::draw_dockspace() {
                         file_names.clear();
                         file_names.reserve(archive_array.hash_to_name.size());
 
-                        for (auto& [hash, path] : archive_array.hash_to_name) {
+                        for (auto&[hash, path] : archive_array.hash_to_name) {
                             file_names.push_back(path.c_str());
                             auto* current_root = &root_tree;
 
@@ -116,7 +116,7 @@ void ProjectDS::draw_dockspace() {
                                 current_root = current_root->add_folder(*it);
 
                             if (archive_array.hash_to_archive.find(hash) != archive_array.hash_to_archive.end())
-                                current_root->add_file(split_path.back(), hash, { 0 });
+                                current_root->add_file(split_path.back(), hash, {0});
                         }
                     }
                 }
@@ -184,27 +184,36 @@ void ProjectDS::draw_filepreview() {
                     selection_info.preview_file = selection_info.selected_file;
                     selection_info.file = archive_array.query_file(selection_info.selected_file);
                     selection_info.file.unpack(0);
+
+                    parse_core_file();
+
+
+
                 }
 
-                const auto file_type = Decima::CoreFile::peek_header(selection_info.file.storage);
-                const auto file_handler = root_tree.file_type_handlers.find(file_type);
+//                const auto file_type = Decima::CoreFile::peek_header(selection_info.file.storage);
+//                const auto file_handler = root_tree.file_type_handlers.find(file_type);
 
-                if (selected_file_changed && file_handler != root_tree.file_type_handlers.end())
-                    file_handler->second.render(selection_info.file, true);
+//                if (selected_file_changed && file_handler != root_tree.file_type_handlers.end())
+//                    file_handler->second.render(selection_info.file, true);
 
                 ImGui::BeginTabBar("Data View");
                 {
                     if (ImGui::BeginTabItem("Raw View")) {
-                        file_viewer.DrawContents(selection_info.file.storage.data(), selection_info.file.storage.size());
+                        file_viewer.DrawContents(selection_info.file.storage.data(),
+                                                 selection_info.file.storage.size());
                         ImGui::EndTabItem();
                     }
 
                     if (ImGui::BeginTabItem("Normal View")) {
-                        if (file_handler != root_tree.file_type_handlers.end()) {
-                            file_handler->second.render(selection_info.file, false);
-                        } else {
-                            ImGui::Text("No human-readable view is available for this file");
+                        for(auto& file:parsed_files){
+                            file.draw(archive_array);
                         }
+//                        if (file_handler != root_tree.file_type_handlers.end()) {
+//                            file_handler->second.render(selection_info.file, false);
+//                        } else {
+//                            ImGui::Text("No human-readable view is available for this file");
+//                        }
                         ImGui::EndTabItem();
                     }
                 }
@@ -227,7 +236,7 @@ void ProjectDS::draw_tree() {
 
             file_names.clear();
 
-            for (auto& [_, path] : archive_array.hash_to_name) {
+            for (auto&[_, path] : archive_array.hash_to_name) {
                 if (filter.PassFilter(path.c_str())) {
                     file_names.push_back(path.c_str());
                 }
@@ -240,7 +249,7 @@ void ProjectDS::draw_tree() {
                 ImGui::PushItemWidth(-1);
                 if (ImGui::ListBox("TREE", &file_id, file_names.data(), file_names.size(), 50))
                     selection_info.selected_file = hash_string(sanitize_name(file_names[file_id]),
-                        Decima::seed);
+                                                               Decima::seed);
                 ImGui::EndTabItem();
             }
 
@@ -275,7 +284,7 @@ void ProjectDS::draw_export() {
             const auto full_path = pfd::save_file("Choose destination file").result();
 
             if (!full_path.empty()) {
-                std::ofstream output_file { full_path };
+                std::ofstream output_file{full_path};
 
                 root_tree.visit([&](const auto& name, auto depth) {
                     output_file << std::string(depth * 2, ' ');
@@ -291,7 +300,7 @@ void ProjectDS::draw_export() {
             const auto full_path = pfd::save_file("Choose destination file").result();
 
             if (!full_path.empty()) {
-                std::ofstream output_file { full_path };
+                std::ofstream output_file{full_path};
 
                 for (const auto& archive : archive_array.archives) {
                     output_file << archive.filepath << '\n';
@@ -374,7 +383,7 @@ void ProjectDS::draw_export() {
 
                     auto file = archive_array.query_file(filename);
                     file.unpack(0);
-                    std::ofstream output_file { full_path, std::ios::binary };
+                    std::ofstream output_file{full_path, std::ios::binary};
                     output_file.write(reinterpret_cast<const char*>(file.storage.data()), file.storage.size());
 
                     std::cout << "File was exported to: " << full_path << "\n";
@@ -396,6 +405,6 @@ void ProjectDS::draw_debug() {
     //            ImGui::PushStyleColor(ImGuiCol_Text,IM_COL32(0x80,0x80,0xFF,0xFF));
     //            ImGui::PushStyleColor(ImGuiCol_Text,IM_COL32(0xF0,0x80,0xFF,0xFF));
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
-        1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+                1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::End();
 }

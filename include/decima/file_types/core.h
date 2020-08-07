@@ -12,9 +12,10 @@
 #include "membuf.hpp"
 #include "shared.hpp"
 
+//#include "decima/archive/archive_array.h"
 
 namespace Decima {
-
+    class ArchiveArray;
     struct __attribute__((packed)) CoreHeader {
         std::uint64_t filetype;
         std::uint32_t file_size;
@@ -26,11 +27,14 @@ namespace Decima {
         uint64_t guid[2] = {0, 0};
 
         static uint64_t peek_header(std::vector<uint8_t>& buffer);
+
         static uint64_t peek_header(std::istream& stream);
 
         virtual void parse(std::vector<uint8_t>& buffer);
 
         virtual void parse(std::istream& stream);
+
+        virtual void draw(ArchiveArray& archive_array);
     };
 }
 
