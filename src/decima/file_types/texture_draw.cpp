@@ -68,7 +68,7 @@ void Decima::Texture::draw(ArchiveArray& archive_array) {
         ImGui::NextColumn();
         ImGui::Separator();
 
-        ImGui::Text("unk3");
+        ImGui::Text("GUID");
         ImGui::NextColumn();
         ImGui::Text("%llX%llX",file_guid[0],file_guid[1]);
         ImGui::NextColumn();
