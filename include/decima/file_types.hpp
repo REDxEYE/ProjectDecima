@@ -9,5 +9,6 @@
 #include "decima/file_types/dummy.h"
 #include "decima/file_types/localization.hpp"
 #include "decima/file_types/prefetch.h"
+#include "decima/file_types/texture.h"
 
 #endif //PROJECTDS_FILE_TYPES_HPP

@@ -21,6 +21,12 @@ void ProjectDS::parse_core_file() {
                 parsed_files.push_back(std::make_shared<Decima::Localization>(localization));
                 break;
             }
+            case (Decima::DeathStranding_FileMagics::Texture): {
+                Decima::Texture texture;
+                texture.parse(stream);
+                parsed_files.push_back(std::make_shared<Decima::Texture>(texture));
+                break;
+            }
             default:{
                 Decima::Dummy dummy;
                 dummy.parse(stream);
