@@ -102,10 +102,10 @@ void FileTree::draw(SelectionInfo& selection, Decima::ArchiveArray& archive_arra
         if (file_entry.has_value()) {
             auto size = file_entry.value().get().size;
 
-            if (data.first.header.filetype == 0) {
+            if (data.first.header.file_type == 0) {
                 auto file_data = archive_array.query_file(data.first.hash);
                 if (!file_data.is_valid()) {
-                    data.first.header.filetype=-1;
+                    data.first.header.file_type =-1;
                 } else {
                     file_data.unpack(0);
                     memcpy(&data.first.header,file_data.storage.data(),sizeof(Decima::CoreHeader));
@@ -114,8 +114,8 @@ void FileTree::draw(SelectionInfo& selection, Decima::ArchiveArray& archive_arra
 
             ImGui::NextColumn();
             auto& file_info = data.first.header;
-            if (Decima::known_file_types.find(file_info.filetype) != Decima::known_file_types.end()) {
-                ImGui::Text("%s", Decima::known_file_types.at(file_info.filetype).c_str());
+            if (Decima::known_file_types.find(file_info.file_type) != Decima::known_file_types.end()) {
+                ImGui::Text("%s", Decima::known_file_types.at(file_info.file_type).c_str());
             } else {
                 ImGui::Text("Unknown");
             }
