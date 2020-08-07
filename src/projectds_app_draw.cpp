@@ -207,7 +207,7 @@ void ProjectDS::draw_filepreview() {
 
                     if (ImGui::BeginTabItem("Normal View")) {
                         for(auto& file:parsed_files){
-                            file.draw(archive_array);
+                            file->draw(archive_array);
                         }
 //                        if (file_handler != root_tree.file_type_handlers.end()) {
 //                            file_handler->second.render(selection_info.file, false);

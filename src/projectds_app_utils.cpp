@@ -17,12 +17,12 @@ void ProjectDS::parse_core_file() {
             case (Decima::DeathStranding_FileMagics::Localization): {
                 Decima::Localization localization;
                 localization.parse(stream);
-                parsed_files.push_back(std::move(localization));
+                parsed_files.push_back(std::make_shared<Decima::Localization>(localization));
             }
             default:{
                 Decima::Dummy dummy;
                 dummy.parse(stream);
-                parsed_files.push_back(std::move(dummy));
+                parsed_files.push_back(std::make_shared<Decima::Dummy>(dummy));
             }
         }
 

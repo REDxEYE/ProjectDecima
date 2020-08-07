@@ -26,7 +26,7 @@ private:
     std::vector<const char*> file_names;
     FileTree root_tree;
     SelectionInfo selection_info;
-    std::vector<Decima::CoreFile> parsed_files;
+    std::vector<std::shared_ptr<Decima::CoreFile>> parsed_files;
     int32_t file_id = 0;
     ImGuiTextFilter filter;
     MemoryEditor file_viewer;
