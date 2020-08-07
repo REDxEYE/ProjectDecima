@@ -6,7 +6,7 @@ add_executable(ProjectDS
         src/utils.cpp
         src/decima/file_types/prefetch.cpp
         src/decima/archive/archive_tree.cpp
-        src/decima/file_types/localization.cpp
+        src/decima/file_types/translation.cpp
         src/decima/file_types/core.cpp
         src/decima/archive/archive_file.cpp
         src/imgui_backend_impl.cpp
@@ -15,7 +15,7 @@ add_executable(ProjectDS
         src/decima/file_types/dummy.cpp
         src/decima/file_types/core_draw.cpp
         src/projectds_app_utils.cpp
-        src/decima/file_types/localization_draw.cpp src/decima/file_types/texture.cpp src/decima/file_types/texture_draw.cpp)
+        src/decima/file_types/translation_draw.cpp src/decima/file_types/texture.cpp src/decima/file_types/texture_draw.cpp)
 
 target_include_directories(ProjectDS PUBLIC include ${HASHLIB_INC} ${OOZLIB_INC})
 

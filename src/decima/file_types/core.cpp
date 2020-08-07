@@ -6,7 +6,6 @@
 
 #include "decima/file_types/core.h"
 
-
 namespace Decima {
     std::ostream& operator<<(std::ostream& os, GUID guid) {
         return os << std::hex << std::setfill('0')
@@ -14,7 +13,7 @@ namespace Decima {
                   << std::setw(4) << (guid.data[0] >> 16 & 0xffff) << '-'
                   << std::setw(4) << (guid.data[0] >> 0 & 0xffff) << '-'
                   << std::setw(4) << (guid.data[1] >> 48) << '-'
-                  << std::setw(12) << (guid.data[1] >> 0);
+                  << std::setw(12) << (guid.data[1] >> 0 & 0xffffffffffff);
     }
 
     void CoreFile::parse(std::vector<uint8_t>& buffer) {
@@ -40,4 +39,17 @@ namespace Decima {
         return magic;
     }
 
+    std::string read_string(std::istream& stream, const std::string& default_value) {
+        std::uint16_t length;
+        stream.read(reinterpret_cast<char*>(&length), sizeof(length));
+
+        if (length > 0) {
+            std::string buffer;
+            buffer.resize(length);
+            stream.read(buffer.data(), length);
+            return buffer;
+        }
+
+        return default_value;
+    }
 }

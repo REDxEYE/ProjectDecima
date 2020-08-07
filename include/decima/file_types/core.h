@@ -12,8 +12,6 @@
 #include "membuf.hpp"
 #include "shared.hpp"
 
-//#include "decima/archive/archive_array.h"
-
 namespace Decima {
     struct GUID {
         std::uint64_t data[2];
@@ -21,11 +19,9 @@ namespace Decima {
 
     std::ostream& operator<<(std::ostream& os, GUID guid);
 
-
-
     class ArchiveArray;
     struct __attribute__((packed)) CoreHeader {
-        std::uint64_t filetype;
+        std::uint64_t file_type;
         std::uint32_t file_size;
     };
 
@@ -44,5 +40,7 @@ namespace Decima {
 
         virtual void draw(ArchiveArray& archive_array);
     };
+
+    std::string read_string(std::istream& stream, const std::string& default_value = "<empty>");
 }
 #endif //PROJECTDS_CORE_H

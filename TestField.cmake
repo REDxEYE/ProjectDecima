@@ -1,7 +1,8 @@
 add_executable(TestField
         src/test_field.cpp
         src/decima/file_types/core.cpp
-        src/decima/file_types/localization.cpp
+        src/decima/file_types/translation.cpp
+        src/decima/file_types/dummy.cpp
         src/utils.cpp
         )
 
