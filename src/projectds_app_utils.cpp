@@ -15,10 +15,10 @@ void ProjectDS::parse_core_file() {
         uint64_t magic = Decima::CoreFile::peek_header(stream);
 
         switch (magic) {
-            case (Decima::DeathStranding_FileMagics::Localization): {
-                Decima::Localization localization;
+            case (Decima::DeathStranding_FileMagics::Translation): {
+                Decima::Translation localization;
                 localization.parse(stream);
-                parsed_files.push_back(std::make_shared<Decima::Localization>(localization));
+                parsed_files.push_back(std::make_shared<Decima::Translation>(localization));
                 break;
             }
             case (Decima::DeathStranding_FileMagics::Texture): {

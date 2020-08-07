@@ -217,6 +217,10 @@ void ProjectDS::draw_tree() {
 
                 ImGui::EndTabItem();
             }
+
+            if (ImGui::BeginTabItem("Update")) {
+                ImGui::EndTabItem();
+            }
         }
         ImGui::EndTabBar();
     }

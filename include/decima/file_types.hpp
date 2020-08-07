@@ -7,7 +7,7 @@
 
 #include "decima/file_types/core.h"
 #include "decima/file_types/dummy.h"
-#include "decima/file_types/localization.hpp"
+#include "decima/file_types/translation.hpp"
 #include "decima/file_types/prefetch.h"
 #include "decima/file_types/texture.h"
 

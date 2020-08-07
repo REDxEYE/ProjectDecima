@@ -20,9 +20,9 @@ namespace Decima {
     public:
         static constexpr uint64_t Texture = 0xa664164d69fd2b38;
         static constexpr uint64_t TextureSet = 0xa321e8c307328d2e;
+        static constexpr uint64_t Translation = 0x31be502435317445;
         static constexpr uint64_t Model = 0x16bb69a9e5aa0d9e;
         static constexpr uint64_t Armature = 0x11e1d1a40b933e66;
-        static constexpr uint64_t Localization = 0x31be502435317445;
     };
 
     enum class Version : uint32_t {
@@ -35,18 +35,17 @@ namespace Decima {
     static constexpr uint32_t encryption_key_2[4] = { 0x06C084A37, 0x07E159D95, 0x03D5AF7E8, 0x018AA7D3F };
 
     static const std::unordered_map<uint64_t, std::string> known_file_types = {
+        { DeathStranding_FileMagics::Armature, "Armature" },
         { DeathStranding_FileMagics::Texture, "Texture" },
         { DeathStranding_FileMagics::TextureSet, "TextureSet" },
-        { DeathStranding_FileMagics::Model, "Model" },
-        { DeathStranding_FileMagics::Armature, "Armature" },
-        { DeathStranding_FileMagics::Localization, "Localization" }
+        { DeathStranding_FileMagics::Translation, "Translation" },
+        { DeathStranding_FileMagics::Model, "Model" }
     };
 
     inline const std::string get_type_name(uint64_t magic) {
-        if (known_file_types.find(magic) != known_file_types.end()) {
+        if (known_file_types.find(magic) != known_file_types.end())
             return known_file_types.at(magic);
-        }
-        return "Unknown_" + uint64_to_hex(magic);
+        return "Unknown '" + uint64_to_hex(magic) + "'";
     }
 
 }

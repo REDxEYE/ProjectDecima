@@ -2,17 +2,15 @@
 // Created by i.getsman on 06.08.2020.
 //
 
-#ifndef PROJECTDS_LOCALIZATION_HPP
-#define PROJECTDS_LOCALIZATION_HPP
+#ifndef PROJECTDS_TRANSLATION_HPP
+#define PROJECTDS_TRANSLATION_HPP
 
 #include "decima/file_types/core.h"
 
-#include <array>
-
 namespace Decima {
-    class Localization : public CoreFile {
+    class Translation : public CoreFile {
     public:
-        static constexpr std::array<const char*, 25> languages = {
+        static constexpr const char* languages[] {
             "English",
             "French",
             "Spanish",
@@ -40,7 +38,13 @@ namespace Decima {
             "Hungarian"
         };
 
-        std::string translations[languages.size()];
+        std::string translations[std::size(languages)];
+
+        /*
+         * Not sure is this is a comment or something else.
+         * Let be comment for now.
+         */
+        std::string comments[std::size(languages)];
 
         void parse(std::vector<uint8_t>& buffer) override;
 
@@ -50,4 +54,4 @@ namespace Decima {
     };
 
 }
-#endif //PROJECTDS_LOCALIZATION_HPP
+#endif //PROJECTDS_TRANSLATION_HPP
