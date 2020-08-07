@@ -8,8 +8,8 @@ void Decima::Translation::parse(std::istream& stream) {
     CoreFile::parse(stream);
 
     for (uint32_t i = 0; i < std::size(languages); i++) {
-        const auto translation = Decima::read_string(stream, "<empty>");
-        const auto comment = Decima::read_string(stream, "<empty>");
+        const auto translation = Decima::read_string(stream);
+        const auto comment = Decima::read_string(stream);
         stream.seekg(1, std::ios::cur);
 
         translations[i] = std::move(translation);
