@@ -1,9 +1,10 @@
 //
 // Created by MED45 on 26.07.2020.
 //
-#include "utils.h"
-
 #include <filesystem>
+
+#include "utils.h"
+#include <iostream>
 
 std::string uint64_to_hex(uint64_t value) {
     char hash[32];
@@ -14,7 +15,7 @@ std::string uint64_to_hex(uint64_t value) {
 uint64_t hash_string(const std::string& filename, uint8_t seed) {
     uint64_t hash;
     uint8_t byte[16];
-    MurmurHash3_x64_128(filename.c_str(), (int32_t) filename.size() + 1, seed, &byte);
+    MurmurHash3_x64_128(filename.c_str(), (int32_t)filename.size() + 1, seed, &byte);
     memcpy(&hash, byte, 8);
     return hash;
 }
@@ -32,11 +33,30 @@ bool decompress_chunk_data(const std::vector<uint8_t>& data, uint64_t decompress
     return res != -1;
 }
 
+bool decompress_chunk_data(const uint8_t* data, uint64_t data_size, uint64_t decompressed_size, uint8_t* output) {
+    int res = Kraken_Decompress(data, data_size, output, decompressed_size);
+    return res != -1;
+}
 
 //TODO:
 std::string sanitize_name(const std::string& filename) {
     std::filesystem::path tmp(filename);
-    if (tmp.extension() != ".core") { return filename + ".core"; }
+    if (tmp.extension() == ".stream") {
+        return filename;
+    }
+    if (tmp.extension() != ".core") {
+        return filename + ".core";
+    }
     return std::string(filename);
 }
 
+void split(const std::string& str, std::vector<std::string>& cont, char delim) {
+    std::stringstream ss(str);
+    std::string token;
+    while (std::getline(ss, token, delim)) {
+        cont.push_back(token);
+    }
+}
+void log(std::string prefix, std::string info) {
+    std::cout << "[" << prefix << "]::" << info << '\n';
+}
