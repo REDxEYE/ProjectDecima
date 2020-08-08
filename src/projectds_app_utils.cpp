@@ -10,7 +10,7 @@ void ProjectDS::parse_core_file() {
     parsed_files.clear();
     Decima::CoreFile::Source stream(selection_info.file.storage, 1024);
 
-    while (stream.tell() < selection_info.file.storage.size()) {
+    while (!stream.eof()) {
         uint64_t magic = Decima::CoreFile::peek_header(stream);
 
         switch (magic) {

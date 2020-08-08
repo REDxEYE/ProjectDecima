@@ -257,7 +257,7 @@ void ProjectDS::draw_export() {
 
                         std::cout << "Processing file '" << path << "' (size: " << file.file_entry->size << ")\n";
 
-                        while (stream.tell() < file.storage.size()) {
+                        while (!stream.eof()) {
                             Decima::Dummy dummy;
                             dummy.parse(stream);
 
