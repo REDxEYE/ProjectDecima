@@ -107,5 +107,11 @@ void Decima::Texture::draw(ArchiveArray& archive_array) {
     ImGui::NextColumn();
     ImGui::Separator();
 
+    ImGui::Text("Stream");
+    ImGui::NextColumn();
+    ImGui::Text("%s", stream_name.c_str());
+    ImGui::NextColumn();
+    ImGui::Separator();
+
     ImGui::Columns(1);
 }

@@ -14,8 +14,8 @@ struct membuf : std::streambuf {
         this->setg(p, p, p + size);
     }
 
-    virtual pos_type
-    seekoff(off_type off, std::ios_base::seekdir dir, std::ios_base::openmode which = std::ios_base::in) {
+    pos_type
+    seekoff(off_type off, std::ios_base::seekdir dir, std::ios_base::openmode which = std::ios_base::in) override {
         if (dir == std::ios_base::cur) gbump(off);
         return gptr() - eback();
     }

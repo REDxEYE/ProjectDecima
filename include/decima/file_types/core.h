@@ -30,6 +30,7 @@ namespace Decima {
 
         CoreHeader header {};
         GUID guid {};
+        uint32_t offset {};
 
         static uint64_t peek_header(Source& stream);
 

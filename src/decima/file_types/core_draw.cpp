@@ -20,5 +20,11 @@ void Decima::CoreFile::draw(ArchiveArray& archive_array) {
     ImGui::Text("Size");
     ImGui::NextColumn();
     ImGui::Text("%u", header.file_size + 12);
+    ImGui::Separator();
+
+    ImGui::NextColumn();
+    ImGui::Text("Offset");
+    ImGui::NextColumn();
+    ImGui::Text("%u", offset);
     ImGui::Columns(1);
 }
