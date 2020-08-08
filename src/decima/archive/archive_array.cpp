@@ -68,7 +68,7 @@ Decima::CompressedFile Decima::ArchiveArray::query_file(uint64_t file_hash) {
         auto& archive = archives[archive_id->second];
         return std::move(archive.query_file(file_hash));
     }
-    return Decima::CompressedFile(nullptr, nullptr,nullptr);
+    return Decima::CompressedFile(nullptr, nullptr, nullptr, true);
 }
 
 Decima::CompressedFile Decima::ArchiveArray::query_file(const std::string& file_name) {

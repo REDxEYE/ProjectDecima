@@ -18,6 +18,7 @@
 #include "archive_file.h"
 
 struct SelectionInfo {
+    SelectionInfo() { }
     std::uint64_t preview_file{0};
     std::uint64_t selected_file{0};
     std::unordered_set<std::uint64_t> selected_files;

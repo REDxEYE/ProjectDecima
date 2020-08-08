@@ -110,6 +110,11 @@ void Decima::Texture::draw(ArchiveArray& archive_array) {
     ImGui::Text("Stream");
     ImGui::NextColumn();
     ImGui::Text("%s", stream_name.c_str());
+    if (ImGui::BeginPopupContextItem("Stream name")) {
+        if (ImGui::Selectable("Copy stream path"))
+            ImGui::SetClipboardText((stream_name+".core.stream").c_str());
+        ImGui::EndPopup();
+    }
     ImGui::NextColumn();
     ImGui::Separator();
 

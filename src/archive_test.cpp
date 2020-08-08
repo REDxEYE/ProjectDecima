@@ -6,7 +6,7 @@
 #include "decima/archive/archive.h"
 
 int main() {
-    Decima::ArchiveArray archive_array(R"(F:\SteamLibrary\steamapps\common\Death Stranding\data)");
+    Decima::ArchiveArray archive_array(R"(F:\SteamLibrary\steamapps\common\Horizon Zero Dawn\Packed_DX12)");
 
     archive_array.read_prefetch_file();
 

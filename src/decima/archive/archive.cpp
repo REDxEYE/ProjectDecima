@@ -135,10 +135,10 @@ Decima::CompressedFile Decima::Archive::query_file(uint64_t file_hash) {
     //    log("Archive", "Queried " + uint64_to_hex(file_hash) + " file");
     auto file_id = get_file_index(file_hash);
     if (file_id == -1) {
-        return Decima::CompressedFile(nullptr, nullptr, nullptr);
+        return Decima::CompressedFile(nullptr, nullptr, nullptr, true);
     }
     auto& file_entry = content_table.at(file_id);
-    Decima::CompressedFile file(&file_entry, &filebuffer, this);
+    Decima::CompressedFile file(&file_entry, &filebuffer, this, is_encrypted());
 
     file.chunk_range = get_mio_boundaries(file_id);
 
