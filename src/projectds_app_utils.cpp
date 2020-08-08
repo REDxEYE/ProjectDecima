@@ -9,9 +9,9 @@
 
 void ProjectDS::parse_core_file() {
     parsed_files.clear();
-    imemstream stream(selection_info.file.storage);
+    Decima::CoreFile::Source stream(selection_info.file.storage, 1024);
 
-    while (stream.tellg() < selection_info.file.storage.size()) {
+    while (stream.tell() < selection_info.file.storage.size()) {
         uint64_t magic = Decima::CoreFile::peek_header(stream);
 
         switch (magic) {
@@ -21,12 +21,12 @@ void ProjectDS::parse_core_file() {
                 parsed_files.push_back(std::make_shared<Decima::Translation>(localization));
                 break;
             }
-            case (Decima::DeathStranding_FileMagics::Texture): {
-                Decima::Texture texture;
-                texture.parse(stream);
-                parsed_files.push_back(std::make_shared<Decima::Texture>(texture));
-                break;
-            }
+//            case (Decima::DeathStranding_FileMagics::Texture): {
+//                Decima::Texture texture;
+//                texture.parse(stream);
+//                parsed_files.push_back(std::make_shared<Decima::Texture>(texture));
+//                break;
+//            }
             default:{
                 Decima::Dummy dummy;
                 dummy.parse(stream);

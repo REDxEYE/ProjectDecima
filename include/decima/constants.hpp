@@ -18,11 +18,11 @@ namespace Decima {
 
     class DeathStranding_FileMagics : public FileMagics {
     public:
+        static constexpr uint64_t Armature = 0x11e1d1a40b933e66;
         static constexpr uint64_t Texture = 0xa664164d69fd2b38;
         static constexpr uint64_t TextureSet = 0xa321e8c307328d2e;
         static constexpr uint64_t Translation = 0x31be502435317445;
         static constexpr uint64_t Model = 0x16bb69a9e5aa0d9e;
-        static constexpr uint64_t Armature = 0x11e1d1a40b933e66;
     };
 
     enum class Version : uint32_t {

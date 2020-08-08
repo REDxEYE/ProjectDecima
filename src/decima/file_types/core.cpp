@@ -16,37 +16,24 @@ namespace Decima {
                   << std::setw(12) << (guid.data[1] >> 0 & 0xffffffffffff);
     }
 
-    void CoreFile::parse(std::vector<uint8_t>& buffer) {
-        imemstream imembuffer(buffer);
-        parse(imembuffer);
-        //        parse();
+    void CoreFile::parse(Source& stream) {
+        header = stream.read<typeof(header)>();
+        guid = stream.read<typeof(guid)>();
     }
 
-    void CoreFile::parse(std::istream& stream) {
-        stream.read(reinterpret_cast<char*>(&header), sizeof(header));
-        stream.read(reinterpret_cast<char*>(&guid), 16);
-    }
-
-    uint64_t CoreFile::peek_header(std::vector<uint8_t>& buffer) {
-        imemstream imembuffer(buffer);
-        return peek_header(imembuffer);
-    }
-
-    uint64_t CoreFile::peek_header(std::istream& stream) {
-        uint64_t magic;
-        stream.read(reinterpret_cast<char*>(&magic), 8);
-        stream.seekg(-8, std::ios::cur);
+    uint64_t CoreFile::peek_header(Source& stream) {
+        auto magic = stream.read<std::uint64_t>();
+        stream.seek(ash::seek_dir::cur, -8);
         return magic;
     }
 
-    std::string read_string(std::istream& stream, const std::string& default_value) {
-        std::uint16_t length;
-        stream.read(reinterpret_cast<char*>(&length), sizeof(length));
+    std::string read_string(CoreFile::Source& stream, const std::string& default_value) {
+        const auto length = stream.read<std::uint16_t>();
 
         if (length > 0) {
             std::string buffer;
             buffer.resize(length);
-            stream.read(buffer.data(), length);
+            stream.read(buffer);
             return buffer;
         }
 

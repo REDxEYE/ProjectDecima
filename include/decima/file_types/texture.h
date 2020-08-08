@@ -33,8 +33,7 @@ namespace Decima {
         uint32_t total_size;
         uint32_t unks[4];
 
-        void parse(std::vector<uint8_t>& buffer) override;
-        void parse(std::istream& stream) override;
+        void parse(Source& stream) override;
         void draw(ArchiveArray& archive_array) override;
     };
 

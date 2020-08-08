@@ -6,10 +6,9 @@
 #define PROJECTDS_CORE_H
 
 #include <cstdint>
-#include <fstream>
 #include <vector>
 
-#include "membuf.hpp"
+#include "ash.hpp"
 #include "shared.hpp"
 
 namespace Decima {
@@ -27,20 +26,18 @@ namespace Decima {
 
     class CoreFile {
     public:
+        using Source = ash::buffered_source<std::vector<uint8_t>>;
+
         CoreHeader header {};
         GUID guid {};
 
-        static uint64_t peek_header(std::vector<uint8_t>& buffer);
+        static uint64_t peek_header(Source& stream);
 
-        static uint64_t peek_header(std::istream& stream);
-
-        virtual void parse(std::vector<uint8_t>& buffer);
-
-        virtual void parse(std::istream& stream);
+        virtual void parse(Source& stream);
 
         virtual void draw(ArchiveArray& archive_array);
     };
 
-    std::string read_string(std::istream& stream, const std::string& default_value = "<empty>");
+    std::string read_string(CoreFile::Source& stream, const std::string& default_value = "<empty>");
 }
 #endif //PROJECTDS_CORE_H

@@ -10,8 +10,7 @@
 namespace Decima {
     class Dummy : public Decima::CoreFile {
     public:
-        void parse(std::vector<uint8_t>& buffer) override;
-        void parse(std::istream& stream) override;
+        void parse(Source& stream) override;
     };
 }
 

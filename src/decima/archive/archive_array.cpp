@@ -15,9 +15,12 @@ Decima::ArchiveArray::ArchiveArray(const std::string& _workdir) {
 }
 
 void Decima::ArchiveArray::read_prefetch_file() {
+
     auto prefetch_data = query_file("prefetch/fullgame.prefetch");
     prefetch_data.unpack(0);
-    prefetch.parse(prefetch_data.storage);
+
+    CoreFile::Source source(prefetch_data.storage, 1024);
+    prefetch.parse(source);
 
     for (auto& string : prefetch.strings) {
         uint64_t hash = hash_string(sanitize_name(string.string), seed);

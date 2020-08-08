@@ -4,12 +4,7 @@
 
 #include "decima/file_types/dummy.h"
 
-void Decima::Dummy::parse(std::vector<uint8_t>& buffer) {
-    imemstream imembuffer(buffer);
-    parse(imembuffer);
-}
-
-void Decima::Dummy::parse(std::istream& stream) {
+void Decima::Dummy::parse(Source& stream) {
     CoreFile::parse(stream);
-    stream.seekg(header.file_size - sizeof(Decima::GUID), std::ios::cur); //Skipping bytes
+    stream.seek(ash::seek_dir::cur, header.file_size - sizeof(Decima::GUID));
 }
