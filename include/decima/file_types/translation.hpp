@@ -45,10 +45,9 @@ namespace Decima {
          * Let be comment for now.
          */
         std::string comments[std::size(languages)];
+        std::uint8_t flags[std::size(languages)];
 
-        void parse(std::vector<uint8_t>& buffer) override;
-
-        void parse(std::istream& stream) override;
+        void parse(Source& stream) override;
 
         void draw(ArchiveArray& archive_array) override;
     };

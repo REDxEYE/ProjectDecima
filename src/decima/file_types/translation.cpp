@@ -4,21 +4,12 @@
 
 #include "decima/file_types/translation.hpp"
 
-void Decima::Translation::parse(std::istream& stream) {
+void Decima::Translation::parse(Source& stream) {
     CoreFile::parse(stream);
 
     for (uint32_t i = 0; i < std::size(languages); i++) {
-        const auto translation = Decima::read_string(stream);
-        const auto comment = Decima::read_string(stream);
-        stream.seekg(1, std::ios::cur);
-
-        translations[i] = std::move(translation);
-        comments[i] = std::move(comment);
+        translations[i] = Decima::read_string(stream);
+        comments[i] = Decima::read_string(stream);
+        flags[i] = stream.read<std::uint8_t>();
     }
-}
-
-void Decima::Translation::parse(std::vector<uint8_t>& buffer) {
-    imemstream imembuffer(buffer);
-    //TODO: ShadelesFox replace it with more appropriate code
-    parse(imembuffer);
 }
