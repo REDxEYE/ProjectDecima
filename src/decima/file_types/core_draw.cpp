@@ -20,11 +20,20 @@ void Decima::CoreFile::draw(ArchiveArray& archive_array) {
     ImGui::Text("Size");
     ImGui::NextColumn();
     ImGui::Text("%u", header.file_size + 12);
+    ImGui::NextColumn();
     ImGui::Separator();
 
+    ImGui::Text("Magic");
     ImGui::NextColumn();
-    ImGui::Text("Offset");
+    ImGui::Text("%s", uint64_to_hex(header.file_type).c_str());
+    if (ImGui::BeginPopupContextItem("File magic")) {
+        if (ImGui::Selectable("Copy file magic"))
+            ImGui::SetClipboardText(uint64_to_hex(header.file_type).c_str());
+        ImGui::EndPopup();
+    }
     ImGui::NextColumn();
-    ImGui::Text("%u", offset);
+
+    ImGui::Separator();
+
     ImGui::Columns(1);
 }

@@ -24,6 +24,11 @@ namespace Decima {
         static constexpr uint64_t Translation = 0x31be502435317445;
         static constexpr uint64_t Model = 0x16bb69a9e5aa0d9e;
     };
+    class ZeroDawn_FileMagics : public FileMagics {
+    public:
+        static constexpr uint64_t Texture = 0xf2e1afb7052b3866;
+
+    };
 
     enum class Version : uint32_t {
         default_version = 0x20304050,
