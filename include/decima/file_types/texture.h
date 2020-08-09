@@ -36,7 +36,7 @@ namespace Decima {
         std::string stream_name="NO_EXTERNAL_STREAM";
 
         void parse(Source& stream) override;
-        void draw(ArchiveArray& archive_array) override;
+        void draw(ProjectDS& ctx) override;
     };
 
 }

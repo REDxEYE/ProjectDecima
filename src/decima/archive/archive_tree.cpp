@@ -59,23 +59,36 @@ void FileTree::reset_filter(bool state) {
     }
 }
 
-void FileTree::draw(SelectionInfo& selection, Decima::ArchiveArray& archive_array) {
+void FileTree::draw(SelectionInfo& selection, Decima::ArchiveArray& archive_array, bool draw_header) {
+    if (draw_header) {
+        ImGui::Separator();
+        ImGui::Columns(3);
+        ImGui::Text("Name");
+        ImGui::NextColumn();
+        ImGui::Text("Type");
+        ImGui::NextColumn();
+        ImGui::Text("Size");
+        ImGui::NextColumn();
+        ImGui::Separator();
+
+        ImGui::SetColumnWidth(0, ImGui::GetWindowWidth() - 200);
+        ImGui::SetColumnWidth(1, 100);
+        ImGui::SetColumnWidth(2, 100);
+    }
+
     for (auto& [name, data] : folders) {
-        const std::string tree_name = name + "##" + std::to_string(folders.size());
+        const auto tree_name = name + "##" + std::to_string(folders.size());
         const auto show = ImGui::TreeNode(tree_name.c_str());
-        const auto files_count = data.first->files.size();
-        const auto folders_count = data.first->folders.size();
+        const auto items_count = data.first->files.size() + data.first->folders.size();
 
         ImGui::NextColumn();
         ImGui::Text("Folder");
         ImGui::NextColumn();
-        ImGui::Text("%llu file%c / %llu folder%c",
-            files_count, files_count == 1 ? ' ' : 's',
-            folders_count, folders_count == 1 ? ' ' : 's');
+        ImGui::Text("%llu item%c", items_count, items_count == 1 ? ' ' : 's');
         ImGui::NextColumn();
 
         if (data.second && show) {
-            data.first->draw(selection, archive_array);
+            data.first->draw(selection, archive_array, false);
             ImGui::TreePop();
         }
     }
@@ -105,10 +118,10 @@ void FileTree::draw(SelectionInfo& selection, Decima::ArchiveArray& archive_arra
             if (data.first.header.file_type == 0) {
                 auto file_data = archive_array.query_file(data.first.hash);
                 if (!file_data.is_valid()) {
-                    data.first.header.file_type =-1;
+                    data.first.header.file_type = -1;
                 } else {
                     file_data.unpack(0);
-                    memcpy(&data.first.header,file_data.storage.data(),sizeof(Decima::CoreHeader));
+                    memcpy(&data.first.header, file_data.storage.data(), sizeof(Decima::CoreHeader));
                 }
             }
 
@@ -129,5 +142,9 @@ void FileTree::draw(SelectionInfo& selection, Decima::ArchiveArray& archive_arra
             ImGui::Text("ERROR");
             ImGui::NextColumn();
         }
+    }
+
+    if (draw_header) {
+        ImGui::Columns(1);
     }
 }
