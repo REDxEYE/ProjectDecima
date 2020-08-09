@@ -22,9 +22,9 @@ void Decima::Translation::draw(ProjectDS& ctx) {
         ImGui::Separator();
         ImGui::Text("%s", Decima::Translation::languages[index]);
         ImGui::NextColumn();
-        ImGui::Text("%s", translations[index].c_str());
+        ImGui::TextWrapped("%s", translations[index].c_str());
         ImGui::NextColumn();
-        ImGui::Text("%s", comments[index].c_str());
+        ImGui::TextWrapped("%s", comments[index].c_str());
         ImGui::NextColumn();
         if(flags[index]) {
             ImGui::Text("%d", flags[index]);
