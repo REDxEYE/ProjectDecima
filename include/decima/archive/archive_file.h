@@ -16,8 +16,7 @@ namespace Decima {
 
     class CompressedFile {
     public:
-
-        CompressedFile(FileEntry* file_entry_, mio::mmap_source* filebuffer_,Archive* archive_);
+        CompressedFile(FileEntry* file_entry_, mio::mmap_source* filebuffer_, Archive* archive_, bool encrypted_);
 
         CompressedFile() = default;
 
@@ -25,6 +24,7 @@ namespace Decima {
         FileEntry* file_entry = nullptr;
         mio::mmap_source* filebuffer = nullptr;
         Archive* archive = nullptr;
+        bool encrypted = true;
 
         std::vector<uint8_t> storage;
 

@@ -25,7 +25,7 @@ target_include_directories(ProjectDS PUBLIC
         )
 
 target_link_libraries(ProjectDS PUBLIC
-        HashLib oozLib glfw glad imgui
+        HashLib oozLib glfw glad imgui detex
         -static-libgcc -static-libstdc++ -static
         -Wl,-Bstatic -lstdc++ -lpthread
         -Wl,-Bdynamic

@@ -19,14 +19,14 @@ public:
     ProjectDS(const std::pair<uint32_t, uint32_t>& windowSize, const std::string& title,
               bool imgui_multi_viewport = false);
 
-private:
+public:
     bool m_multi_viewport;
 
     Decima::ArchiveArray archive_array;
     std::vector<const char*> file_names;
     FileTree root_tree;
     SelectionInfo selection_info;
-    std::vector<std::shared_ptr<Decima::CoreFile>> parsed_files;
+    std::vector<std::unique_ptr<Decima::CoreFile>> parsed_files;
     int32_t file_id = 0;
     ImGuiTextFilter filter;
     MemoryEditor file_viewer;

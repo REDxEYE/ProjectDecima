@@ -70,6 +70,10 @@ namespace ash {
             pos = std::min(pos + amount, cap);
         }
 
+        [[nodiscard]] bool eof() const noexcept {
+            return cur == end;
+        }
+
         [[nodiscard]] std::size_t tell() const noexcept {
             return std::distance(beg, cur);
         }

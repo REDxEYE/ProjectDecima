@@ -5,7 +5,7 @@
 #include "projectds_app.hpp"
 
 int main() {
-    ProjectDS app({ 1280, 720 }, "Project Decima");
+    ProjectDS app({ 1700, 720 }, "Project Decima");
     app.init();
     app.run();
 }

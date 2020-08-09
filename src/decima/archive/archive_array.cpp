@@ -8,7 +8,6 @@
 
 #include "utils.h"
 #include "decima/archive/archive_array.h"
-#include "decima/archive/archive.h"
 
 Decima::ArchiveArray::ArchiveArray(const std::string& _workdir) {
     open(_workdir);
@@ -24,8 +23,10 @@ void Decima::ArchiveArray::read_prefetch_file() {
 
     for (auto& string : prefetch.strings) {
         uint64_t hash = hash_string(sanitize_name(string.string), seed);
-        hash_to_name[hash] = string.string;
+        hash_to_name.insert({ hash, string.string });
     }
+
+    hash_to_name.insert({ 0x2fff5af65cd64c0a, "prefetch/fullgame.prefetch" });
 }
 
 void Decima::ArchiveArray::open(const std::string& _workdir) {
@@ -57,7 +58,7 @@ Decima::ArchiveArray::get_file_entry(uint64_t file_hash) {
         uint64_t archive_id = hash_to_archive.at(file_hash);
         auto& archive = archives[archive_id];
         uint64_t file_id = archive.get_file_index(file_hash);
-        return std::optional<std::reference_wrapper<FileEntry>> {archive.content_table[file_id] };
+        return std::optional<std::reference_wrapper<FileEntry>> { archive.content_table[file_id] };
     }
     return std::nullopt;
 }
@@ -68,7 +69,7 @@ Decima::CompressedFile Decima::ArchiveArray::query_file(uint64_t file_hash) {
         auto& archive = archives[archive_id->second];
         return std::move(archive.query_file(file_hash));
     }
-    return Decima::CompressedFile(nullptr, nullptr,nullptr);
+    return Decima::CompressedFile(nullptr, nullptr, nullptr, true);
 }
 
 Decima::CompressedFile Decima::ArchiveArray::query_file(const std::string& file_name) {

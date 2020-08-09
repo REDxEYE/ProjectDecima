@@ -6,34 +6,36 @@
 
 #include "decima/file_types.hpp"
 
+template <class Base, typename... Args>
+using Constructor = std::function<std::unique_ptr<Base>(Args&&...)>;
+
+template <class T, typename... Args>
+static std::unique_ptr<Decima::CoreFile> construct(Args&&... args) {
+    return std::make_unique<T>(std::forward<Args>(args)...);
+}
 
 void ProjectDS::parse_core_file() {
     parsed_files.clear();
     Decima::CoreFile::Source stream(selection_info.file.storage, 1024);
 
-    while (stream.tell() < selection_info.file.storage.size()) {
-        uint64_t magic = Decima::CoreFile::peek_header(stream);
+    static const std::map<std::uint64_t, Constructor<Decima::CoreFile>> types = {
+        { Decima::DeathStranding_FileMagics::Translation, construct<Decima::Translation> },
+        { Decima::DeathStranding_FileMagics::Texture, construct<Decima::Texture> }
+    };
 
-        switch (magic) {
-            case (Decima::DeathStranding_FileMagics::Translation): {
-                Decima::Translation localization;
-                localization.parse(stream);
-                parsed_files.push_back(std::make_shared<Decima::Translation>(localization));
-                break;
-            }
-            case (Decima::DeathStranding_FileMagics::Texture): {
-                Decima::Texture texture;
-                texture.parse(stream);
-                parsed_files.push_back(std::make_shared<Decima::Texture>(texture));
-                break;
-            }
-            default:{
-                Decima::Dummy dummy;
-                dummy.parse(stream);
-                parsed_files.push_back(std::make_shared<Decima::Dummy>(dummy));
-                break;
-            }
-        }
+    static const auto get_handler = [](std::uint64_t hash) noexcept {
+        const auto handler = types.find(hash);
+        return handler != types.end() ? handler->second() : construct<Decima::Dummy>();
+    };
 
+    while (!stream.eof()) {
+        const auto offset = stream.tell();
+        const auto magic = Decima::CoreFile::peek_header(stream);
+
+        auto handler = get_handler(magic);
+        handler->parse(stream);
+        handler->offset = offset;
+
+        parsed_files.push_back(std::move(handler));
     }
 }
