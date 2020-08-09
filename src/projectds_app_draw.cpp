@@ -106,6 +106,7 @@ void ProjectDS::draw_filepreview() {
                     ImGui::EndPopup();
                 }
 
+                ImGui::Separator();
                 ImGui::Columns(2);
                 ImGui::Text("Size");
                 ImGui::NextColumn();
@@ -125,10 +126,8 @@ void ProjectDS::draw_filepreview() {
                 ImGui::Text("Offset");
                 ImGui::NextColumn();
                 ImGui::Text("%llu", file_entry.offset);
-                ImGui::Separator();
-                ImGui::NextColumn();
-                ImGui::Separator();
                 ImGui::Columns(1);
+                ImGui::Separator();
 
                 const bool selected_file_changed = selection_info.preview_file != selection_info.selected_file;
 
@@ -146,6 +145,46 @@ void ProjectDS::draw_filepreview() {
             }
         } else {
             ImGui::Text("No file selected");
+        }
+
+        ImGui::DockSpace(ImGui::GetID("Dock2"));
+    }
+    ImGui::End();
+
+    ImGui::Begin("Normal View", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+    {
+        if (selection_info.selected_file > 0) {
+            for (const auto& file : parsed_files) {
+                std::stringstream buffer;
+                buffer << '[' << file->guid << "] " << Decima::get_type_name(file->header.file_type);
+
+                const bool opened = ImGui::TreeNode(buffer.str().c_str());
+
+                if (ImGui::BeginPopupContextItem(buffer.str().c_str())) {
+                    if (ImGui::Selectable("Highlight")) {
+                        selection_info.preview_file_offset = file->offset;
+                        selection_info.preview_file_size = file->header.file_size + sizeof(Decima::CoreHeader);
+                    }
+
+                    ImGui::EndPopup();
+                }
+
+                if (opened) {
+                    file->draw(*this);
+                    ImGui::TreePop();
+                }
+            }
+        }
+    }
+    ImGui::End();
+
+    ImGui::Begin("Raw View", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+    {
+        if (selection_info.selected_file > 0) {
+            file_viewer.DrawContents(
+                selection_info.file.storage.data() + selection_info.preview_file_offset,
+                selection_info.preview_file_size,
+                0);
         }
     }
     ImGui::End();
@@ -177,21 +216,7 @@ void ProjectDS::draw_tree() {
             }
 
             if (ImGui::BeginTabItem("TreeView")) {
-                ImGui::Columns(3);
-
-                ImGui::Separator();
-                ImGui::Text("Name");
-                ImGui::NextColumn();
-                ImGui::Text("Type");
-                ImGui::NextColumn();
-                ImGui::Text("Size");
-                ImGui::NextColumn();
-                ImGui::Separator();
-
                 root_tree.draw(selection_info, archive_array);
-
-                ImGui::Columns(1);
-
                 ImGui::EndTabItem();
             }
         }
