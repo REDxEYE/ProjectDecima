@@ -18,6 +18,13 @@ void ProjectDS::update_user(double ts) {
     draw_debug();
     draw_export();
     draw_tree();
+
+    if (glfwGetKey(m_window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+        if (selection_info.preview_file != 0) {
+            selection_info.preview_file_size = selection_info.file.storage.size();
+            selection_info.preview_file_offset = 0;
+        }
+    }
 }
 
 void ProjectDS::init_filetype_handlers() {
@@ -100,7 +107,6 @@ void ProjectDS::draw_filepreview() {
                 }
 
                 ImGui::Columns(2);
-                ImGui::Separator();
                 ImGui::Text("Size");
                 ImGui::NextColumn();
                 ImGui::Text("%u bytes", file_entry.size);
@@ -127,43 +133,14 @@ void ProjectDS::draw_filepreview() {
                 const bool selected_file_changed = selection_info.preview_file != selection_info.selected_file;
 
                 if (selected_file_changed) {
-                    selection_info.preview_file = selection_info.selected_file;
                     selection_info.file = archive_array.query_file(selection_info.selected_file);
                     selection_info.file.unpack(0);
+                    selection_info.preview_file = selection_info.selected_file;
+                    selection_info.preview_file_size = selection_info.file.storage.size();
+                    selection_info.preview_file_offset = 0;
 
                     parse_core_file();
                 }
-
-                //                const auto file_type = Decima::CoreFile::peek_header(selection_info.file.storage);
-                //                const auto file_handler = root_tree.file_type_handlers.find(file_type);
-
-                //                if (selected_file_changed && file_handler != root_tree.file_type_handlers.end())
-                //                    file_handler->second.render(selection_info.file, true);
-
-                ImGui::BeginTabBar("Data View");
-                {
-                    if (ImGui::BeginTabItem("Raw View")) {
-                        file_viewer.DrawContents(selection_info.file.storage.data(),
-                            selection_info.file.storage.size());
-                        ImGui::EndTabItem();
-                    }
-
-                    if (ImGui::BeginTabItem("Normal View")) {
-                        for (const auto& file : parsed_files) {
-                            std::stringstream buffer;
-                            buffer << '[' << file->guid << "] " << Decima::get_type_name(file->header.file_type);
-
-                            if (ImGui::TreeNode(buffer.str().c_str())) {
-                                file->draw(archive_array);
-                                ImGui::TreePop();
-                            }
-
-                            ImGui::Separator();
-                        }
-                        ImGui::EndTabItem();
-                    }
-                }
-                ImGui::EndTabBar();
             } else {
                 ImGui::Text("Error getting file info!");
             }
