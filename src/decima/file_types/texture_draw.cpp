@@ -7,7 +7,9 @@
 #include "projectds_app.hpp"
 
 #include <detex.h>
+#include <detex-png.h>
 #include <imgui.h>
+#include <portable-file-dialogs.h>
 
 void Decima::Texture::draw(ProjectDS& ctx) {
     ImGui::Columns(2);
@@ -193,6 +195,25 @@ void Decima::Texture::draw_texture(ProjectDS& ctx, float preview_width, float pr
     const ImVec4 border = { 1, 1, 1, 1 };
 
     ImGui::Image(reinterpret_cast<ImTextureID>(image_texture), { preview_width, preview_height }, { 0, 0 }, { 1, 1 }, tint, border);
+
+    if (ImGui::BeginPopupContextItem("Export Image")) {
+        if (ImGui::Selectable("Export image")) {
+            const auto full_path = pfd::save_file("Choose destination file", "", {"PNG", "*.png"}).result() + ".png";
+
+            if (!full_path.empty()) {
+                detexTexture texture;
+                texture.format = DETEX_PIXEL_FORMAT_RGBA8;
+                texture.data = image_buffer.data();
+                texture.width = width;
+                texture.height = height;
+                detexSavePNGFile(&texture, full_path.c_str());
+
+                std::cout << "Image was saved to: " << full_path << '\n';
+            }
+        }
+
+        ImGui::EndPopup();
+    }
 
     if (ImGui::IsItemHovered()) {
         ImGui::BeginTooltip();
