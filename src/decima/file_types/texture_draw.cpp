@@ -8,7 +8,6 @@
 #include "imgui.h"
 
 void Decima::Texture::draw(ProjectDS& ctx) {
-
     ImGui::Columns(2);
     ImGui::SetColumnWidth(-1, 200);
     ImGui::Text("Prop");
@@ -49,7 +48,11 @@ void Decima::Texture::draw(ProjectDS& ctx) {
 
     ImGui::Text("Pixel format");
     ImGui::NextColumn();
-    ImGui::Text("%hhu", pixel_format);
+    {
+        std::stringstream buffer;
+        buffer << pixel_format;
+        ImGui::Text("%s", buffer.str().c_str());
+    }
     ImGui::NextColumn();
     ImGui::Separator();
 
@@ -67,7 +70,11 @@ void Decima::Texture::draw(ProjectDS& ctx) {
 
     ImGui::Text("GUID");
     ImGui::NextColumn();
-    ImGui::Text("%llX%llX", file_guid[0], file_guid[1]);
+    {
+        std::stringstream buffer;
+        buffer << file_guid;
+        ImGui::Text("%s", buffer.str().c_str());
+    }
     ImGui::NextColumn();
     ImGui::Separator();
 

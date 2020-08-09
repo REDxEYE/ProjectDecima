@@ -15,8 +15,7 @@ void Decima::Texture::parse(Source& stream) {
     pixel_format = stream.read<typeof(pixel_format)>();
     unk2 = stream.read<typeof(unk2)>();
     unk3 = stream.read<typeof(unk3)>();
-    file_guid[0] = stream.read<typeof(file_guid[0])>();
-    file_guid[1] = stream.read<typeof(file_guid[1])>();
+    file_guid = stream.read<typeof(file_guid)>();
     buffer_size = stream.read<typeof(buffer_size)>();
     total_size = stream.read<typeof(total_size)>();
     unks[0] = stream.read<typeof(unks[0])>();
@@ -24,12 +23,38 @@ void Decima::Texture::parse(Source& stream) {
     unks[2] = stream.read<typeof(unks[0])>();
     unks[3] = stream.read<typeof(unks[0])>();
 
-    if(unks[0]!=0&&unks[1]!=0){
+    if (unks[0] != 0 && unks[1] != 0) {
         auto str_len = stream.read<uint32_t>();
-        std::string buff(str_len,0);
+        std::string buff(str_len, 0);
         stream.read(buff);
         stream_name = std::move(buff);
     }
 
     stream.seek(ash::seek_dir::beg, start + header.file_size - sizeof(GUID));
+}
+
+#include <ostream>
+
+namespace Decima {
+    std::ostream& operator<<(std::ostream& os, Decima::TexturePixelFormat fmt) {
+        switch (fmt) {
+        case Decima::TexturePixelFormat::R8G8B8A8:
+            return os << "RGBA8";
+        case Decima::TexturePixelFormat::A8:
+            return os << "A8";
+        case Decima::TexturePixelFormat::BC1:
+            return os << "BC1";
+        case Decima::TexturePixelFormat::BC2:
+            return os << "BC2";
+        case Decima::TexturePixelFormat::BC3:
+            return os << "BC3";
+        case Decima::TexturePixelFormat::BC4:
+            return os << "BC4";
+        case Decima::TexturePixelFormat::BC5:
+            return os << "BC5";
+        case Decima::TexturePixelFormat::BC7:
+            return os << "BC7";
+        }
+        return os;
+    }
 }
