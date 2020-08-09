@@ -124,7 +124,7 @@ void Decima::Texture::draw(ProjectDS& ctx) {
             ImGui::SetClipboardText((stream_name + ".core.stream").c_str());
         ImGui::EndPopup();
     }
-    draw_texture(ctx, 128, 128);
+    draw_texture(ctx, 128, 128, 128, 4);
     ImGui::NextColumn();
     ImGui::Columns(1);
 }
@@ -146,11 +146,14 @@ static bool decompress_texture(std::vector<std::uint8_t>& src, std::vector<std::
     return true;
 }
 
-void Decima::Texture::draw_texture(ProjectDS& ctx, float preview_width, float preview_height) {
+void Decima::Texture::draw_texture(ProjectDS& ctx, float preview_width, float preview_height, float zoom_region, float zoom_scale) {
     static const std::unordered_map<TexturePixelFormat, int> format_mapper = {
         { TexturePixelFormat::BC1, DETEX_TEXTURE_FORMAT_BC1 },
         { TexturePixelFormat::BC2, DETEX_TEXTURE_FORMAT_BC2 },
-        { TexturePixelFormat::BC3, DETEX_TEXTURE_FORMAT_BC3 }
+        { TexturePixelFormat::BC3, DETEX_TEXTURE_FORMAT_BC3 },
+        { TexturePixelFormat::BC4, DETEX_TEXTURE_FORMAT_RGTC1 },
+        { TexturePixelFormat::BC5, DETEX_TEXTURE_FORMAT_RGTC2 },
+        { TexturePixelFormat::BC7, DETEX_TEXTURE_FORMAT_BPTC }
     };
 
     if (stream_size > 0 && stream_buffer.empty()) {
@@ -178,14 +181,44 @@ void Decima::Texture::draw_texture(ProjectDS& ctx, float preview_width, float pr
         glGenTextures(1, &image_texture);
         glBindTexture(GL_TEXTURE_2D, image_texture);
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_buffer.data());
     }
 
-    ImGui::Image(reinterpret_cast<ImTextureID>(image_texture), { preview_width, preview_height }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 }, { 1, 1, 1, 1 });
+    const ImVec2 pos = ImGui::GetCursorScreenPos();
+    const ImVec4 tint = { 1, 1, 1, 1 };
+    const ImVec4 border = { 1, 1, 1, 1 };
+
+    ImGui::Image(reinterpret_cast<ImTextureID>(image_texture), { preview_width, preview_height }, { 0, 0 }, { 1, 1 }, tint, border);
+
+    if (ImGui::IsItemHovered()) {
+        ImGui::BeginTooltip();
+
+        auto& io = ImGui::GetIO();
+        auto region_x = io.MousePos.x - pos.x - zoom_region * 0.5f;
+        auto region_y = io.MousePos.y - pos.y - zoom_region * 0.5f;
+
+        if (region_x < 0.0f) {
+            region_x = 0.0f;
+        } else if (region_x > preview_width - zoom_region) {
+            region_x = preview_width - zoom_region;
+        }
+
+        if (region_y < 0.0f) {
+            region_y = 0.0f;
+        } else if (region_y > preview_height - zoom_region) {
+            region_y = preview_height - zoom_region;
+        }
+
+        ImVec2 uv0 = { region_x / preview_width, region_y / preview_height };
+        ImVec2 uv1 = { (region_x + zoom_region) / preview_width, (region_y + zoom_region) / preview_height };
+        ImGui::Image(reinterpret_cast<ImTextureID>(image_texture), ImVec2(zoom_region * zoom_scale, zoom_region * zoom_scale), uv0, uv1, tint, border);
+
+        ImGui::EndTooltip();
+    }
 }
 
 Decima::Texture::~Texture() {
