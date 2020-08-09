@@ -11,9 +11,6 @@
 #include <MurmurHash3.h>
 #include <md5.h>
 
-template <class T>
-using slice = std::pair<std::decay_t<T>, std::decay_t<T>>;
-
 Decima::Archive::Archive(const std::string& workdir, const std::string& filename)
     : filepath(workdir + "\\" + filename) { }
 
