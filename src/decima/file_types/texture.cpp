@@ -23,14 +23,15 @@ void Decima::Texture::parse(Source& stream) {
     unks[1] = stream.read<typeof(unks[1])>();
     unks[2] = stream.read<typeof(unks[2])>();
 
-    if (stream_size != 0 && unks[0] != 0) {
-        auto str_len = stream.read<uint32_t>();
-        std::string buff(str_len, 0);
-        stream.read(buff);
-        stream_name = std::move(buff);
+    if (stream_size > 0) {
+        const auto length = stream.read<uint32_t>();
+        stream_name.resize(length);
+        stream.read_exact(stream_name);
+        stream.seek(ash::seek_dir::cur, total_size + sizeof(CoreHeader) + sizeof(GUID));
+    } else {
+        stream_buffer.resize(total_size);
+        stream.read_exact(stream_buffer);
     }
-
-    stream.seek(ash::seek_dir::beg, start + header.file_size - sizeof(GUID));
 }
 
 #include <ostream>

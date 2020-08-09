@@ -149,6 +149,11 @@ static bool decompress_texture(std::vector<std::uint8_t>& src, std::vector<std::
 }
 
 void Decima::Texture::draw_texture(ProjectDS& ctx, float preview_width, float preview_height, float zoom_region, float zoom_scale) {
+    /*
+     * This is very clunky approach. Maybe rewrite into something
+     * similar to what I did in ProjectDS::parse_core_file using
+     * factory pattern
+     */
     static const std::unordered_map<TexturePixelFormat, int> format_mapper = {
         { TexturePixelFormat::BC1, DETEX_TEXTURE_FORMAT_BC1 },
         { TexturePixelFormat::BC2, DETEX_TEXTURE_FORMAT_BC2 },
@@ -158,26 +163,32 @@ void Decima::Texture::draw_texture(ProjectDS& ctx, float preview_width, float pr
         { TexturePixelFormat::BC7, DETEX_TEXTURE_FORMAT_BPTC }
     };
 
-    if (stream_size > 0 && stream_buffer.empty()) {
-        const auto format = format_mapper.find(pixel_format);
-
-        if (format == format_mapper.end()) {
-            std::stringstream buffer;
-            buffer << "Image pixel format is not supported: " << pixel_format;
-
-            ImGui::Text("%s", buffer.str().c_str());
-            return;
-        }
-
-        auto stream_file = ctx.archive_array.query_file(stream_name + ".core.stream");
-        stream_file.unpack(0);
-
-        stream_buffer = std::move(stream_file.storage);
+    if (image_buffer.empty()) {
         image_buffer.resize(width * height * 4);
 
-        if (!decompress_texture(stream_buffer, image_buffer, width, height, format->second)) {
-            std::puts("Texture was failed to decode");
-            return;
+        if (stream_size > 0) {
+            auto stream_file = ctx.archive_array.query_file(stream_name + ".core.stream");
+            stream_file.unpack(0);
+            stream_buffer = std::move(stream_file.storage);
+        }
+
+        if (pixel_format == TexturePixelFormat::RGBA8) {
+            std::memcpy(image_buffer.data(), stream_buffer.data(), image_buffer.size());
+        } else {
+            const auto format = format_mapper.find(pixel_format);
+
+            if (format == format_mapper.end()) {
+                std::stringstream buffer;
+                buffer << "Image pixel format is not supported: " << pixel_format;
+
+                ImGui::Text("%s", buffer.str().c_str());
+                return;
+            }
+
+            if (!decompress_texture(stream_buffer, image_buffer, width, height, format->second)) {
+                std::puts("Texture was failed to decode");
+                return;
+            }
         }
 
         glGenTextures(1, &image_texture);
@@ -198,7 +209,7 @@ void Decima::Texture::draw_texture(ProjectDS& ctx, float preview_width, float pr
 
     if (ImGui::BeginPopupContextItem("Export Image")) {
         if (ImGui::Selectable("Export image")) {
-            const auto full_path = pfd::save_file("Choose destination file", "", {"PNG", "*.png"}).result() + ".png";
+            const auto full_path = pfd::save_file("Choose destination file", "", { "PNG", "*.png" }).result() + ".png";
 
             if (!full_path.empty()) {
                 detexTexture texture;
