@@ -4,8 +4,10 @@
 #include "decima/file_types/texture.h"
 #include "decima/archive/archive_array.h"
 #include "utils.h"
+#include "projectds_app.hpp"
 
-#include "imgui.h"
+#include <detex.h>
+#include <imgui.h>
 
 void Decima::Texture::draw(ProjectDS& ctx) {
     ImGui::Columns(2);
@@ -122,16 +124,10 @@ void Decima::Texture::draw(ProjectDS& ctx) {
             ImGui::SetClipboardText((stream_name + ".core.stream").c_str());
         ImGui::EndPopup();
     }
+    draw_texture(ctx, 128, 128);
     ImGui::NextColumn();
     ImGui::Columns(1);
-    ImGui::Separator();
-
-    draw_texture(ctx);
 }
-
-#include "projectds_app.hpp"
-
-#include <detex.h>
 
 static bool decompress_texture(std::vector<std::uint8_t>& src, std::vector<std::uint8_t>& dst, int width, int height, int fmt) {
     detexTexture texture;
@@ -150,7 +146,7 @@ static bool decompress_texture(std::vector<std::uint8_t>& src, std::vector<std::
     return true;
 }
 
-void Decima::Texture::draw_texture(ProjectDS& ctx) {
+void Decima::Texture::draw_texture(ProjectDS& ctx, float preview_width, float preview_height) {
     static const std::unordered_map<TexturePixelFormat, int> format_mapper = {
         { TexturePixelFormat::BC1, DETEX_TEXTURE_FORMAT_BC1 },
         { TexturePixelFormat::BC2, DETEX_TEXTURE_FORMAT_BC2 },
@@ -189,7 +185,7 @@ void Decima::Texture::draw_texture(ProjectDS& ctx) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_buffer.data());
     }
 
-    ImGui::Image(reinterpret_cast<ImTextureID>(image_texture), { static_cast<float>(1024), static_cast<float>(1024) }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 }, { 1, 1, 1, 1 });
+    ImGui::Image(reinterpret_cast<ImTextureID>(image_texture), { preview_width, preview_height }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 }, { 1, 1, 1, 1 });
 }
 
 Decima::Texture::~Texture() {

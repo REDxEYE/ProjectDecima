@@ -47,7 +47,7 @@ namespace Decima {
 
         void parse(Source& stream) override;
         void draw(ProjectDS& ctx) override;
-        void draw_texture(ProjectDS& ctx);
+        void draw_texture(ProjectDS& ctx, float preview_width, float preview_height);
     };
 }
 #endif //PROJECTDS_TEXTURE_H
