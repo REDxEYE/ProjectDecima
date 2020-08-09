@@ -11,6 +11,8 @@
 #include "ash.hpp"
 #include "shared.hpp"
 
+class ProjectDS;
+
 namespace Decima {
     struct GUID {
         std::uint64_t data[2];
@@ -36,7 +38,7 @@ namespace Decima {
 
         virtual void parse(Source& stream);
 
-        virtual void draw(ArchiveArray& archive_array);
+        virtual void draw(ProjectDS& ctx);
     };
 
     std::string read_string(CoreFile::Source& stream, const std::string& default_value = "<empty>");

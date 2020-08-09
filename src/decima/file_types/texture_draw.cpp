@@ -7,7 +7,7 @@
 
 #include "imgui.h"
 
-void Decima::Texture::draw(ArchiveArray& archive_array) {
+void Decima::Texture::draw(ProjectDS& ctx) {
 
     ImGui::Columns(2);
     ImGui::SetColumnWidth(-1, 200);
