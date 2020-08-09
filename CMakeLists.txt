@@ -20,6 +20,7 @@ add_subdirectory(libs/glfw)
 add_subdirectory(cmake_subprojects/glad)
 add_subdirectory(cmake_subprojects/stb)
 add_subdirectory(cmake_subprojects/imgui)
+add_subdirectory(cmake_subprojects/detex)
 
 include(QuickHash.cmake)
 include(ArchiveTest.cmake)

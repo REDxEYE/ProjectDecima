@@ -18,12 +18,12 @@ void Decima::Texture::parse(Source& stream) {
     file_guid = stream.read<typeof(file_guid)>();
     buffer_size = stream.read<typeof(buffer_size)>();
     total_size = stream.read<typeof(total_size)>();
+    stream_size = stream.read<typeof(stream_size)>();
     unks[0] = stream.read<typeof(unks[0])>();
-    unks[1] = stream.read<typeof(unks[0])>();
-    unks[2] = stream.read<typeof(unks[0])>();
-    unks[3] = stream.read<typeof(unks[0])>();
+    unks[1] = stream.read<typeof(unks[1])>();
+    unks[2] = stream.read<typeof(unks[2])>();
 
-    if (unks[0] != 0 && unks[1] != 0) {
+    if (stream_size != 0 && unks[0] != 0) {
         auto str_len = stream.read<uint32_t>();
         std::string buff(str_len, 0);
         stream.read(buff);
@@ -38,7 +38,7 @@ void Decima::Texture::parse(Source& stream) {
 namespace Decima {
     std::ostream& operator<<(std::ostream& os, Decima::TexturePixelFormat fmt) {
         switch (fmt) {
-        case Decima::TexturePixelFormat::R8G8B8A8:
+        case Decima::TexturePixelFormat::RGBA8:
             return os << "RGBA8";
         case Decima::TexturePixelFormat::A8:
             return os << "A8";
@@ -54,7 +54,8 @@ namespace Decima {
             return os << "BC5";
         case Decima::TexturePixelFormat::BC7:
             return os << "BC7";
+        default:
+            return os << "Unsupported: " << std::to_string(int(fmt));
         }
-        return os;
     }
 }

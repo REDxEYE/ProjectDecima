@@ -173,6 +173,8 @@ void ProjectDS::draw_filepreview() {
                     file->draw(*this);
                     ImGui::TreePop();
                 }
+
+                ImGui::Separator();
             }
         }
     }
