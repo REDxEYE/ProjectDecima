@@ -2,7 +2,7 @@
 // Created by MED45 on 07.08.2020.
 //
 
-#include "decima/file_types/translation.hpp"
+#include "decima/file_types/core/translation.hpp"
 
 #include "imgui.h"
 

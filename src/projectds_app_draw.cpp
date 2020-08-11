@@ -9,7 +9,7 @@
 #include "utils.h"
 #include "portable-file-dialogs.h"
 
-#include "decima/file_types/dummy.h"
+#include "decima/file_types/core/dummy.h"
 
 void ProjectDS::update_user(double ts) {
     App::update_user(ts);

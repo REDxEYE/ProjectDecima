@@ -1,7 +1,7 @@
 //
 // Created by MED45 on 07.08.2020.
 //
-#include "decima/file_types/texture.h"
+#include "decima/file_types/core/texture.h"
 #include "decima/archive/archive_array.h"
 #include "utils.h"
 #include "projectds_app.hpp"

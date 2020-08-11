@@ -5,10 +5,10 @@
 #ifndef PROJECTDS_FILE_TYPES_HPP
 #define PROJECTDS_FILE_TYPES_HPP
 
-#include "decima/file_types/core.h"
-#include "decima/file_types/dummy.h"
-#include "decima/file_types/translation.hpp"
-#include "decima/file_types/prefetch.h"
-#include "decima/file_types/texture.h"
+#include "decima/file_types/core/core.h"
+#include "decima/file_types/core/dummy.h"
+#include "decima/file_types/core/translation.hpp"
+#include "decima/file_types/core/prefetch.h"
+#include "decima/file_types/core/texture.h"
 
 #endif //PROJECTDS_FILE_TYPES_HPP

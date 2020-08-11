@@ -2,7 +2,7 @@
 // Created by i.getsman on 06.08.2020.
 //
 
-#include "decima/file_types/translation.hpp"
+#include "decima/file_types/core/translation.hpp"
 
 void Decima::Translation::parse(Source& stream) {
     CoreFile::parse(stream);
