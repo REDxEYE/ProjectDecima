@@ -51,7 +51,7 @@ void Decima::Texture::parse(ArchiveArray& archives, Source& stream) {
     image_buffer.resize(width * height * 4);
 
     if (pixel_format == TexturePixelFormat::RGBA8) {
-        if(stream_size > 0) {
+        if (stream_size > 0) {
             memcpy(image_buffer.data(), stream_info.data().data(), image_buffer.size());
         } else {
             memcpy(image_buffer.data(), embedded_data.data(), image_buffer.size());
@@ -89,6 +89,10 @@ static bool decompress_texture(const std::vector<std::uint8_t>& src, std::vector
     texture.height = height;
     texture.width_in_blocks = int(width / (detexGetCompressedBlockSize(fmt) / 2));
     texture.height_in_blocks = int(height / (detexGetCompressedBlockSize(fmt) / 2));
+    if(fmt == DETEX_TEXTURE_FORMAT_RGTC2 || fmt==DETEX_TEXTURE_FORMAT_BPTC || fmt==DETEX_TEXTURE_FORMAT_BC3){
+        texture.width_in_blocks*=2;
+        texture.height_in_blocks*=2;
+    }
 
     if (!detexDecompressTextureLinear(&texture, dst.data(), DETEX_PIXEL_FORMAT_RGBA8)) {
         std::printf("Buffer cannot be decompressed: %s\n", detexGetErrorMessage());
