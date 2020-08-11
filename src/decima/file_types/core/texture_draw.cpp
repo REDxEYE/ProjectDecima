@@ -2,13 +2,11 @@
 // Created by MED45 on 07.08.2020.
 //
 #include "decima/file_types/core/texture.h"
-#include "decima/archive/archive_array.h"
 #include "utils.h"
 #include "projectds_app.hpp"
 
 #include <detex.h>
 #include <detex-png.h>
-#include <imgui.h>
 #include <portable-file-dialogs.h>
 
 void Decima::Texture::draw() {
@@ -134,72 +132,11 @@ void Decima::Texture::draw() {
     ImGui::Columns(1);
 }
 
-static bool decompress_texture(const std::vector<std::uint8_t>& src, std::vector<std::uint8_t>& dst, int width, int height, int fmt) {
-    detexTexture texture;
-    texture.format = fmt;
-    texture.data = const_cast<uint8_t*>(src.data());
-    texture.width = width;
-    texture.height = height;
-    texture.width_in_blocks = int(width / (detexGetCompressedBlockSize(fmt) / 2));
-    texture.height_in_blocks = int(height / (detexGetCompressedBlockSize(fmt) / 2));
-
-    if (!detexDecompressTextureLinear(&texture, dst.data(), DETEX_PIXEL_FORMAT_RGBA8)) {
-        std::printf("Buffer cannot be decompressed: %s\n", detexGetErrorMessage());
-        return false;
-    }
-
-    return true;
-}
-
 void Decima::Texture::draw_texture(float preview_width, float preview_height, float zoom_region, float zoom_scale) {
-    /*
-     * This is very clunky approach. Maybe rewrite into something
-     * similar to what I did in ProjectDS::parse_core_file using
-     * factory pattern
-     */
-    static const std::unordered_map<TexturePixelFormat, int> format_mapper = {
-        { TexturePixelFormat::BC1, DETEX_TEXTURE_FORMAT_BC1 },
-        { TexturePixelFormat::BC2, DETEX_TEXTURE_FORMAT_BC2 },
-        { TexturePixelFormat::BC3, DETEX_TEXTURE_FORMAT_BC3 },
-        { TexturePixelFormat::BC4, DETEX_TEXTURE_FORMAT_RGTC1 },
-        { TexturePixelFormat::BC5, DETEX_TEXTURE_FORMAT_RGTC2 },
-        { TexturePixelFormat::BC7, DETEX_TEXTURE_FORMAT_BPTC }
-    };
-
-    if (image_buffer.empty()) {
-        image_buffer.resize(width * height * 4);
-
-        if (pixel_format == TexturePixelFormat::RGBA8) {
-            if(stream_size > 0) {
-                std::memcpy(image_buffer.data(), stream_info.data().data(), image_buffer.size());
-            } else {
-                std::memcpy(image_buffer.data(), embedded_data.data(), image_buffer.size());
-            }
-        } else {
-            const auto format = format_mapper.find(pixel_format);
-
-            if (format == format_mapper.end()) {
-                std::stringstream buffer;
-                buffer << "Image pixel format is not supported: " << pixel_format;
-
-                ImGui::Text("%s", buffer.str().c_str());
-                return;
-            }
-
-            if (!decompress_texture(stream_info.data(), image_buffer, width, height, format->second)) {
-                std::puts("Texture was failed to decode");
-                return;
-            }
-        }
-
-        glGenTextures(1, &image_texture);
-        glBindTexture(GL_TEXTURE_2D, image_texture);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_buffer.data());
+    if(image_texture == 0) {
+        std::stringstream buffer;
+        buffer << "Image pixel format is not supported: " << pixel_format;
+        ImGui::TextColored({1.0, 0.25, 0.25, 1.0}, "%s", buffer.str().c_str());
     }
 
     const ImVec2 pos = ImGui::GetCursorScreenPos();
@@ -210,9 +147,11 @@ void Decima::Texture::draw_texture(float preview_width, float preview_height, fl
 
     if (ImGui::BeginPopupContextItem("Export Image")) {
         if (ImGui::Selectable("Export image")) {
-            const auto full_path = pfd::save_file("Choose destination file", "", { "PNG", "*.png" }).result() + ".png";
+            auto full_path = pfd::save_file("Choose destination file", "", { "PNG", "*.png" }).result();
 
             if (!full_path.empty()) {
+                full_path += ".png";
+
                 detexTexture texture;
                 texture.format = DETEX_PIXEL_FORMAT_RGBA8;
                 texture.data = image_buffer.data();
