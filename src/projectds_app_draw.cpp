@@ -257,7 +257,7 @@ void ProjectDS::draw_export() {
 
                     if (file.file_entry) {
                         file.unpack(0);
-                        Decima::CoreFile::Source stream(file.storage, 1024);
+                        Decima::Source stream(file.storage, 1024);
 
                         std::cout << "Processing file '" << path << "' (size: " << file.file_entry->size << ")\n";
 

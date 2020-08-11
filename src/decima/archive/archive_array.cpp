@@ -18,12 +18,12 @@ void Decima::ArchiveArray::read_prefetch_file() {
     auto prefetch_data = query_file("prefetch/fullgame.prefetch");
     prefetch_data.unpack(0);
 
-    CoreFile::Source source(prefetch_data.storage, 1024);
+    Source source(prefetch_data.storage, 1024);
     prefetch.parse(source);
 
     for (auto& string : prefetch.strings) {
-        uint64_t hash = hash_string(sanitize_name(string.string), seed);
-        hash_to_name.insert({ hash, string.string });
+        uint64_t hash = hash_string(sanitize_name(string.data()), seed);
+        hash_to_name.insert({ hash, string.data() });
     }
 
     hash_to_name.insert({ 0x2fff5af65cd64c0a, "prefetch/fullgame.prefetch" });

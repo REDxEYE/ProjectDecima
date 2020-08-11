@@ -16,7 +16,7 @@ static std::unique_ptr<Decima::CoreFile> construct(Args&&... args) {
 
 void ProjectDS::parse_core_file() {
     parsed_files.clear();
-    Decima::CoreFile::Source stream(selection_info.file.storage, 1024);
+    Decima::Source stream(selection_info.file.storage, 1024);
 
     static const std::map<std::uint64_t, Constructor<Decima::CoreFile>> types = {
         { Decima::DeathStranding_FileMagics::Translation, construct<Decima::Translation> },

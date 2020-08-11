@@ -100,33 +100,36 @@ void Decima::Texture::draw(ProjectDS& ctx) {
     ImGui::NextColumn();
     ImGui::Separator();
 
-    ImGui::Text("unks-1");
+    ImGui::Text("Stream Mips");
     ImGui::NextColumn();
-    ImGui::Text("%i", unks[0]);
-    ImGui::NextColumn();
-    ImGui::Separator();
-
-    ImGui::Text("unks-1");
-    ImGui::NextColumn();
-    ImGui::Text("%i", unks[1]);
+    ImGui::Text("%i", stream_mips);
     ImGui::NextColumn();
     ImGui::Separator();
 
-    ImGui::Text("unks-2");
+    ImGui::Text("unk4");
     ImGui::NextColumn();
-    ImGui::Text("%i", unks[2]);
+    ImGui::Text("%i", unk4);
+    ImGui::NextColumn();
+    ImGui::Separator();
+
+    ImGui::Text("unk5");
+    ImGui::NextColumn();
+    ImGui::Text("%i", unk5);
     ImGui::NextColumn();
     ImGui::Separator();
 
     ImGui::Text("Stream");
     ImGui::NextColumn();
-    ImGui::Text("%s", stream_name.c_str());
-    if (ImGui::BeginPopupContextItem("Stream name")) {
-        if (ImGui::Selectable("Copy stream path"))
-            ImGui::SetClipboardText((stream_name + ".core.stream").c_str());
-        ImGui::EndPopup();
+    if (stream_size > 0) {
+        ImGui::BeginChild(file_guid.hash(), { 0, 150 }, true);
+        stream_info.draw();
+        ImGui::EndChild();
+    } else {
+        ImGui::Text("No external stream");
     }
+
     draw_texture(ctx, 128, 128, 128, 4);
+
     ImGui::NextColumn();
     ImGui::Columns(1);
 }
@@ -167,7 +170,7 @@ void Decima::Texture::draw_texture(ProjectDS& ctx, float preview_width, float pr
         image_buffer.resize(width * height * 4);
 
         if (stream_size > 0) {
-            auto stream_file = ctx.archive_array.query_file(stream_name + ".core.stream");
+            auto stream_file = ctx.archive_array.query_file(stream_info.name().data() + ".core.stream");
             stream_file.unpack(0);
             stream_buffer = std::move(stream_file.storage);
         }

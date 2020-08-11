@@ -5,17 +5,10 @@
 #ifndef PROJECTDS_SHARED_HPP
 #define PROJECTDS_SHARED_HPP
 
-#include <unordered_map>
-#include <string>
+#include "ash.hpp"
 
 namespace Decima {
-
-    struct HashedString {
-        uint32_t size;
-        uint32_t hash;
-        std::string string;
-    };
-
+    using Source = ash::buffered_source<std::vector<uint8_t>>;
 }
 
 #endif //PROJECTDS_SHARED_HPP

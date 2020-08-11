@@ -17,7 +17,10 @@ add_executable(ProjectDS
         src/decima/file_types/core/translation.cpp
         src/decima/file_types/core/translation_draw.cpp
         src/decima/file_types/core/texture.cpp
-        src/decima/file_types/core/texture_draw.cpp)
+        src/decima/file_types/core/texture_draw.cpp
+        src/decima/file_types/pod/string.cpp
+        src/decima/file_types/pod/stream.cpp
+        src/decima/file_types/pod/guid.cpp)
 
 target_include_directories(ProjectDS PUBLIC include ${HASHLIB_INC} ${OOZLIB_INC})
 

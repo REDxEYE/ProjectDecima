@@ -8,18 +8,12 @@
 #include <cstdint>
 #include <vector>
 
-#include "ash.hpp"
-#include "shared.hpp"
+#include "decima/file_types/shared.hpp"
+#include "decima/file_types/pod/guid.hpp"
 
 class ProjectDS;
 
 namespace Decima {
-    struct GUID {
-        std::uint64_t data[2];
-    };
-
-    std::ostream& operator<<(std::ostream& os, GUID guid);
-
     class ArchiveArray;
     struct __attribute__((packed)) CoreHeader {
         std::uint64_t file_type;
@@ -28,8 +22,6 @@ namespace Decima {
 
     class CoreFile {
     public:
-        using Source = ash::buffered_source<std::vector<uint8_t>>;
-
         CoreHeader header {};
         GUID guid {};
         uint32_t offset {};
@@ -41,6 +33,6 @@ namespace Decima {
         virtual void draw(ProjectDS& ctx);
     };
 
-    std::string read_string(CoreFile::Source& stream, const std::string& default_value = "<empty>");
+    std::string read_string(Source& stream, const std::string& default_value = "<empty>");
 }
 #endif //PROJECTDS_CORE_H

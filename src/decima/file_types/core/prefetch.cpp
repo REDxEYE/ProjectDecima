@@ -9,13 +9,9 @@ void Decima::Prefetch::parse(Source& stream) {
     string_count = stream.read<typeof(string_count)>();
     strings.resize(string_count);
 
-    for (uint32_t i = 0; i < string_count; i++) {
-        auto& hashed_string = strings[i];
-        hashed_string.size = stream.read<typeof(hashed_string.size)>();
-        hashed_string.hash = stream.read<typeof(hashed_string.hash)>();
-        hashed_string.string.resize(hashed_string.size);
-        stream.read_exact(hashed_string.string);
-    }
+    std::for_each_n(strings.begin(), string_count, [&](auto& string) {
+        string.parse(stream);
+    });
 
     file_sizes_count = stream.read<typeof(file_sizes_count)>();
     file_sizes.resize(file_sizes_count);

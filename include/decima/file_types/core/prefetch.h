@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "core.h"
+#include "decima/file_types/pod/string.hpp"
 
 namespace Decima {
     class Prefetch : public CoreFile {
@@ -17,7 +18,7 @@ namespace Decima {
         uint32_t file_sizes_count = 0;
         uint32_t indices_count = 0;
 
-        std::vector<HashedString> strings;
+        std::vector<StringHashed> strings;
         std::vector<uint32_t> file_sizes;
         std::vector<uint32_t> indices;
 

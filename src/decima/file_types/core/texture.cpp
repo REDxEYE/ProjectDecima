@@ -15,23 +15,19 @@ void Decima::Texture::parse(Source& stream) {
     pixel_format = stream.read<typeof(pixel_format)>();
     unk2 = stream.read<typeof(unk2)>();
     unk3 = stream.read<typeof(unk3)>();
-    file_guid = stream.read<typeof(file_guid)>();
+    file_guid.parse(stream);
     buffer_size = stream.read<typeof(buffer_size)>();
     total_size = stream.read<typeof(total_size)>();
     stream_size = stream.read<typeof(stream_size)>();
-    unks[0] = stream.read<typeof(unks[0])>();
-    unks[1] = stream.read<typeof(unks[1])>();
-    unks[2] = stream.read<typeof(unks[2])>();
+    stream_mips = stream.read<typeof(stream_mips)>();
+    unk4 = stream.read<typeof(unk4)>();
+    unk5 = stream.read<typeof(unk5)>();
 
-    if (stream_size > 0) {
-        const auto length = stream.read<uint32_t>();
-        stream_name.resize(length);
-        stream.read_exact(stream_name);
-        stream.seek(ash::seek_dir::cur, total_size + sizeof(CoreHeader) + sizeof(GUID));
-    } else {
-        stream_buffer.resize(total_size);
-        stream.read_exact(stream_buffer);
-    }
+    if (stream_size > 0)
+        stream_info.parse(stream);
+
+    stream_buffer.resize(total_size);
+    stream.read_exact(stream_buffer);
 }
 
 #include <ostream>

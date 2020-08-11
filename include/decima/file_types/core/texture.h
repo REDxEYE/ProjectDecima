@@ -5,7 +5,8 @@
 #ifndef PROJECTDS_TEXTURE_H
 #define PROJECTDS_TEXTURE_H
 
-#include "core.h"
+#include "decima/file_types/pod/stream.hpp"
+#include "decima/file_types/core/core.h"
 
 namespace Decima {
     enum class TexturePixelFormat : uint8_t {
@@ -37,7 +38,11 @@ namespace Decima {
         std::uint32_t buffer_size {};
         std::uint32_t total_size {};
         std::uint32_t stream_size {};
-        std::uint32_t unks[3] {};
+        std::uint32_t stream_mips {};
+        std::uint32_t unk4 {};
+        std::uint32_t unk5 {};
+
+        Decima::Stream stream_info {};
 
         std::vector<std::uint8_t> stream_buffer;
         std::vector<std::uint8_t> image_buffer;
