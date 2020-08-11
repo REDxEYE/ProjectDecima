@@ -4,39 +4,25 @@
 
 #include <fstream>
 #include <iostream>
-#include "decima/file_types/core.h"
-#include "decima/file_types/localization.hpp"
+#include "decima/file_types/core/core.h"
+#include "decima/file_types/core/translation.hpp"
+#include "decima/file_types/core/texture.h"
+#include "decima/file_types/core/texture_set.h"
 #include "decima/constants.hpp"
 #include "utils.h"
 
 int main() {
-    std::ifstream file("C:\\Users\\i.getsman\\Downloads\\Telegram Desktop\\simpletext (2).core",std::ios::binary);
-    file.seekg(0,std::ios::end);
+    std::ifstream file("F:\\SteamLibrary\\steamapps\\common\\Death Stranding\\dump\\ds\\models\\characters\\sam_sam\\core\\sam_textures\\textures\\sam_body_naked_v00_set.core", std::ios::binary);
+    file.seekg(0, std::ios::end);
     uint64_t stream_size = file.tellg();
     file.seekg(0);
 
-
-    while (file.tellg()<stream_size) {
+    while (file.tellg() < stream_size) {
         uint64_t magic;
         file.read(reinterpret_cast<char*>(&magic), 8);
-        file.seekg(-8,std::ios::cur);
-        if(magic==Decima::DeathStranding_FileMagics::Localization){
-            Decima::Localization localization;
-            localization.parse(file);
-            std::cout<<localization.translations[0]<<'\n';
-        }else{
-            Decima::CoreFile core_file;
-            core_file.parse(file);
-            std::string file_type_name = uint64_to_hex(core_file.header.filetype);
-            if (Decima::known_file_types.find(core_file.header.filetype) != Decima::known_file_types.end()) {
-                file_type_name = Decima::known_file_types.at(core_file.header.filetype);
-            }
-            std::cout << "Header: " << file_type_name << '\n';
-            std::cout << "\tSize: " << core_file.header.file_size << '\n';
-            file.seekg(core_file.header.file_size-16, std::ios::seekdir::_S_cur);
+        file.seekg(-8, std::ios::cur);
+
         }
-
-
     }
     return 0;
 }

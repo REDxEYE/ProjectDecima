@@ -10,5 +10,6 @@
 #include "decima/file_types/core/translation.hpp"
 #include "decima/file_types/core/prefetch.h"
 #include "decima/file_types/core/texture.h"
+#include "decima/file_types/core/texture_set.h"
 
 #endif //PROJECTDS_FILE_TYPES_HPP

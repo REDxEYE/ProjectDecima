@@ -20,7 +20,8 @@ void ProjectDS::parse_core_file() {
 
     static const std::map<std::uint64_t, Constructor<Decima::CoreFile>> types = {
         { Decima::DeathStranding_FileMagics::Translation, construct<Decima::Translation> },
-        { Decima::DeathStranding_FileMagics::Texture, construct<Decima::Texture> }
+        { Decima::DeathStranding_FileMagics::Texture, construct<Decima::Texture> },
+        { Decima::DeathStranding_FileMagics::TextureSet, construct<Decima::TextureSet> }
     };
 
     static const auto get_handler = [](std::uint64_t hash) noexcept {
