@@ -33,7 +33,7 @@ void ProjectDS::parse_core_file() {
         const auto magic = Decima::CoreFile::peek_header(stream);
 
         auto handler = get_handler(magic);
-        handler->parse(stream);
+        handler->parse(archive_array, stream);
         handler->offset = offset;
 
         parsed_files.push_back(std::move(handler));

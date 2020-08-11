@@ -7,7 +7,7 @@
 #include "decima/file_types/core/core.h"
 
 namespace Decima {
-    void CoreFile::parse(Source& stream) {
+    void CoreFile::parse(ArchiveArray& archives, Source& stream) {
         header = stream.read<typeof(header)>();
         guid.parse(stream);
     }

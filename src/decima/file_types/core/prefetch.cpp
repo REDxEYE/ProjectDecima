@@ -4,8 +4,8 @@
 
 #include "decima/file_types/core/prefetch.h"
 
-void Decima::Prefetch::parse(Source& stream) {
-    CoreFile::parse(stream);
+void Decima::Prefetch::parse(ArchiveArray& archives, Source& stream) {
+    CoreFile::parse(archives, stream);
     string_count = stream.read<typeof(string_count)>();
     strings.resize(string_count);
 

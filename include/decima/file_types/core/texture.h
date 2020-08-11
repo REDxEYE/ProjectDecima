@@ -44,15 +44,15 @@ namespace Decima {
 
         Decima::Stream stream_info {};
 
-        std::vector<std::uint8_t> stream_buffer;
+        std::vector<std::uint8_t> embedded_data;
         std::vector<std::uint8_t> image_buffer;
         unsigned int image_texture;
 
-        std::string stream_name = "NO_EXTERNAL_STREAM";
+        void parse(ArchiveArray& archives, Source& stream) override;
+        void draw() override;
 
-        void parse(Source& stream) override;
-        void draw(ProjectDS& ctx) override;
-        void draw_texture(ProjectDS& ctx, float preview_width, float preview_height, float zoom_region, float zoom_scale);
+    private:
+        void draw_texture(float preview_width, float preview_height, float zoom_region, float zoom_scale);
     };
 }
 #endif //PROJECTDS_TEXTURE_H

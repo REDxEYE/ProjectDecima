@@ -24,7 +24,7 @@ namespace Decima {
 
         Prefetch() = default;
 
-        void parse(Source& stream) override;
+        void parse(ArchiveArray& archives, Source& stream) override;
     };
 }
 #endif //PROJECTDS_PREFETCH_H

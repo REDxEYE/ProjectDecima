@@ -19,7 +19,7 @@ void Decima::ArchiveArray::read_prefetch_file() {
     prefetch_data.unpack(0);
 
     Source source(prefetch_data.storage, 1024);
-    prefetch.parse(source);
+    prefetch.parse(*this, source);
 
     for (auto& string : prefetch.strings) {
         uint64_t hash = hash_string(sanitize_name(string.data()), seed);

@@ -10,7 +10,7 @@
 namespace Decima {
     class Dummy : public Decima::CoreFile {
     public:
-        void parse(Source& stream) override;
+        void parse(ArchiveArray& archives, Source& stream) override;
     };
 }
 

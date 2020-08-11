@@ -3,8 +3,8 @@
 //
 #include "decima/file_types/core/texture.h"
 
-void Decima::Texture::parse(Source& stream) {
-    CoreFile::parse(stream);
+void Decima::Texture::parse(ArchiveArray& archives, Source& stream) {
+    CoreFile::parse(archives, stream);
     uint64_t start = stream.tell();
 
     unk1 = stream.read<typeof(unk1)>();
@@ -24,10 +24,10 @@ void Decima::Texture::parse(Source& stream) {
     unk5 = stream.read<typeof(unk5)>();
 
     if (stream_size > 0)
-        stream_info.parse(stream);
+        stream_info.parse(archives, stream);
 
-    stream_buffer.resize(total_size);
-    stream.read_exact(stream_buffer);
+    embedded_data.resize(total_size);
+    stream.read_exact(embedded_data);
 }
 
 #include <ostream>

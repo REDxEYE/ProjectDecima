@@ -28,9 +28,9 @@ namespace Decima {
 
         static uint64_t peek_header(Source& stream);
 
-        virtual void parse(Source& stream);
+        virtual void parse(ArchiveArray& archives, Source& stream);
 
-        virtual void draw(ProjectDS& ctx);
+        virtual void draw();
     };
 
     std::string read_string(Source& stream, const std::string& default_value = "<empty>");

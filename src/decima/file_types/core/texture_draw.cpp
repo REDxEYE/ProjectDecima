@@ -11,7 +11,7 @@
 #include <imgui.h>
 #include <portable-file-dialogs.h>
 
-void Decima::Texture::draw(ProjectDS& ctx) {
+void Decima::Texture::draw() {
     ImGui::Columns(2);
     ImGui::SetColumnWidth(-1, 200);
     ImGui::Text("Prop");
@@ -128,16 +128,16 @@ void Decima::Texture::draw(ProjectDS& ctx) {
         ImGui::Text("No external stream");
     }
 
-    draw_texture(ctx, 128, 128, 128, 4);
+    draw_texture(128, 128, 128, 4);
 
     ImGui::NextColumn();
     ImGui::Columns(1);
 }
 
-static bool decompress_texture(std::vector<std::uint8_t>& src, std::vector<std::uint8_t>& dst, int width, int height, int fmt) {
+static bool decompress_texture(const std::vector<std::uint8_t>& src, std::vector<std::uint8_t>& dst, int width, int height, int fmt) {
     detexTexture texture;
     texture.format = fmt;
-    texture.data = src.data();
+    texture.data = const_cast<uint8_t*>(src.data());
     texture.width = width;
     texture.height = height;
     texture.width_in_blocks = int(width / (detexGetCompressedBlockSize(fmt) / 2));
@@ -151,7 +151,7 @@ static bool decompress_texture(std::vector<std::uint8_t>& src, std::vector<std::
     return true;
 }
 
-void Decima::Texture::draw_texture(ProjectDS& ctx, float preview_width, float preview_height, float zoom_region, float zoom_scale) {
+void Decima::Texture::draw_texture(float preview_width, float preview_height, float zoom_region, float zoom_scale) {
     /*
      * This is very clunky approach. Maybe rewrite into something
      * similar to what I did in ProjectDS::parse_core_file using
@@ -169,14 +169,12 @@ void Decima::Texture::draw_texture(ProjectDS& ctx, float preview_width, float pr
     if (image_buffer.empty()) {
         image_buffer.resize(width * height * 4);
 
-        if (stream_size > 0) {
-            auto stream_file = ctx.archive_array.query_file(stream_info.name().data() + ".core.stream");
-            stream_file.unpack(0);
-            stream_buffer = std::move(stream_file.storage);
-        }
-
         if (pixel_format == TexturePixelFormat::RGBA8) {
-            std::memcpy(image_buffer.data(), stream_buffer.data(), image_buffer.size());
+            if(stream_size > 0) {
+                std::memcpy(image_buffer.data(), stream_info.data().data(), image_buffer.size());
+            } else {
+                std::memcpy(image_buffer.data(), embedded_data.data(), image_buffer.size());
+            }
         } else {
             const auto format = format_mapper.find(pixel_format);
 
@@ -188,7 +186,7 @@ void Decima::Texture::draw_texture(ProjectDS& ctx, float preview_width, float pr
                 return;
             }
 
-            if (!decompress_texture(stream_buffer, image_buffer, width, height, format->second)) {
+            if (!decompress_texture(stream_info.data(), image_buffer, width, height, format->second)) {
                 std::puts("Texture was failed to decode");
                 return;
             }

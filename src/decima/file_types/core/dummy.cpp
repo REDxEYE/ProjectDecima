@@ -4,7 +4,7 @@
 
 #include "decima/file_types/core/dummy.h"
 
-void Decima::Dummy::parse(Source& stream) {
-    CoreFile::parse(stream);
+void Decima::Dummy::parse(ArchiveArray& archives, Source& stream) {
+    CoreFile::parse(archives, stream);
     stream.seek(ash::seek_dir::cur, header.file_size - sizeof(Decima::GUID));
 }

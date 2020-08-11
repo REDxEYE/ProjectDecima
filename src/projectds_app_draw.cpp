@@ -170,7 +170,7 @@ void ProjectDS::draw_filepreview() {
                 }
 
                 if (opened) {
-                    file->draw(*this);
+                    file->draw();
                     ImGui::TreePop();
                 }
 
@@ -263,7 +263,7 @@ void ProjectDS::draw_export() {
 
                         while (!stream.eof()) {
                             Decima::Dummy dummy;
-                            dummy.parse(stream);
+                            dummy.parse(archive_array, stream);
 
                             output_file << path << '_' << dummy.guid << '\n';
                         }

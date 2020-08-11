@@ -6,7 +6,7 @@
 
 #include "imgui.h"
 
-void Decima::Translation::draw(ProjectDS& ctx) {
+void Decima::Translation::draw() {
     ImGui::Columns(4);
     ImGui::SetColumnWidth(-1, 200);
     ImGui::Text("Language");
