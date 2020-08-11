@@ -30,7 +30,7 @@ namespace Decima {
         std::uint16_t width {};
         std::uint16_t height {};
         std::uint16_t layers {};
-        std::uint8_t mip_count {};
+        std::uint8_t total_mips {};
         TexturePixelFormat pixel_format {};
         std::uint16_t unk2 {};
         std::uint32_t unk3 {};
@@ -42,11 +42,8 @@ namespace Decima {
         std::uint32_t unk4 {};
         std::uint32_t unk5 {};
 
-        Decima::Stream stream_info {};
-
-        std::vector<std::uint8_t> embedded_data;
-        std::vector<std::uint8_t> image_buffer;
-        unsigned int image_texture;
+        Decima::Stream external_data;
+        std::vector<std::pair<unsigned int, std::vector<std::uint8_t>>> image_mips;
 
         void parse(ArchiveArray& archives, Source& stream) override;
         void draw() override;

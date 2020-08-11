@@ -44,7 +44,7 @@ void Decima::Texture::draw() {
 
     ImGui::Text("Mip count");
     ImGui::NextColumn();
-    ImGui::Text("%i", mip_count);
+    ImGui::Text("%i", total_mips);
     ImGui::NextColumn();
     ImGui::Separator();
 
@@ -120,7 +120,7 @@ void Decima::Texture::draw() {
     ImGui::NextColumn();
     if (stream_size > 0) {
         ImGui::BeginChild(file_guid.hash(), { 0, 150 }, true);
-        stream_info.draw();
+        external_data.draw();
         ImGui::EndChild();
     } else {
         ImGui::Text("No external stream");
@@ -133,67 +133,72 @@ void Decima::Texture::draw() {
 }
 
 void Decima::Texture::draw_texture(float preview_width, float preview_height, float zoom_region, float zoom_scale) {
-    if(image_texture == 0) {
-        std::stringstream buffer;
-        buffer << "Image pixel format is not supported: " << pixel_format;
-        ImGui::TextColored({1.0, 0.25, 0.25, 1.0}, "%s", buffer.str().c_str());
+    auto mip_index = 0;
+
+    for (const auto& [id, _] : image_mips) {
+        ImGui::Text("Mip #%d (%dx%d)", total_mips - mip_index, width >> mip_index, height >> mip_index);
+        mip_index += 1;
+
+        const ImVec4 tint = { 1, 1, 1, 1 };
+        const ImVec4 border = { 1, 1, 1, 1 };
+        ImGui::Image(reinterpret_cast<ImTextureID>(id), { preview_width, preview_height }, { 0, 0 }, { 1, 1 }, tint, border);
     }
-
-    const ImVec2 pos = ImGui::GetCursorScreenPos();
-    const ImVec4 tint = { 1, 1, 1, 1 };
-    const ImVec4 border = { 1, 1, 1, 1 };
-
-    ImGui::Image(reinterpret_cast<ImTextureID>(image_texture), { preview_width, preview_height }, { 0, 0 }, { 1, 1 }, tint, border);
-
-    if (ImGui::BeginPopupContextItem("Export Image")) {
-        if (ImGui::Selectable("Export image")) {
-            auto full_path = pfd::save_file("Choose destination file", "", { "PNG", "*.png" }).result();
-
-            if (!full_path.empty()) {
-                full_path += ".png";
-
-                detexTexture texture;
-                texture.format = DETEX_PIXEL_FORMAT_RGBA8;
-                texture.data = image_buffer.data();
-                texture.width = width;
-                texture.height = height;
-                detexSavePNGFile(&texture, full_path.c_str());
-
-                std::cout << "Image was saved to: " << full_path << '\n';
-            }
-        }
-
-        ImGui::EndPopup();
-    }
-
-    if (ImGui::IsItemHovered()) {
-        ImGui::BeginTooltip();
-
-        auto& io = ImGui::GetIO();
-        auto region_x = io.MousePos.x - pos.x - zoom_region * 0.5f;
-        auto region_y = io.MousePos.y - pos.y - zoom_region * 0.5f;
-
-        if (region_x < 0.0f) {
-            region_x = 0.0f;
-        } else if (region_x > preview_width - zoom_region) {
-            region_x = preview_width - zoom_region;
-        }
-
-        if (region_y < 0.0f) {
-            region_y = 0.0f;
-        } else if (region_y > preview_height - zoom_region) {
-            region_y = preview_height - zoom_region;
-        }
-
-        ImVec2 uv0 = { region_x / preview_width, region_y / preview_height };
-        ImVec2 uv1 = { (region_x + zoom_region) / preview_width, (region_y + zoom_region) / preview_height };
-        ImGui::Image(reinterpret_cast<ImTextureID>(image_texture), ImVec2(zoom_region * zoom_scale, zoom_region * zoom_scale), uv0, uv1, tint, border);
-
-        ImGui::EndTooltip();
-    }
-}
-
-Decima::Texture::~Texture() {
-    if (image_texture > 0)
-        glDeleteTextures(1, &image_texture);
+    //    if(image_texture == 0) {
+    //        std::stringstream buffer;
+    //        buffer << "Image pixel format is not supported: " << pixel_format;
+    //        ImGui::TextColored({1.0, 0.25, 0.25, 1.0}, "%s", buffer.str().c_str());
+    //    }
+    //
+    //    const ImVec2 pos = ImGui::GetCursorScreenPos();
+    //    const ImVec4 tint = { 1, 1, 1, 1 };
+    //    const ImVec4 border = { 1, 1, 1, 1 };
+    //
+    //    ImGui::Image(reinterpret_cast<ImTextureID>(image_texture), { preview_width, preview_height }, { 0, 0 }, { 1, 1 }, tint, border);
+    //
+    //    if (ImGui::BeginPopupContextItem("Export Image")) {
+    //        if (ImGui::Selectable("Export image")) {
+    //            auto full_path = pfd::save_file("Choose destination file", "", { "PNG", "*.png" }).result();
+    //
+    //            if (!full_path.empty()) {
+    //                full_path += ".png";
+    //
+    //                detexTexture texture;
+    //                texture.format = DETEX_PIXEL_FORMAT_RGBA8;
+    //                texture.data = image_buffer.data();
+    //                texture.width = width;
+    //                texture.height = height;
+    //                detexSavePNGFile(&texture, full_path.c_str());
+    //
+    //                std::cout << "Image was saved to: " << full_path << '\n';
+    //            }
+    //        }
+    //
+    //        ImGui::EndPopup();
+    //    }
+    //
+    //    if (ImGui::IsItemHovered()) {
+    //        ImGui::BeginTooltip();
+    //
+    //        auto& io = ImGui::GetIO();
+    //        auto region_x = io.MousePos.x - pos.x - zoom_region * 0.5f;
+    //        auto region_y = io.MousePos.y - pos.y - zoom_region * 0.5f;
+    //
+    //        if (region_x < 0.0f) {
+    //            region_x = 0.0f;
+    //        } else if (region_x > preview_width - zoom_region) {
+    //            region_x = preview_width - zoom_region;
+    //        }
+    //
+    //        if (region_y < 0.0f) {
+    //            region_y = 0.0f;
+    //        } else if (region_y > preview_height - zoom_region) {
+    //            region_y = preview_height - zoom_region;
+    //        }
+    //
+    //        ImVec2 uv0 = { region_x / preview_width, region_y / preview_height };
+    //        ImVec2 uv1 = { (region_x + zoom_region) / preview_width, (region_y + zoom_region) / preview_height };
+    //        ImGui::Image(reinterpret_cast<ImTextureID>(image_texture), ImVec2(zoom_region * zoom_scale, zoom_region * zoom_scale), uv0, uv1, tint, border);
+    //
+    //        ImGui::EndTooltip();
+    //    }
 }
