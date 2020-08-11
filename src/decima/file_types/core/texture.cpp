@@ -7,9 +7,9 @@
 #include <detex.h>
 
 /*
- * <enum: int> <pixel_bits: int, padding_bytes: int>
+ * <enum: int> <pixel_bits: int>
  */
-using DXGIPixelFormat = std::tuple<int, int, int>;
+using DXGIPixelFormat = std::pair<int, int>;
 
 /*
  * This is very clunky approach. Maybe rewrite into something
@@ -17,13 +17,13 @@ using DXGIPixelFormat = std::tuple<int, int, int>;
  * factory pattern
  */
 static const std::unordered_map<Decima::TexturePixelFormat, DXGIPixelFormat> format_mapper = {
-    { Decima::TexturePixelFormat::BC1, { DETEX_TEXTURE_FORMAT_BC1, 8, 14 } },
-    { Decima::TexturePixelFormat::BC2, { DETEX_TEXTURE_FORMAT_BC2, 16, 0 } },
-    { Decima::TexturePixelFormat::BC3, { DETEX_TEXTURE_FORMAT_BC3, 16, 0 } },
-    { Decima::TexturePixelFormat::BC4, { DETEX_TEXTURE_FORMAT_RGTC1, 8, 14 } },
-    { Decima::TexturePixelFormat::BC5, { DETEX_TEXTURE_FORMAT_RGTC2, 16, 27 } },
-    { Decima::TexturePixelFormat::BC7, { DETEX_TEXTURE_FORMAT_BPTC, 16, 27 } },
-    { Decima::TexturePixelFormat::RGBA8, { DETEX_TEXTURE_FORMAT_BPTC, 16, 3 } },
+    { Decima::TexturePixelFormat::BC1, { DETEX_TEXTURE_FORMAT_BC1, 8 } },
+    { Decima::TexturePixelFormat::BC2, { DETEX_TEXTURE_FORMAT_BC2, 16 } },
+    { Decima::TexturePixelFormat::BC3, { DETEX_TEXTURE_FORMAT_BC3, 16 } },
+    { Decima::TexturePixelFormat::BC4, { DETEX_TEXTURE_FORMAT_RGTC1, 8 } },
+    { Decima::TexturePixelFormat::BC5, { DETEX_TEXTURE_FORMAT_RGTC2, 16 } },
+    { Decima::TexturePixelFormat::BC7, { DETEX_TEXTURE_FORMAT_BPTC, 16 } },
+    { Decima::TexturePixelFormat::RGBA8, { DETEX_TEXTURE_FORMAT_BPTC, 16 } },
 };
 
 static bool decompress_texture(const std::uint8_t* src, std::vector<std::uint8_t>& dst, int width, int height, int fmt);
@@ -55,7 +55,7 @@ void Decima::Texture::parse(ArchiveArray& archives, Source& stream) {
     embedded_data.resize(total_size);
     stream.read(embedded_data);
 
-    const auto [fmt, fmt_bps, fmt_pad] = format_mapper.at(pixel_format);
+    const auto [fmt, fmt_bps] = format_mapper.at(pixel_format);
 
     unsigned int data_offset = 0;
 
