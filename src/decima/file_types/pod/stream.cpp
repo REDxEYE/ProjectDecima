@@ -1,11 +1,15 @@
 #include "decima/file_types/pod/stream.hpp"
 #include <imgui.h>
 
-void Decima::Stream::parse(Source& stream) {
+void Decima::Stream::parse(ArchiveArray& archives, Source& stream) {
     m_name.parse(stream);
     stream.seek(ash::seek_dir::cur, 20);
     m_offs = stream.read<std::uint32_t>();
     m_size = stream.read<std::uint32_t>();
+
+    auto stream_file = archives.query_file(m_name.data() + ".core.stream");
+    stream_file.unpack(0);
+    m_data = std::move(stream_file.storage);
 }
 
 void Decima::Stream::draw() {
