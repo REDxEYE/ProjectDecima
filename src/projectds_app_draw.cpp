@@ -11,6 +11,72 @@
 
 #include "decima/file_types/core/dummy.h"
 
+static void show_data_selection_dialog(ProjectDS& self) {
+    auto folder = pfd::select_folder("Select Death Stranding data folder!").result();
+
+    if (!folder.empty()) {
+        self.archive_array.open(folder);
+        self.file_names.clear();
+        self.file_names.reserve(self.archive_array.hash_to_name.size());
+
+        for (auto& [hash, path] : self.archive_array.hash_to_name) {
+            self.file_names.push_back(path.c_str());
+            auto* current_root = &self.root_tree;
+
+            std::vector<std::string> split_path;
+            split(path, split_path, '/');
+
+            for (auto it = split_path.cbegin(); it != split_path.end() - 1; it++)
+                current_root = current_root->add_folder(*it);
+
+            if (self.archive_array.hash_to_archive.find(hash) != self.archive_array.hash_to_archive.end())
+                current_root->add_file(split_path.back(), hash, { 0 });
+        }
+    }
+}
+
+static void show_export_selection_dialog(ProjectDS& self) {
+    if (self.selection_info.selected_files.empty())
+        return;
+
+    const auto base_folder = pfd::select_folder("Choose destination folder").result();
+
+    if (!base_folder.empty()) {
+        for (const auto selected_file : self.selection_info.selected_files) {
+            const auto filename = sanitize_name(self.archive_array.hash_to_name.at(selected_file));
+
+            std::filesystem::path full_path = std::filesystem::path(base_folder) / filename;
+            std::filesystem::create_directories(full_path.parent_path());
+
+            auto file = self.archive_array.query_file(filename);
+            file.unpack(0);
+            std::ofstream output_file { full_path, std::ios::binary };
+            output_file.write(reinterpret_cast<const char*>(file.storage.data()), file.storage.size());
+
+            std::cout << "File was exported to: " << full_path << "\n";
+        }
+    }
+}
+
+void ProjectDS::input_user() {
+    ImGuiIO& io = ImGui::GetIO();
+
+    if (io.KeyCtrl) {
+        if (io.KeysDown[GLFW_KEY_O])
+            show_data_selection_dialog(*this);
+
+        if (io.KeysDown[GLFW_KEY_E])
+            show_export_selection_dialog(*this);
+    }
+
+    if (io.KeysDown[GLFW_KEY_ESCAPE]) {
+        if (selection_info.preview_file != 0) {
+            selection_info.preview_file_size = selection_info.file.storage.size();
+            selection_info.preview_file_offset = 0;
+        }
+    }
+}
+
 void ProjectDS::update_user(double ts) {
     App::update_user(ts);
     draw_dockspace();
@@ -18,13 +84,6 @@ void ProjectDS::update_user(double ts) {
     draw_debug();
     draw_export();
     draw_tree();
-
-    if (glfwGetKey(m_window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-        if (selection_info.preview_file != 0) {
-            selection_info.preview_file_size = selection_info.file.storage.size();
-            selection_info.preview_file_offset = 0;
-        }
-    }
 }
 
 void ProjectDS::init_filetype_handlers() {
@@ -51,27 +110,7 @@ void ProjectDS::draw_dockspace() {
         if (ImGui::BeginMenuBar()) {
             if (ImGui::BeginMenu("File")) {
                 if (ImGui::MenuItem("Open archive", "Ctrl+O")) {
-                    auto folder = pfd::select_folder("Select Death Stranding data folder!").result();
-
-                    if (!folder.empty()) {
-                        archive_array.open(folder);
-                        file_names.clear();
-                        file_names.reserve(archive_array.hash_to_name.size());
-
-                        for (auto& [hash, path] : archive_array.hash_to_name) {
-                            file_names.push_back(path.c_str());
-                            auto* current_root = &root_tree;
-
-                            std::vector<std::string> split_path;
-                            split(path, split_path, '/');
-
-                            for (auto it = split_path.cbegin(); it != split_path.end() - 1; it++)
-                                current_root = current_root->add_folder(*it);
-
-                            if (archive_array.hash_to_archive.find(hash) != archive_array.hash_to_archive.end())
-                                current_root->add_file(split_path.back(), hash, { 0 });
-                        }
-                    }
+                    show_data_selection_dialog(*this);
                 }
 
                 ImGui::EndMenu();
@@ -349,24 +388,8 @@ void ProjectDS::draw_export() {
             ImGui::ListBoxFooter();
         }
 
-        if (ImGui::Button("Export selected file(-s)") && !selection_info.selected_files.empty()) {
-            const auto base_folder = pfd::select_folder("Choose destination folder").result();
-
-            if (!base_folder.empty()) {
-                for (const auto selected_file : selection_info.selected_files) {
-                    const auto filename = sanitize_name(archive_array.hash_to_name.at(selected_file));
-
-                    std::filesystem::path full_path = std::filesystem::path(base_folder) / filename;
-                    std::filesystem::create_directories(full_path.parent_path());
-
-                    auto file = archive_array.query_file(filename);
-                    file.unpack(0);
-                    std::ofstream output_file { full_path, std::ios::binary };
-                    output_file.write(reinterpret_cast<const char*>(file.storage.data()), file.storage.size());
-
-                    std::cout << "File was exported to: " << full_path << "\n";
-                }
-            }
+        if (ImGui::Button("Export selected file(-s)")) {
+            show_export_selection_dialog(*this);
         }
 
         if (selection_info.selected_files.empty()) {

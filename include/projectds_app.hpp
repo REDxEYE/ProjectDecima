@@ -40,8 +40,9 @@ public:
 
 protected:
     void update_user(double ts) override;
-    void draw_dockspace();
+    void input_user() override;
 
+    void draw_dockspace();
     void draw_filepreview();
     void draw_tree();
     void draw_export();

@@ -76,6 +76,7 @@ void App::init_opengl() {
 }
 
 void App::update(double ts) {
+    input_user();
     begin_frame();
     update_user(ts);
     end_frame();
@@ -101,6 +102,9 @@ void App::init_user() {
 }
 
 void App::update_user(double ts) {
+}
+
+void App::input_user() {
 }
 
 void App::begin_frame_user() {

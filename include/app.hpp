@@ -46,6 +46,8 @@ protected:
 
     virtual void update_user(double ts);
 
+    virtual void input_user();
+
     virtual void begin_frame_user();
 
     virtual void end_frame_user();
