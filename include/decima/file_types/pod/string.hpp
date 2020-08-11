@@ -3,7 +3,6 @@
 #include "decima/file_types/pod/pod.hpp"
 
 namespace Decima {
-
     class String : public POD {
     public:
         void parse(Source& stream);
