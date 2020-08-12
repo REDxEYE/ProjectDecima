@@ -141,7 +141,7 @@ void Decima::Texture::draw_texture(float preview_width, float preview_height, fl
             mip_index = std::min(int(image_mips.size()) - 1, mip_index + 1);
         ImGui::SameLine();
         ImGui::PushItemWidth(150);
-        ImGui::DragInt("##", &mip_index, 1.0f, 0, image_mips.size() - 1, "Mip #%d");
+        ImGui::DragInt("##", &mip_index, 0.05f, 0, image_mips.size() - 1, "Mip #%d");
     }
 
     ImGui::Text("Mip #%d (%dx%d)", mip_index, width >> mip_index, height >> mip_index);
