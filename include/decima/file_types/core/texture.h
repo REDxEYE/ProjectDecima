@@ -44,6 +44,7 @@ namespace Decima {
 
         Decima::Stream external_data;
         std::vector<std::pair<unsigned int, std::vector<std::uint8_t>>> image_mips;
+        int mip_index{};
 
         void parse(ArchiveArray& archives, Source& stream) override;
         void draw() override;

@@ -93,7 +93,7 @@ void Decima::Texture::parse(ArchiveArray& archives, Source& stream) {
 }
 
 Decima::Texture::~Texture() {
-    for (const auto [id, _] : image_mips) {
+    for (const auto& [id, _] : image_mips) {
         glDeleteTextures(1, &id);
     }
 }
