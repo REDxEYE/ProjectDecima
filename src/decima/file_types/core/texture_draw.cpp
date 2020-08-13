@@ -146,7 +146,34 @@ void Decima::Texture::draw_texture(float preview_width, float preview_height, fl
 
     ImGui::Text("Mip #%d (%dx%d)", mip_index, width >> mip_index, height >> mip_index);
 
+    const ImVec2 pos = ImGui::GetCursorScreenPos();
     const ImVec4 tint = { 1, 1, 1, 1 };
     const ImVec4 border = { 1, 1, 1, 1 };
     ImGui::Image(reinterpret_cast<ImTextureID>(image_mips[mip_index].first), { preview_width, preview_height }, { 0, 0 }, { 1, 1 }, tint, border);
+
+    if (ImGui::IsItemHovered()) {
+        ImGui::BeginTooltip();
+
+        auto& io = ImGui::GetIO();
+        auto region_x = io.MousePos.x - pos.x - zoom_region * 0.5f;
+        auto region_y = io.MousePos.y - pos.y - zoom_region * 0.5f;
+
+        if (region_x < 0.0f) {
+            region_x = 0.0f;
+        } else if (region_x > preview_width - zoom_region) {
+            region_x = preview_width - zoom_region;
+        }
+
+        if (region_y < 0.0f) {
+            region_y = 0.0f;
+        } else if (region_y > preview_height - zoom_region) {
+            region_y = preview_height - zoom_region;
+        }
+
+        ImVec2 uv0 = { region_x / preview_width, region_y / preview_height };
+        ImVec2 uv1 = { (region_x + zoom_region) / preview_width, (region_y + zoom_region) / preview_height };
+        ImGui::Image(reinterpret_cast<ImTextureID>(image_mips[mip_index].first), ImVec2(zoom_region * zoom_scale, zoom_region * zoom_scale), uv0, uv1, tint, border);
+
+        ImGui::EndTooltip();
+    }
 }
