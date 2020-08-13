@@ -61,12 +61,20 @@ static void show_export_selection_dialog(ProjectDS& self) {
 void ProjectDS::input_user() {
     ImGuiIO& io = ImGui::GetIO();
 
+    /*
+     * Somehow need to disable shortcuts processing
+     * if the keyboard is in use (e.g. user is
+     * printing text)
+     */
     if (io.KeyCtrl) {
         if (io.KeysDown[GLFW_KEY_O])
             show_data_selection_dialog(*this);
 
         if (io.KeysDown[GLFW_KEY_E])
             show_export_selection_dialog(*this);
+
+        if (io.KeysDown[GLFW_KEY_A])
+            current_popup = io.KeyShift ? Popup::AppendExportByHash : Popup::AppendExportByName;
     }
 
     if (io.KeysDown[GLFW_KEY_ESCAPE]) {
@@ -338,18 +346,23 @@ void ProjectDS::draw_export() {
             }
         }
 
-        ImGui::Separator();
-
         if (ImGui::Button("Add file by name"))
-            ImGui::OpenPopup("By name");
+            current_popup = Popup::AppendExportByName;
 
         if (ImGui::Button("Add file by hash"))
-            ImGui::OpenPopup("By hash");
+            current_popup = Popup::AppendExportByHash;
 
-        if (ImGui::BeginPopup("By name")) {
+        if (current_popup == Popup::AppendExportByName) {
+            ImGui::OpenPopup("AppendExportByName");
+            current_popup = Popup::None;
+        }
+
+        if (ImGui::BeginPopup("AppendExportByName")) {
             static char path[512];
-            ImGui::InputText("File name", path, IM_ARRAYSIZE(path));
-            if (ImGui::Button("Add to selection!")) {
+
+            const auto submit = ImGui::InputText("File name", path, IM_ARRAYSIZE(path), ImGuiInputTextFlags_EnterReturnsTrue);
+
+            if (submit || ImGui::Button("Add to selection!")) {
                 std::string str_path(path);
                 uint64_t file_hash = hash_string(sanitize_name(str_path), Decima::seed);
                 if (archive_array.get_file_entry(file_hash).has_value()) {
@@ -360,10 +373,18 @@ void ProjectDS::draw_export() {
 
             ImGui::EndPopup();
         }
-        if (ImGui::BeginPopup("By hash")) {
+
+        if (current_popup == Popup::AppendExportByHash) {
+            ImGui::OpenPopup("AppendExportByHash");
+            current_popup = Popup::None;
+        }
+
+        if (ImGui::BeginPopup("AppendExportByHash")) {
             static uint64_t file_hash;
-            ImGui::InputScalar("File hash", ImGuiDataType_U64, &file_hash);
-            if (ImGui::Button("Add to selection!")) {
+
+            const auto submit = ImGui::InputScalar("File hash", ImGuiDataType_U64, &file_hash, nullptr, nullptr, nullptr, ImGuiInputTextFlags_EnterReturnsTrue);
+
+            if (submit || ImGui::Button("Add to selection!")) {
                 if (archive_array.get_file_entry(file_hash).has_value()) {
                     archive_array.hash_to_name[file_hash] = "HASH: " + uint64_to_hex(file_hash);
                     selection_info.selected_files.insert(file_hash);

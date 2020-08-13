@@ -16,11 +16,19 @@
 
 class ProjectDS : public App {
 public:
+    enum class Popup {
+        None,
+        AppendExportByName,
+        AppendExportByHash
+    };
+
+public:
     ProjectDS(const std::pair<uint32_t, uint32_t>& windowSize, const std::string& title,
-              bool imgui_multi_viewport = false);
+        bool imgui_multi_viewport = false);
 
 public:
     bool m_multi_viewport;
+    Popup current_popup = Popup::None;
 
     Decima::ArchiveArray archive_array;
     std::vector<const char*> file_names;
@@ -30,7 +38,6 @@ public:
     int32_t file_id = 0;
     ImGuiTextFilter filter;
     MemoryEditor file_viewer;
-
 
     void init_user() override;
 
@@ -54,6 +61,5 @@ protected:
 
     void parse_core_file();
 };
-
 
 #endif //PROJECTDS_PROJECTDS_APP_HPP
