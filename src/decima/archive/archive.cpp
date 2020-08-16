@@ -71,19 +71,23 @@ bool Decima::Archive::is_encrypted() const {
 }
 
 void Decima::Archive::decrypt(uint32_t key_1, uint32_t key_2, uint32_t* data) {
-    const uint32_t inputKey[2][4] = {
-        { key_1, encryption_key_1[1], encryption_key_1[2], encryption_key_1[3] },
-        { key_2, encryption_key_1[1], encryption_key_1[2], encryption_key_1[3] }
+    const std::uint32_t key[8] = {
+        key_1, encryption_key_1[1], encryption_key_1[2], encryption_key_1[3],
+        key_2, encryption_key_1[1], encryption_key_1[2], encryption_key_1[3]
     };
 
-    uint32_t iv[4];
+    std::uint32_t iv[8];
+    MurmurHash3_x64_128(key, 16, seed, iv);
+    MurmurHash3_x64_128(key + 4, 16, seed, iv + 4);
 
-    for (int i = 0; i < 2; i++) {
-        MurmurHash3_x64_128(inputKey[i], 0x10, seed, iv);
-        for (int j = 0; j < 4; j++) {
-            data[(i * 4) + j] ^= iv[j];
-        }
-    }
+    data[0] ^= iv[0];
+    data[1] ^= iv[1];
+    data[2] ^= iv[2];
+    data[3] ^= iv[3];
+    data[4] ^= iv[4];
+    data[5] ^= iv[5];
+    data[6] ^= iv[6];
+    data[7] ^= iv[7];
 }
 
 std::pair<std::vector<Decima::ChunkEntry>::iterator, std::vector<Decima::ChunkEntry>::iterator>
