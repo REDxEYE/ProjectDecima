@@ -28,7 +28,26 @@ bool decompress_chunk_data(const uint8_t* data, uint64_t data_size, uint64_t dec
 
 void split(const std::string& str, std::vector<std::string>& cont, char delim);
 
-void log(std::string prefix, std::string info);
+#include <iostream>
+
+template <typename... Args>
+inline constexpr void log(Args&&... args) {
+    (std::cout << ... << args) << '\n';
+}
+
+template <std::size_t Size>
+inline constexpr const char* filename(const char (&path)[Size]) {
+    std::size_t separator_offset = 0;
+
+    for (std::size_t index = 0; index < Size; index++) {
+        if (path[index] == '/' || path[index] == '\\') {
+            separator_offset = index + 1;
+        }
+    }
+
+    return path + separator_offset;
+}
+
+#define LOG(...) (log(filename(__FILE__), ':', __LINE__, ' ', __VA_ARGS__))
 
 #endif //PROJECTDS_UTILS_H
-

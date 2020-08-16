@@ -16,11 +16,11 @@ App::App(std::pair<uint32_t, uint32_t> window_size, std::string title) {
 }
 
 void App::init() {
-    log("App", "Initialization");
+    log("Initialization");
     init_glfw();
     init_opengl();
     init_user();
-    log("App", "Done");
+    log("Done");
 }
 
 void App::run() {
@@ -32,7 +32,7 @@ void App::run() {
 }
 
 void App::init_glfw() {
-    log("App::GLFW", "Initialization");
+    log("  GLFW Initialization");
     glfwInit();
     m_window = glfwCreateWindow(m_win_info.m_win_width, m_win_info.m_win_height, m_win_info.m_title.c_str(),
         nullptr, nullptr);
@@ -54,7 +54,7 @@ void App::init_glfw() {
         glfwGetWindowSize(hwnd, &width, &height);
         glViewport(0, 0, width, height);
     });
-    log("App::GLFW", "Done");
+    log("  GLFW Done");
 }
 
 void App::glfw_error_handler(int error, const char* message) {
@@ -62,7 +62,7 @@ void App::glfw_error_handler(int error, const char* message) {
 }
 
 void App::init_opengl() {
-    log("App GLAD", "Initialization");
+    log("  GLAD Initialization");
     gladLoadGL();
     glEnable(GL_DEBUG_OUTPUT);
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -72,7 +72,7 @@ void App::init_opengl() {
 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
-    log("App GLAD", "Done");
+    log("  GLAD Done");
 }
 
 void App::update(double ts) {

@@ -19,8 +19,6 @@ Decima::Archive::Archive(const std::string& workdir, uint64_t filehash)
 
 bool Decima::Archive::open() {
     std::error_code error;
-
-    log("Archive", "Loading " + std::filesystem::path(filepath).stem().string() + " archive");
     filebuffer.map(filepath, error);
 
     if (error)
@@ -37,14 +35,14 @@ bool Decima::Archive::open() {
     std::size_t read_offset = sizeof(header);
 
     content_table.resize(header.content_table_size);
-    log("Archive", "Reading " + std::to_string(header.content_table_size) + " file entries");
+    LOG("Reading ", header.content_table_size, " file entries");
     memcpy(content_table.data(), filebuffer.data() + read_offset,
         sizeof(FileEntry) * header.content_table_size);
 
     read_offset += sizeof(FileEntry) * header.content_table_size;
 
     chunk_table.resize(header.chunk_table_size);
-    log("Archive", "Reading " + std::to_string(header.chunk_table_size) + " chunks");
+    LOG("Reading ", header.chunk_table_size, " chunks");
     memcpy(chunk_table.data(), filebuffer.data() + read_offset, sizeof(chunk_table.front()) * header.chunk_table_size);
 
     if (is_encrypted()) {

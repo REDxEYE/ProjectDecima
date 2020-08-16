@@ -37,6 +37,7 @@ void Decima::ArchiveArray::open(const std::string& _workdir) {
     }
     uint32_t archive_id = 0;
     for (auto& archive : archives) {
+        LOG("Loading archive ", std::filesystem::path(archive.filepath).stem().string(), " (", std::to_string(archive_id + 1), '/', std::to_string(archives.size()), ')');
         archive.open();
         for (auto& entry : archive.content_table) {
             hash_to_archive[entry.hash] = archive_id;

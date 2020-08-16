@@ -57,6 +57,3 @@ void split(const std::string& str, std::vector<std::string>& cont, char delim) {
         cont.push_back(token);
     }
 }
-void log(std::string prefix, std::string info) {
-    std::cout << "[" << prefix << "]::" << info << '\n';
-}
