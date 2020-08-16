@@ -61,11 +61,9 @@ static void show_export_selection_dialog(ProjectDS& self) {
 void ProjectDS::input_user() {
     ImGuiIO& io = ImGui::GetIO();
 
-    /*
-     * Somehow need to disable shortcuts processing
-     * if the keyboard is in use (e.g. user is
-     * printing text)
-     */
+    if (io.WantCaptureKeyboard)
+        return;
+
     if (io.KeyCtrl) {
         if (io.KeysDown[GLFW_KEY_O])
             show_data_selection_dialog(*this);
