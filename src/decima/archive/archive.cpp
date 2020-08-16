@@ -35,14 +35,12 @@ bool Decima::Archive::open() {
     std::size_t read_offset = sizeof(header);
 
     content_table.resize(header.content_table_size);
-    LOG("Reading ", header.content_table_size, " file entries");
     memcpy(content_table.data(), filebuffer.data() + read_offset,
         sizeof(FileEntry) * header.content_table_size);
 
     read_offset += sizeof(FileEntry) * header.content_table_size;
 
     chunk_table.resize(header.chunk_table_size);
-    LOG("Reading ", header.chunk_table_size, " chunks");
     memcpy(chunk_table.data(), filebuffer.data() + read_offset, sizeof(chunk_table.front()) * header.chunk_table_size);
 
     if (is_encrypted()) {
