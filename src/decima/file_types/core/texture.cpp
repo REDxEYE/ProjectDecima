@@ -71,8 +71,9 @@ void Decima::Texture::parse(ArchiveArray& archives, Source& stream) {
 
         const auto data_ptr = (current_mip < stream_mips ? external_data.data().data() : embedded_data.data()) + data_offset;
 
+#ifndef NDEBUG
         std::printf("Reading %s mip image %d-%d (pos: %u)\n", current_mip < stream_mips ? "external" : "embedded", current_mip_width, current_mip_height, data_offset);
-
+#endif
         data_offset += current_mip_width * current_mip_height / (16 / fmt_bps);
 
         if (!decompress_texture(data_ptr, image_data, current_mip_width, current_mip_height, fmt)) {
