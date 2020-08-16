@@ -5,6 +5,8 @@
 #include <filesystem>
 #include <iostream>
 #include <optional>
+#include <thread>
+#include <mutex>
 
 #include "utils.h"
 #include "decima/archive/archive_array.h"
@@ -21,7 +23,7 @@ void Decima::ArchiveArray::read_prefetch_file() {
     Source source(prefetch_data.storage, 1024);
     prefetch.parse(*this, source);
 
-    for (auto& string : prefetch.strings) {
+    for (const auto& string : prefetch.strings) {
         uint64_t hash = hash_string(sanitize_name(string.data()), seed);
         hash_to_name.insert({ hash, string.data() });
     }
@@ -35,15 +37,30 @@ void Decima::ArchiveArray::open(const std::string& _workdir) {
              std::filesystem::directory_options::skip_permission_denied)) {
         archives.emplace_back(workdir, file.path().filename().string());
     }
-    uint32_t archive_id = 0;
-    for (auto& archive : archives) {
-        LOG("Loading archive ", std::filesystem::path(archive.filepath).stem().string(), " (", std::to_string(archive_id + 1), '/', std::to_string(archives.size()), ')');
-        archive.open();
-        for (auto& entry : archive.content_table) {
-            hash_to_archive[entry.hash] = archive_id;
-        }
-        archive_id++;
+
+    std::vector<std::thread> thread_pool;
+    std::mutex mutex;
+
+    for(std::size_t index = 0; index < archives.size(); index++) {
+        auto& archive = archives[index];
+
+        LOG("Loading archive ", std::filesystem::path(archive.filepath).stem().string(), " (", std::to_string(index + 1), '/', std::to_string(archives.size()), ')');
+
+        thread_pool.emplace_back([&](const auto id) {
+            archive.open();
+
+            std::lock_guard<std::mutex> lock { mutex };
+
+            for (const auto& entry : archive.content_table) {
+                hash_to_archive.emplace(entry.hash, id);
+            }
+        }, index);
     }
+
+    for (auto& thread : thread_pool) {
+        thread.join();
+    }
+
     read_prefetch_file();
 }
 
