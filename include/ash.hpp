@@ -49,11 +49,11 @@ namespace ash {
             return count;
         }
 
-        template <class Type, typename = std::enable_if_t<std::is_trivially_constructible_v<Type>>>
+        template <class Type, typename = std::enable_if_t<std::is_trivially_constructible_v<std::decay_t<Type>>>>
         Type read() {
             std::array<value_type, sizeof(Type)> buffer { 0 };
             read_exact(buffer);
-            return *reinterpret_cast<Type*>(buffer.data());
+            return *reinterpret_cast<std::decay_t<Type>*>(buffer.data());
         }
 
         template <class Container>
