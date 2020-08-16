@@ -19,14 +19,15 @@ static void show_data_selection_dialog(ProjectDS& self) {
         self.file_names.clear();
         self.file_names.reserve(self.archive_array.hash_to_name.size());
 
-        for (auto& [hash, path] : self.archive_array.hash_to_name) {
+        for (const auto& [hash, path] : self.archive_array.hash_to_name) {
             self.file_names.push_back(path.c_str());
-            auto* current_root = &self.root_tree;
 
             std::vector<std::string> split_path;
             split(path, split_path, '/');
 
-            for (auto it = split_path.cbegin(); it != split_path.end() - 1; it++)
+            auto* current_root = &self.root_tree;
+
+            for (auto it = split_path.begin(); it != split_path.end() - 1; it++)
                 current_root = current_root->add_folder(*it);
 
             if (self.archive_array.hash_to_archive.find(hash) != self.archive_array.hash_to_archive.end())

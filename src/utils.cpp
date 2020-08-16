@@ -38,22 +38,24 @@ bool decompress_chunk_data(const uint8_t* data, uint64_t data_size, uint64_t dec
     return res != -1;
 }
 
-//TODO:
 std::string sanitize_name(const std::string& filename) {
-    std::filesystem::path tmp(filename);
-    if (tmp.extension() == ".stream") {
-        return filename;
-    }
-    if (tmp.extension() != ".core") {
+    const auto extension = filename.substr(filename.rfind('.') + 1);
+
+    if (extension != "stream" && extension != "core")
         return filename + ".core";
-    }
-    return std::string(filename);
+
+    return filename;
 }
 
 void split(const std::string& str, std::vector<std::string>& cont, char delim) {
-    std::stringstream ss(str);
-    std::string token;
-    while (std::getline(ss, token, delim)) {
-        cont.push_back(token);
+    std::size_t offset = 0;
+
+    for (std::size_t index = 0; index < str.size(); index++) {
+        if (str[index] == delim) {
+            cont.emplace_back(str.substr(offset, index - offset));
+            offset = index + 1;
+        }
     }
+
+    cont.emplace_back(str.substr(offset));
 }
