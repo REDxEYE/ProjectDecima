@@ -32,21 +32,21 @@ void Decima::Texture::parse(ArchiveArray& archives, Source& stream) {
     CoreFile::parse(archives, stream);
     uint64_t start = stream.tell();
 
-    unk1 = stream.read<typeof(unk1)>();
-    width = stream.read<typeof(width)>();
-    height = stream.read<typeof(height)>();
-    layers = stream.read<typeof(layers)>();
-    total_mips = stream.read<typeof(total_mips)>();
-    pixel_format = stream.read<typeof(pixel_format)>();
-    unk2 = stream.read<typeof(unk2)>();
-    unk3 = stream.read<typeof(unk3)>();
+    unk1 = stream.read<decltype(unk1)>();
+    width = stream.read<decltype(width)>();
+    height = stream.read<decltype(height)>();
+    layers = stream.read<decltype(layers)>();
+    total_mips = stream.read<decltype(total_mips)>();
+    pixel_format = stream.read<decltype(pixel_format)>();
+    unk2 = stream.read<decltype(unk2)>();
+    unk3 = stream.read<decltype(unk3)>();
     file_guid.parse(stream);
-    buffer_size = stream.read<typeof(buffer_size)>();
-    total_size = stream.read<typeof(total_size)>();
-    stream_size = stream.read<typeof(stream_size)>();
-    stream_mips = stream.read<typeof(stream_mips)>();
-    unk4 = stream.read<typeof(unk4)>();
-    unk5 = stream.read<typeof(unk5)>();
+    buffer_size = stream.read<decltype(buffer_size)>();
+    total_size = stream.read<decltype(total_size)>();
+    stream_size = stream.read<decltype(stream_size)>();
+    stream_mips = stream.read<decltype(stream_mips)>();
+    unk4 = stream.read<decltype(unk4)>();
+    unk5 = stream.read<decltype(unk5)>();
 
     if (stream_size > 0)
         external_data.parse(archives, stream);

@@ -8,7 +8,7 @@
 
 namespace Decima {
     void CoreFile::parse(ArchiveArray& archives, Source& stream) {
-        header = stream.read<typeof(header)>();
+        header = stream.read<decltype(header)>();
         guid.parse(stream);
     }
 
