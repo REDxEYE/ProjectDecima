@@ -5,8 +5,6 @@
 #include "utils.h"
 #include "projectds_app.hpp"
 
-#include <detex.h>
-#include <detex-png.h>
 #include <portable-file-dialogs.h>
 
 void Decima::Texture::draw() {
@@ -126,30 +124,30 @@ void Decima::Texture::draw() {
         ImGui::Text("No external stream");
     }
 
-    draw_texture(256, 256, 128, 4);
+    draw_preview(256, 256, 128, 4);
 
     ImGui::NextColumn();
     ImGui::Columns(1);
 }
 
-void Decima::Texture::draw_texture(float preview_width, float preview_height, float zoom_region, float zoom_scale) {
-    if(image_mips.size() > 1) {
+void Decima::Texture::draw_preview(float preview_width, float preview_height, float zoom_region, float zoom_scale) {
+    if (mip_textures.size() > 1) {
         if (ImGui::ArrowButton("Up", ImGuiDir_Left))
             mip_index = std::max(0, mip_index - 1);
         ImGui::SameLine();
         if (ImGui::ArrowButton("Down", ImGuiDir_Right))
-            mip_index = std::min(int(image_mips.size()) - 1, mip_index + 1);
+            mip_index = std::min(int(mip_textures.size()) - 1, mip_index + 1);
         ImGui::SameLine();
         ImGui::PushItemWidth(150);
-        ImGui::DragInt("##", &mip_index, 0.05f, 0, image_mips.size() - 1, "Mip #%d");
+        ImGui::DragInt("##", &mip_index, 0.05f, 0, mip_textures.size() - 1, "Mip #%d");
     }
 
-    ImGui::Text("Mip #%d (%dx%d)", mip_index, width >> mip_index, height >> mip_index);
+    ImGui::Text("Mip #%d (%s, %dx%d)", mip_index, mip_index >= stream_mips ? "Internal" : "External", width >> mip_index, height >> mip_index);
 
     const ImVec2 pos = ImGui::GetCursorScreenPos();
     const ImVec4 tint = { 1, 1, 1, 1 };
     const ImVec4 border = { 1, 1, 1, 1 };
-    ImGui::Image(reinterpret_cast<ImTextureID>(image_mips[mip_index].first), { preview_width, preview_height }, { 0, 0 }, { 1, 1 }, tint, border);
+    ImGui::Image(reinterpret_cast<ImTextureID>(mip_textures[mip_index]), { preview_width, preview_height }, { 0, 0 }, { 1, 1 }, tint, border);
 
     if (ImGui::IsItemHovered()) {
         ImGui::BeginTooltip();
@@ -172,8 +170,33 @@ void Decima::Texture::draw_texture(float preview_width, float preview_height, fl
 
         ImVec2 uv0 = { region_x / preview_width, region_y / preview_height };
         ImVec2 uv1 = { (region_x + zoom_region) / preview_width, (region_y + zoom_region) / preview_height };
-        ImGui::Image(reinterpret_cast<ImTextureID>(image_mips[mip_index].first), ImVec2(zoom_region * zoom_scale, zoom_region * zoom_scale), uv0, uv1, tint, border);
+        ImGui::Image(reinterpret_cast<ImTextureID>(mip_textures[mip_index]), ImVec2(zoom_region * zoom_scale, zoom_region * zoom_scale), uv0, uv1, tint, border);
 
         ImGui::EndTooltip();
+    }
+}
+
+namespace Decima {
+    std::ostream& operator<<(std::ostream& os, Decima::TexturePixelFormat fmt) {
+        switch (fmt) {
+        case Decima::TexturePixelFormat::RGBA8:
+            return os << "RGBA8";
+        case Decima::TexturePixelFormat::A8:
+            return os << "A8";
+        case Decima::TexturePixelFormat::BC1:
+            return os << "BC1";
+        case Decima::TexturePixelFormat::BC2:
+            return os << "BC2";
+        case Decima::TexturePixelFormat::BC3:
+            return os << "BC3";
+        case Decima::TexturePixelFormat::BC4:
+            return os << "BC4";
+        case Decima::TexturePixelFormat::BC5:
+            return os << "BC5";
+        case Decima::TexturePixelFormat::BC7:
+            return os << "BC7";
+        default:
+            return os << "Unsupported: " << std::to_string(int(fmt));
+        }
     }
 }

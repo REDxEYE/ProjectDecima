@@ -41,16 +41,16 @@ namespace Decima {
         std::uint32_t stream_mips {};
         std::uint32_t unk4 {};
         std::uint32_t unk5 {};
-
         Decima::Stream external_data;
-        std::vector<std::pair<unsigned int, std::vector<std::uint8_t>>> image_mips;
-        int mip_index{};
+        std::vector<std::uint8_t> embedded_data;
+        std::vector<unsigned int> mip_textures;
+        int mip_index;
 
         void parse(ArchiveArray& archives, Source& stream) override;
         void draw() override;
 
     private:
-        void draw_texture(float preview_width, float preview_height, float zoom_region, float zoom_scale);
+        void draw_preview(float preview_width, float preview_height, float zoom_region, float zoom_scale);
     };
 }
 #endif //PROJECTDS_TEXTURE_H

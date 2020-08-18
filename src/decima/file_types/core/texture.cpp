@@ -4,34 +4,31 @@
 #include "decima/file_types/core/texture.h"
 
 #include <glad/glad.h>
-#include <detex.h>
 
-/*
- * <enum: int> <pixel_bits: int>
- */
-using DXGIPixelFormat = std::pair<int, int>;
-
-/*
- * This is very clunky approach. Maybe rewrite into something
- * similar to what I did in ProjectDS::parse_core_file using
- * factory pattern
- */
-static const std::unordered_map<Decima::TexturePixelFormat, DXGIPixelFormat> format_mapper = {
-    { Decima::TexturePixelFormat::BC1, { DETEX_TEXTURE_FORMAT_BC1, 8 } },
-    { Decima::TexturePixelFormat::BC2, { DETEX_TEXTURE_FORMAT_BC2, 16 } },
-    { Decima::TexturePixelFormat::BC3, { DETEX_TEXTURE_FORMAT_BC3, 16 } },
-    { Decima::TexturePixelFormat::BC4, { DETEX_TEXTURE_FORMAT_RGTC1, 8 } },
-    { Decima::TexturePixelFormat::BC5, { DETEX_TEXTURE_FORMAT_RGTC2, 16 } },
-    { Decima::TexturePixelFormat::BC7, { DETEX_TEXTURE_FORMAT_BPTC, 16 } },
-    { Decima::TexturePixelFormat::RGBA8, { DETEX_TEXTURE_FORMAT_BPTC, 16 } },
+struct TexturePixelFormatInfo {
+    /* This format's block size (in pixels) */
+    int block_size;
+    /* How many bits occupies one pixel */
+    int block_density;
+    /* Corresponding OpenGL internal format */
+    int format;
+    /* Is format whether compressed or not */
+    bool compressed;
 };
 
-static bool decompress_texture(const std::uint8_t* src, std::vector<std::uint8_t>& dst, int width, int height, int fmt);
+static const std::unordered_map<Decima::TexturePixelFormat, TexturePixelFormatInfo> format_info {
+    // clang-format off
+    { Decima::TexturePixelFormat::BC1,   { 4, 4,  GL_COMPRESSED_RGBA_S3TC_DXT1_EXT, true  } },
+    { Decima::TexturePixelFormat::BC3,   { 4, 8,  GL_COMPRESSED_RGBA_S3TC_DXT3_EXT, true  } },
+    { Decima::TexturePixelFormat::BC4,   { 4, 4,  GL_COMPRESSED_RED_RGTC1,          true  } },
+    { Decima::TexturePixelFormat::BC5,   { 4, 8,  GL_COMPRESSED_RG_RGTC2,           true  } },
+    { Decima::TexturePixelFormat::BC7,   { 4, 8,  GL_COMPRESSED_RGBA_BPTC_UNORM,    true  } },
+    { Decima::TexturePixelFormat::RGBA8, { 1, 32, GL_COMPRESSED_RGBA,               false } },
+    // clang-format on
+};
 
 void Decima::Texture::parse(ArchiveArray& archives, Source& stream) {
     CoreFile::parse(archives, stream);
-    uint64_t start = stream.tell();
-
     unk1 = stream.read<decltype(unk1)>();
     width = stream.read<decltype(width)>();
     height = stream.read<decltype(height)>();
@@ -51,99 +48,59 @@ void Decima::Texture::parse(ArchiveArray& archives, Source& stream) {
     if (stream_size > 0)
         external_data.parse(archives, stream);
 
-    std::vector<std::uint8_t> embedded_data;
     embedded_data.resize(total_size);
-    stream.read(embedded_data);
+    stream.read_exact(embedded_data);
 
-    const auto [fmt, fmt_bps] = format_mapper.at(pixel_format);
+    if (const auto format = format_info.find(pixel_format); format != format_info.end()) {
+        const auto [format_block_size, format_block_density, format_internal, format_compressed] = format->second;
 
-    unsigned int data_offset = 0;
+        const std::uint8_t* stream_data = nullptr;
 
-    for (int current_mip = 0; current_mip < total_mips; current_mip++) {
-        const auto current_mip_width = width >> current_mip;
-        const auto current_mip_height = height >> current_mip;
+        for (auto mip = 0; mip < total_mips; mip++) {
+            /*
+             * Mips that are smaller than minimum block size
+             * actually occupy size of one block and must be
+             * cropped to the size of the mip, but we don't
+             * do that just for the sake of simplicity.
+             */
+            const auto mip_width = std::max(width >> mip, format_block_size);
+            const auto mip_height = std::max(height >> mip, format_block_size);
+            const auto mip_buffer_size = mip_width * mip_height * format_block_density / 8;
 
-        std::vector<std::uint8_t> image_data;
-        image_data.resize(current_mip_width * current_mip_height * 4);
+            if (mip == 0)
+                stream_data = external_data.data().data();
 
-        if (current_mip == stream_mips)
-            data_offset = 0;
+            if (mip >= stream_mips)
+                stream_data = embedded_data.data();
 
-        const auto data_ptr = (current_mip < stream_mips ? external_data.data().data() : embedded_data.data()) + data_offset;
+            GLuint texture_id;
+            glGenTextures(1, &texture_id);
+            glBindTexture(GL_TEXTURE_2D, texture_id);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-#ifndef NDEBUG
-        std::printf("Reading %s mip image %d-%d (pos: %u)\n", current_mip < stream_mips ? "external" : "embedded", current_mip_width, current_mip_height, data_offset);
-#endif
-        data_offset += current_mip_width * current_mip_height / (16 / fmt_bps);
+            if (format_compressed) {
+                glCompressedTexImage2D(GL_TEXTURE_2D, 0, format_internal, mip_width, mip_height, 0, mip_buffer_size, stream_data);
+            } else {
+                /*
+                 * This is really only a specific case for RGBA8,
+                 * but as far as we know there's more other unknown
+                 * formats for us at this moment, so let this be a
+                 * feature for the future (badum-tss).
+                 */
+                glTexImage2D(GL_TEXTURE_2D, 0, format_internal, mip_width, mip_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, stream_data);
+            }
 
-        if (!decompress_texture(data_ptr, image_data, current_mip_width, current_mip_height, fmt)) {
-            log("Texture::parse", "Texture was failed to decode");
-            return;
+            glBindTexture(GL_TEXTURE_2D, 0);
+
+            mip_textures.push_back(texture_id);
+            stream_data += mip_buffer_size;
         }
-
-        unsigned int mip_id;
-        glGenTextures(1, &mip_id);
-        glBindTexture(GL_TEXTURE_2D, mip_id);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, current_mip_width, current_mip_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data.data());
-
-        image_mips.emplace_back(mip_id, std::move(image_data));
     }
 }
 
 Decima::Texture::~Texture() {
-    for (const auto& [id, _] : image_mips) {
-        glDeleteTextures(1, &id);
-    }
-}
-
-static bool decompress_texture(const std::uint8_t* src, std::vector<std::uint8_t>& dst, int width, int height, int fmt) {
-    detexTexture texture;
-    texture.format = fmt;
-    texture.data = const_cast<uint8_t*>(src);
-    texture.width = width;
-    texture.height = height;
-    texture.width_in_blocks = int(width / (detexGetCompressedBlockSize(fmt) / 2));
-    texture.height_in_blocks = int(height / (detexGetCompressedBlockSize(fmt) / 2));
-
-    if (fmt == DETEX_TEXTURE_FORMAT_RGTC2 || fmt == DETEX_TEXTURE_FORMAT_BPTC || fmt == DETEX_TEXTURE_FORMAT_BC3) {
-        texture.width_in_blocks *= 2;
-        texture.height_in_blocks *= 2;
-    }
-
-    if (!detexDecompressTextureLinear(&texture, dst.data(), DETEX_PIXEL_FORMAT_RGBA8)) {
-        std::printf("Buffer cannot be decompressed: %s\n", detexGetErrorMessage());
-        return false;
-    }
-
-    return true;
-}
-
-#include <ostream>
-
-namespace Decima {
-    std::ostream& operator<<(std::ostream& os, Decima::TexturePixelFormat fmt) {
-        switch (fmt) {
-        case Decima::TexturePixelFormat::RGBA8:
-            return os << "RGBA8";
-        case Decima::TexturePixelFormat::A8:
-            return os << "A8";
-        case Decima::TexturePixelFormat::BC1:
-            return os << "BC1";
-        case Decima::TexturePixelFormat::BC2:
-            return os << "BC2";
-        case Decima::TexturePixelFormat::BC3:
-            return os << "BC3";
-        case Decima::TexturePixelFormat::BC4:
-            return os << "BC4";
-        case Decima::TexturePixelFormat::BC5:
-            return os << "BC5";
-        case Decima::TexturePixelFormat::BC7:
-            return os << "BC7";
-        default:
-            return os << "Unsupported: " << std::to_string(int(fmt));
-        }
+    for (const auto texture_id : mip_textures) {
+        glDeleteTextures(1, &texture_id);
     }
 }
