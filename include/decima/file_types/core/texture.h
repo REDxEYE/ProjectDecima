@@ -11,6 +11,7 @@
 namespace Decima {
     enum class TexturePixelFormat : uint8_t {
         RGBA8 = 0xC,
+        RGBA16F = 0x13,
         A8 = 0x1F,
         BC1 = 0x42,
         BC2 = 0x43,

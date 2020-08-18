@@ -18,13 +18,14 @@ struct TexturePixelFormatInfo {
 
 static const std::unordered_map<Decima::TexturePixelFormat, TexturePixelFormatInfo> format_info {
     // clang-format off
-    { Decima::TexturePixelFormat::BC1,   { 4, 4,  GL_COMPRESSED_RGBA_S3TC_DXT1_EXT, true  } },
-    { Decima::TexturePixelFormat::BC3,   { 4, 8,  GL_COMPRESSED_RGBA_S3TC_DXT3_EXT, true  } },
-    { Decima::TexturePixelFormat::BC4,   { 4, 4,  GL_COMPRESSED_RED_RGTC1,          true  } },
-    { Decima::TexturePixelFormat::BC5,   { 4, 8,  GL_COMPRESSED_RG_RGTC2,           true  } },
-    { Decima::TexturePixelFormat::BC7,   { 4, 8,  GL_COMPRESSED_RGBA_BPTC_UNORM,    true  } },
-    { Decima::TexturePixelFormat::A8,    { 1, 8,  GL_R8,                            false } },
-    { Decima::TexturePixelFormat::RGBA8, { 1, 32, GL_RGBA8,                         false } },
+    { Decima::TexturePixelFormat::BC1,     { 4, 4,  GL_COMPRESSED_RGBA_S3TC_DXT1_EXT, true  } },
+    { Decima::TexturePixelFormat::BC3,     { 4, 8,  GL_COMPRESSED_RGBA_S3TC_DXT3_EXT, true  } },
+    { Decima::TexturePixelFormat::BC4,     { 4, 4,  GL_COMPRESSED_RED_RGTC1,          true  } },
+    { Decima::TexturePixelFormat::BC5,     { 4, 8,  GL_COMPRESSED_RG_RGTC2,           true  } },
+    { Decima::TexturePixelFormat::BC7,     { 4, 8,  GL_COMPRESSED_RGBA_BPTC_UNORM,    true  } },
+    { Decima::TexturePixelFormat::A8,      { 1, 8,  GL_R8,                            false } },
+    { Decima::TexturePixelFormat::RGBA8,   { 1, 32, GL_RGBA8,                         false } },
+    { Decima::TexturePixelFormat::RGBA16F, { 1, 64, GL_RGBA16F,                       false } },
     // clang-format on
 };
 
