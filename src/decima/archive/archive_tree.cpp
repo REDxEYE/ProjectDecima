@@ -88,7 +88,11 @@ void FileTree::draw(SelectionInfo& selection, Decima::ArchiveArray& archive_arra
         ImGui::NextColumn();
 
         if (data.second && show) {
-            data.first->draw(selection, archive_array, false);
+            if (items_count > 0) {
+                data.first->draw(selection, archive_array, false);
+            } else {
+                ImGui::TextDisabled("Empty");
+            }
             ImGui::TreePop();
         }
     }
