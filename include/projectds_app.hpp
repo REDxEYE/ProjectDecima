@@ -53,7 +53,6 @@ protected:
     void draw_filepreview();
     void draw_tree();
     void draw_export();
-    void draw_debug();
 
     void begin_frame_user() override;
 

@@ -88,7 +88,6 @@ void ProjectDS::update_user(double ts) {
     App::update_user(ts);
     draw_dockspace();
     draw_filepreview();
-    draw_debug();
     draw_export();
     draw_tree();
 }
@@ -417,15 +416,5 @@ void ProjectDS::draw_export() {
             ImGui::Text("No files selected");
         }
     }
-    ImGui::End();
-}
-
-void ProjectDS::draw_debug() {
-    ImGui::Begin("DEBUG");
-    //            ImGui::PushStyleColor(ImGuiCol_Text,IM_COL32(0x80,0xFF,0x80,0xFF));
-    //            ImGui::PushStyleColor(ImGuiCol_Text,IM_COL32(0x80,0x80,0xFF,0xFF));
-    //            ImGui::PushStyleColor(ImGuiCol_Text,IM_COL32(0xF0,0x80,0xFF,0xFF));
-    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
-        1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::End();
 }
