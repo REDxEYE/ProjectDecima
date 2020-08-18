@@ -23,7 +23,8 @@ static const std::unordered_map<Decima::TexturePixelFormat, TexturePixelFormatIn
     { Decima::TexturePixelFormat::BC4,   { 4, 4,  GL_COMPRESSED_RED_RGTC1,          true  } },
     { Decima::TexturePixelFormat::BC5,   { 4, 8,  GL_COMPRESSED_RG_RGTC2,           true  } },
     { Decima::TexturePixelFormat::BC7,   { 4, 8,  GL_COMPRESSED_RGBA_BPTC_UNORM,    true  } },
-    { Decima::TexturePixelFormat::RGBA8, { 1, 32, GL_COMPRESSED_RGBA,               false } },
+    { Decima::TexturePixelFormat::A8,    { 1, 8,  GL_R8,                            false } },
+    { Decima::TexturePixelFormat::RGBA8, { 1, 32, GL_RGBA8,                         false } },
     // clang-format on
 };
 
