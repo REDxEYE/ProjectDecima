@@ -131,6 +131,11 @@ void Decima::Texture::draw() {
 }
 
 void Decima::Texture::draw_preview(float preview_width, float preview_height, float zoom_region, float zoom_scale) {
+    if (mip_textures.empty()) {
+        ImGui::TextDisabled("No preview available");
+        return;
+    }
+
     if (mip_textures.size() > 1) {
         if (ImGui::ArrowButton("Up", ImGuiDir_Left))
             mip_index = std::max(0, mip_index - 1);
@@ -144,10 +149,82 @@ void Decima::Texture::draw_preview(float preview_width, float preview_height, fl
 
     ImGui::Text("Mip #%d (%s, %dx%d)", mip_index, mip_index >= stream_mips ? "Internal" : "External", width >> mip_index, height >> mip_index);
 
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
     const ImVec2 pos = ImGui::GetCursorScreenPos();
     const ImVec4 tint = { 1, 1, 1, 1 };
     const ImVec4 border = { 1, 1, 1, 1 };
     ImGui::Image(reinterpret_cast<ImTextureID>(mip_textures[mip_index]), { preview_width, preview_height }, { 0, 0 }, { 1, 1 }, tint, border);
+
+    if (ImGui::BeginPopupContextItem("Export Image")) {
+        if (ImGui::Selectable("Export image")) {
+            auto full_path = pfd::save_file("Choose destination file", "", { "Truevision TGA (TARGA)", "*.tga" }).result();
+
+            if (!full_path.empty()) {
+                full_path += ".tga";
+
+                struct __attribute__((packed)) {
+                    std::uint8_t id_length;
+                    std::uint8_t color_map_type;
+                    std::uint8_t image_type;
+                    std::uint16_t color_map_origin;
+                    std::uint16_t color_map_length;
+                    std::uint8_t color_map_depth;
+                    std::uint16_t x_origin;
+                    std::uint16_t y_origin;
+                    std::uint16_t width;
+                    std::uint16_t height;
+                    std::uint8_t pixel_depth;
+                    std::uint8_t image_descriptor;
+                } tga_header { 0 };
+
+                tga_header.image_type = 2;
+                tga_header.width = width;
+                tga_header.height = height;
+                tga_header.pixel_depth = 32;
+                tga_header.image_descriptor = 8;
+
+                struct __attribute__((packed)) {
+                    std::uint32_t extension_offset;
+                    std::uint32_t dev_area_offset;
+                    std::int8_t signature[18];
+                } tga_footer { 0 };
+
+                std::memcpy(tga_footer.signature, "TRUEVISION-XFILE.", 18);
+
+                std::vector<std::uint32_t> buffer;
+                buffer.resize(width * height);
+
+                glGetTextureImage(mip_textures[0], 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer.size() * 4, buffer.data());
+
+                for (std::size_t y = 0; y < height / 2; y++) {
+                    for (std::size_t x = 0; x < width; x++) {
+                        auto& a = buffer[y * width + x];
+                        auto& b = buffer[(height - y - 1) * width + x];
+
+                        constexpr auto rgb2bgr = [](std::uint32_t color) {
+                            return (color & 0xff000000) | ((color & 0xff0000) >> 16) | (color & 0x00ff00) | ((color & 0x0000ff) << 16);
+                        };
+
+                        a = rgb2bgr(a);
+                        b = rgb2bgr(b);
+
+                        std::swap(a, b);
+                    }
+                }
+
+                std::ofstream writer { full_path, std::ios::binary | std::ios::trunc };
+                writer.write(reinterpret_cast<const char*>(&tga_header), sizeof(tga_header));
+                writer.write(reinterpret_cast<const char*>(buffer.data()), buffer.size() * 4);
+                writer.write(reinterpret_cast<const char*>(&tga_footer), sizeof(tga_footer));
+
+                LOG("File was saved to: ", full_path);
+            }
+        }
+
+        ImGui::EndPopup();
+    }
 
     if (ImGui::IsItemHovered()) {
         ImGui::BeginTooltip();
