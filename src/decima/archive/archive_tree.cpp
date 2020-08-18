@@ -110,38 +110,19 @@ void FileTree::draw(SelectionInfo& selection, Decima::ArchiveArray& archive_arra
             }
         }
 
-        auto filename = sanitize_name(archive_array.hash_to_name[data.first.hash]);
-        auto file_entry = archive_array.get_file_entry(filename);
+        ImGui::NextColumn();
+        ImGui::Text("File");
+        ImGui::NextColumn();
+
+        const auto file_entry = archive_array.get_file_entry(data.first.hash);
+
         if (file_entry.has_value()) {
-            auto size = file_entry.value().get().size;
-
-            if (data.first.header.file_type == 0) {
-                auto file_data = archive_array.query_file(data.first.hash);
-                if (!file_data.is_valid()) {
-                    data.first.header.file_type = -1;
-                } else {
-                    file_data.unpack(0);
-                    memcpy(&data.first.header, file_data.storage.data(), sizeof(Decima::CoreHeader));
-                }
-            }
-
-            ImGui::NextColumn();
-            auto& file_info = data.first.header;
-            if (Decima::known_file_types.find(file_info.file_type) != Decima::known_file_types.end()) {
-                ImGui::Text("%s", Decima::known_file_types.at(file_info.file_type).c_str());
-            } else {
-                ImGui::Text("Unknown");
-            }
-            ImGui::NextColumn();
-            ImGui::Text("%dB", size);
-            ImGui::NextColumn();
+            ImGui::Text("%dB", file_entry.value().get().size);
         } else {
-            ImGui::NextColumn();
             ImGui::Text("Unknown");
-            ImGui::NextColumn();
-            ImGui::Text("ERROR");
-            ImGui::NextColumn();
         }
+
+        ImGui::NextColumn();
     }
 
     if (draw_header) {
