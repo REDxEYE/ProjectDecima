@@ -22,8 +22,7 @@ add_executable(ProjectDS
         src/decima/file_types/pod/stream.cpp
         src/decima/file_types/pod/guid.cpp
         src/decima/file_types/core/texture_set.cpp
-        src/decima/file_types/core/texture_set_draw.cpp
-        src/decima/file_types/core/icon.cpp)
+        src/decima/file_types/core/texture_set_draw.cpp)
 
 target_include_directories(ProjectDS PUBLIC include ${HASHLIB_INC} ${OOZLIB_INC})
 
@@ -35,7 +34,7 @@ target_include_directories(ProjectDS PUBLIC
 target_compile_options(ProjectDS PUBLIC -march=native)
 
 target_link_libraries(ProjectDS PUBLIC
-        HashLib oozLib glfw glad imgui detex
+        HashLib oozLib glfw glad imgui
         -static-libgcc -static-libstdc++ -static
         -Wl,-Bstatic -lstdc++ -lpthread
         -Wl,-Bdynamic

@@ -1,18 +1,6 @@
-[submodule "libs/LGLE"]
-	path = libs/LGLE
-	url = https://github.com/REDxEYE/LGLE
 [submodule "libs/glfw"]
 	path = libs/glfw
 	url = https://github.com/glfw/glfw
 [submodule "libs/imgui"]
 	path = libs/imgui
 	url = https://github.com/ocornut/imgui
-[submodule "libs/detex"]
-	path = libs/detex
-	url = https://github.com/hglm/detex
-[submodule "libs/libpng"]
-	path = libs/libpng
-	url = https://github.com/glennrp/libpng
-[submodule "libs/zlib"]
-	path = libs/zlib
-	url = https://github.com/madler/zlib
