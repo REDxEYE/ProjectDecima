@@ -252,22 +252,9 @@ void ProjectDS::draw_tree() {
             }
         }
 
-        ImGui::BeginTabBar("Tabs");
-        {
-            if (ImGui::BeginTabItem("ListView")) {
-                ImGui::PushItemWidth(-1);
-                if (ImGui::ListBox("TREE", &file_id, file_names.data(), file_names.size(), 50))
-                    selection_info.selected_file = hash_string(sanitize_name(file_names[file_id]),
-                        Decima::seed);
-                ImGui::EndTabItem();
-            }
-
-            if (ImGui::BeginTabItem("TreeView")) {
-                root_tree.draw(selection_info, archive_array);
-                ImGui::EndTabItem();
-            }
-        }
-        ImGui::EndTabBar();
+        ImGui::BeginChild("FileTree");
+        root_tree.draw(selection_info, archive_array);
+        ImGui::EndChild();
     }
     ImGui::End();
 }
