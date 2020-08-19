@@ -258,6 +258,8 @@ namespace Decima {
         switch (fmt) {
         case Decima::TexturePixelFormat::RGBA8:
             return os << "RGBA8";
+        case Decima::TexturePixelFormat::RGBA16F:
+            return os << "RGBA16F";
         case Decima::TexturePixelFormat::A8:
             return os << "A8";
         case Decima::TexturePixelFormat::BC1:
