@@ -81,8 +81,39 @@ void FileTree::draw(SelectionInfo& selection, Decima::ArchiveArray& archive_arra
             continue;
 
         const auto tree_name = name + "##" + std::to_string(folders.size());
-        const auto show = ImGui::TreeNode(tree_name.c_str());
+        const auto show = ImGui::TreeNodeEx(tree_name.c_str(), ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick);
         const auto items_count = data.first->files.size() + data.first->folders.size();
+
+        if (ImGui::IsItemClicked(ImGuiMouseButton_Left) && !ImGui::IsItemToggledOpen() && ImGui::GetIO().KeyCtrl) {
+            /*
+             * Check whether all files in this folders are selected or not,
+             * if selected, then deselect everything, if at least one is not selected,
+             * then select everything
+             */
+
+            std::unordered_set<std::uint64_t> folder_files;
+
+            for (const auto& file : data.first->files) {
+                folder_files.insert(file.second.first.hash);
+            }
+
+            bool contains_all = true;
+
+            for (const auto& item : folder_files) {
+                if (selection.selected_files.find(item) == selection.selected_files.end()) {
+                    contains_all = false;
+                    break;
+                }
+            }
+
+            if (contains_all) {
+                for (const auto& item : folder_files)
+                    selection.selected_files.erase(item);
+            } else {
+                for (const auto& item : folder_files)
+                    selection.selected_files.insert(item);
+            }
+        }
 
         ImGui::NextColumn();
         ImGui::Text("Folder");
@@ -104,8 +135,11 @@ void FileTree::draw(SelectionInfo& selection, Decima::ArchiveArray& archive_arra
         if (!data.second)
             continue;
 
-        auto is_selected = selection.selected_files.find(data.first.hash) != selection.selected_files.end();
-        if (ImGui::Selectable(name.c_str(), is_selected)) {
+        const auto is_selected = selection.selected_files.find(data.first.hash) != selection.selected_files.end();
+
+        ImGui::TreeNodeEx(name.c_str(), ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_Leaf | is_selected);
+
+        if(ImGui::IsItemClicked(ImGuiMouseButton_Left)) {
             selection.selected_file = data.first.hash;
 
             if (ImGui::GetIO().KeyCtrl) {
@@ -116,6 +150,8 @@ void FileTree::draw(SelectionInfo& selection, Decima::ArchiveArray& archive_arra
                 }
             }
         }
+
+        ImGui::TreePop();
 
         ImGui::NextColumn();
         ImGui::Text("File");
