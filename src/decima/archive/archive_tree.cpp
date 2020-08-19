@@ -160,7 +160,7 @@ void FileTree::draw(SelectionInfo& selection, Decima::ArchiveArray& archive_arra
         const auto file_entry = archive_array.get_file_entry(data.first.hash);
 
         if (file_entry.has_value()) {
-            ImGui::Text("%dB", file_entry.value().get().size);
+            ImGui::Text("%s", format_size(file_entry.value().get().size).c_str());
         } else {
             ImGui::Text("Unknown");
         }
