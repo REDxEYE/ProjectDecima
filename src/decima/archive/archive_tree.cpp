@@ -77,6 +77,9 @@ void FileTree::draw(SelectionInfo& selection, Decima::ArchiveArray& archive_arra
     }
 
     for (auto& [name, data] : folders) {
+        if (!data.second)
+            continue;
+
         const auto tree_name = name + "##" + std::to_string(folders.size());
         const auto show = ImGui::TreeNode(tree_name.c_str());
         const auto items_count = data.first->files.size() + data.first->folders.size();
@@ -87,7 +90,7 @@ void FileTree::draw(SelectionInfo& selection, Decima::ArchiveArray& archive_arra
         ImGui::Text("%llu item%c", items_count, items_count == 1 ? ' ' : 's');
         ImGui::NextColumn();
 
-        if (data.second && show) {
+        if (show) {
             if (items_count > 0) {
                 data.first->draw(selection, archive_array, false);
             } else {
