@@ -8,11 +8,11 @@ void Decima::GUID::parse(Source& stream) {
 
 void Decima::GUID::draw() {
     ImGui::Text("%08x-%04x-%04x-%04x-%012llx",
-        std::uint32_t(m_data_8[0] >> 32),
+        std::uint32_t(m_data_8[0] >> 32 & 0xffffffff),
         std::uint16_t(m_data_8[0] >> 16 & 0xffff),
         std::uint16_t(m_data_8[0] >> 0 & 0xffff),
-        std::uint16_t(m_data_8[1] >> 48),
-        std::uint64_t(m_data_8[1] >> 0));
+        std::uint16_t(m_data_8[1] >> 48 & 0xffff),
+        std::uint64_t(m_data_8[1] >> 0 & 0xffffffffffff));
 }
 
 #include <ostream>
