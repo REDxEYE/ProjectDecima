@@ -8,7 +8,7 @@
 #include <cstdint>
 #include <vector>
 
-#include "decima/file_types/shared.hpp"
+#include "decima/shared.hpp"
 #include "decima/file_types/pod/guid.hpp"
 
 class ProjectDS;
