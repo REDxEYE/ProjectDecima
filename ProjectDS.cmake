@@ -28,7 +28,7 @@ add_executable(ProjectDS
 target_link_libraries(ProjectDS PRIVATE oodle hash imgui glfw glad)
 target_include_directories(ProjectDS PRIVATE include)
 
-if (WIN32)
+if (MSVC)
     target_compile_definitions(ProjectDS PUBLIC _CRT_SECURE_NO_WARNINGS)
     target_compile_options(ProjectDS PUBLIC /EHs)
 endif ()
