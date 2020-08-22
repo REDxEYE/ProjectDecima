@@ -22,7 +22,7 @@ namespace Decima {
         static constexpr uint64_t Texture = 0xa664164d69fd2b38;
         static constexpr uint64_t TextureSet = 0xa321e8c307328d2e;
         static constexpr uint64_t Translation = 0x31be502435317445;
-        static constexpr uint64_t Model = 0x16bb69a9e5aa0d9e;
+        static constexpr uint64_t Shader = 0x16bb69a9e5aa0d9e;
         static constexpr uint64_t Collection = 0xf3586131b4f18516;
     };
     class ZeroDawn_FileMagics : public FileMagics {
@@ -41,12 +41,14 @@ namespace Decima {
     static constexpr uint32_t encryption_key_2[4] = { 0x06C084A37, 0x07E159D95, 0x03D5AF7E8, 0x018AA7D3F };
 
     static const std::unordered_map<uint64_t, std::string> known_file_types = {
-        { DeathStranding_FileMagics::Armature, "Armature" },
-        { DeathStranding_FileMagics::Texture, "Texture" },
-        { DeathStranding_FileMagics::TextureSet, "TextureSet" },
+        // clang-format off
+        { DeathStranding_FileMagics::Armature,    "Armature"    },
+        { DeathStranding_FileMagics::Texture,     "Texture"     },
+        { DeathStranding_FileMagics::TextureSet,  "TextureSet"  },
         { DeathStranding_FileMagics::Translation, "Translation" },
-        { DeathStranding_FileMagics::Model, "Model" },
-        { DeathStranding_FileMagics::Collection, "Collection" }
+        { DeathStranding_FileMagics::Shader,      "Shader"      },
+        { DeathStranding_FileMagics::Collection,  "Collection"  }
+        // clang-format on
     };
 
     inline const std::string get_type_name(uint64_t magic) {
