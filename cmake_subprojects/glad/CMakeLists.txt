@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.15)
 project(glad)
-set(CMAKE_CXX_STANDARD 17)
 
-file(GLOB_RECURSE GLAD_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/glad/src/*.c)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-add_library(glad SHARED ${GLAD_SOURCES})
-set_target_properties(glad PROPERTIES PREFIX "")
+set(GLAD_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/glad/src)
+set(GLAD_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/glad/include)
 
-target_include_directories(glad PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/glad/include)
+add_library(glad STATIC
+        ${GLAD_SOURCE_DIR}/glad.c)
+
+target_include_directories(glad PUBLIC ${GLAD_INCLUDE_DIR})

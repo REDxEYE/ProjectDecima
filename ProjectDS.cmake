@@ -4,7 +4,6 @@ add_executable(ProjectDS
         src/decima/archive/archive_array.cpp
         src/decima/archive/archive_tree.cpp
         src/decima/archive/archive_file.cpp
-        src/imgui_backend_impl.cpp
         src/utils.cpp
         src/app.cpp
         src/projectds_app.cpp
@@ -26,16 +25,10 @@ add_executable(ProjectDS
 
 target_include_directories(ProjectDS PUBLIC include ${HASHLIB_INC} ${OOZLIB_INC})
 
-target_include_directories(ProjectDS PUBLIC
-        libs/glad/include
-        libs/glfw/include
-        )
+target_link_libraries(ProjectDS PRIVATE oodle hash imgui glfw glad)
+target_include_directories(ProjectDS PRIVATE include)
 
-target_compile_options(ProjectDS PUBLIC -march=native)
-
-target_link_libraries(ProjectDS PUBLIC
-        HashLib oozLib glfw glad imgui
-        -static-libgcc -static-libstdc++ -static
-        -Wl,-Bstatic -lstdc++ -lpthread
-        -Wl,-Bdynamic
-        -fuse-ld=lld)
+if (WIN32)
+    target_compile_definitions(ProjectDS PUBLIC _CRT_SECURE_NO_WARNINGS)
+    target_compile_options(ProjectDS PUBLIC /EHs)
+endif ()
