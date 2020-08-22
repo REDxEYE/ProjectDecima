@@ -2,7 +2,6 @@
 // Created by MED45 on 07.08.2020.
 //
 #include "decima/file_types/core/texture.h"
-
 #include <glad/glad.h>
 
 struct TexturePixelFormatInfo {
@@ -51,7 +50,14 @@ void Decima::Texture::parse(ArchiveArray& archives, Source& stream) {
         external_data.parse(archives, stream);
 
     embedded_data.resize(total_size);
-    stream.read_exact(embedded_data);
+
+    /* TODO:
+     *  By some reason, some textures contain
+     *  total_size greater than actual embedded
+     *  buffer. Add this workaround until we'll
+     *  figure out what is happening.
+     */
+    stream.read(embedded_data);
 
     if (const auto format = format_info.find(pixel_format); format != format_info.end()) {
         const auto [format_block_size, format_block_density, format_internal, format_compressed] = format->second;
