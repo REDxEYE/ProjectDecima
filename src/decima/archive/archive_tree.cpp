@@ -137,7 +137,7 @@ void FileTree::draw(SelectionInfo& selection, Decima::ArchiveArray& archive_arra
 
         const auto is_selected = selection.selected_files.find(data.first.hash) != selection.selected_files.end();
 
-        ImGui::TreeNodeEx(name.c_str(), ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_Leaf | is_selected);
+        ImGui::TreeNodeEx(name.c_str(), ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_Leaf | static_cast<int>(is_selected));
 
         if(ImGui::IsItemClicked(ImGuiMouseButton_Left)) {
             selection.selected_file = data.first.hash;

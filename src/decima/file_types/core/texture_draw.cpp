@@ -155,7 +155,7 @@ void Decima::Texture::draw_preview(float preview_width, float preview_height, fl
     const ImVec2 pos = ImGui::GetCursorScreenPos();
     const ImVec4 tint = { 1, 1, 1, 1 };
     const ImVec4 border = { 1, 1, 1, 1 };
-    ImGui::Image(reinterpret_cast<ImTextureID>(mip_textures[mip_index]), { preview_width, preview_height }, { 0, 0 }, { 1, 1 }, tint, border);
+    ImGui::Image(reinterpret_cast<ImTextureID>(static_cast<std::size_t>(mip_textures[mip_index])), { preview_width, preview_height }, { 0, 0 }, { 1, 1 }, tint, border);
 
     if (ImGui::BeginPopupContextItem("Export Image")) {
         if (ImGui::Selectable("Export image")) {
@@ -177,7 +177,7 @@ void Decima::Texture::draw_preview(float preview_width, float preview_height, fl
                     std::uint16_t height;
                     std::uint8_t pixel_depth;
                     std::uint8_t image_descriptor;
-                } tga_header { 0 };
+                });
 
                 tga_header.image_type = 2;
                 tga_header.width = width;
@@ -189,7 +189,7 @@ void Decima::Texture::draw_preview(float preview_width, float preview_height, fl
                     std::uint32_t extension_offset;
                     std::uint32_t dev_area_offset;
                     std::int8_t signature[18];
-                } tga_footer { 0 };
+                });
 
                 std::memcpy(tga_footer.signature, "TRUEVISION-XFILE.", 18);
 
@@ -247,7 +247,7 @@ void Decima::Texture::draw_preview(float preview_width, float preview_height, fl
 
         ImVec2 uv0 = { region_x / preview_width, region_y / preview_height };
         ImVec2 uv1 = { (region_x + zoom_region) / preview_width, (region_y + zoom_region) / preview_height };
-        ImGui::Image(reinterpret_cast<ImTextureID>(mip_textures[mip_index]), ImVec2(zoom_region * zoom_scale, zoom_region * zoom_scale), uv0, uv1, tint, border);
+        ImGui::Image(reinterpret_cast<ImTextureID>(static_cast<std::size_t>(mip_textures[mip_index])), ImVec2(zoom_region * zoom_scale, zoom_region * zoom_scale), uv0, uv1, tint, border);
 
         ImGui::EndTooltip();
     }

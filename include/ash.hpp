@@ -1,9 +1,12 @@
 #pragma once
 
+#define NOMINMAX
 #include <algorithm>
 #include <stdexcept>
 #include <vector>
 #include <memory>
+#include <string>
+#include <array>
 
 namespace ash {
     enum class seek_dir {
@@ -58,11 +61,12 @@ namespace ash {
 
         template <class Container>
         void read_exact(Container& container) {
-            if (std::size(container) != read(container))
-                throw std::runtime_error("Unexpected end of file");
+            const auto count = read(container);
+            if (std::size(container) != count)
+                throw std::runtime_error("Unexpected end of file, read " + std::to_string(count) + "/" + std::to_string(std::size(container)));
         }
 
-        std::size_t seek(seek_dir direction, ssize_t count) noexcept {
+        std::size_t seek(seek_dir direction, long long count) noexcept {
             std::size_t result = seek_inner(direction, count);
             discard();
             return result;
@@ -97,7 +101,7 @@ namespace ash {
             return available;
         }
 
-        std::size_t seek_inner(seek_dir direction, ssize_t count) noexcept {
+        std::size_t seek_inner(seek_dir direction, long long count) noexcept {
             switch (direction) {
             case seek_dir::beg:
                 cur = std::clamp(beg + count, beg, end);

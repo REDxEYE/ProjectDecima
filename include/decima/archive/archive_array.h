@@ -6,6 +6,7 @@
 #define PROJECTDS_ARCHIVE_ARRAY_H
 
 #include <unordered_map>
+#include <optional>
 
 #include "decima/file_types/core/prefetch.h"
 #include "archive.h"
