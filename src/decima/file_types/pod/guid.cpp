@@ -20,11 +20,14 @@ void Decima::GUID::draw() {
 
 namespace Decima {
     std::ostream& operator<<(std::ostream& os, GUID guid) {
-        return os << std::hex << std::setfill('0')
-                  << std::setw(8) << (guid.m_data_8[0] >> 32) << '-'
-                  << std::setw(4) << (guid.m_data_8[0] >> 16 & 0xffff) << '-'
-                  << std::setw(4) << (guid.m_data_8[0] >> 0 & 0xffff) << '-'
-                  << std::setw(4) << (guid.m_data_8[1] >> 48) << '-'
-                  << std::setw(12) << (guid.m_data_8[1] >> 0 & 0xffffffffffff);
+        const auto flags = os.flags();
+        os << std::hex << std::setfill('0')
+           << std::setw(8) << (guid.m_data_8[0] >> 32) << '-'
+           << std::setw(4) << (guid.m_data_8[0] >> 16 & 0xffff) << '-'
+           << std::setw(4) << (guid.m_data_8[0] >> 0 & 0xffff) << '-'
+           << std::setw(4) << (guid.m_data_8[1] >> 48) << '-'
+           << std::setw(12) << (guid.m_data_8[1] >> 0 & 0xffffffffffff);
+        os.flags(flags);
+        return os;
     }
 }
