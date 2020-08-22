@@ -23,6 +23,7 @@ namespace Decima {
         static constexpr uint64_t TextureSet = 0xa321e8c307328d2e;
         static constexpr uint64_t Translation = 0x31be502435317445;
         static constexpr uint64_t Model = 0x16bb69a9e5aa0d9e;
+        static constexpr uint64_t Collection = 0xf3586131b4f18516;
     };
     class ZeroDawn_FileMagics : public FileMagics {
     public:
@@ -44,7 +45,8 @@ namespace Decima {
         { DeathStranding_FileMagics::Texture, "Texture" },
         { DeathStranding_FileMagics::TextureSet, "TextureSet" },
         { DeathStranding_FileMagics::Translation, "Translation" },
-        { DeathStranding_FileMagics::Model, "Model" }
+        { DeathStranding_FileMagics::Model, "Model" },
+        { DeathStranding_FileMagics::Collection, "Collection" }
     };
 
     inline const std::string get_type_name(uint64_t magic) {

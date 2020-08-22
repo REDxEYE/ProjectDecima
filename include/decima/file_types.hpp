@@ -6,6 +6,7 @@
 #define PROJECTDS_FILE_TYPES_HPP
 
 #include "decima/file_types/core/core.h"
+#include "decima/file_types/core/collection.hpp"
 #include "decima/file_types/core/dummy.h"
 #include "decima/file_types/core/translation.hpp"
 #include "decima/file_types/core/prefetch.h"

@@ -21,9 +21,9 @@ add_executable(ProjectDS
         src/decima/file_types/pod/stream.cpp
         src/decima/file_types/pod/guid.cpp
         src/decima/file_types/core/texture_set.cpp
-        src/decima/file_types/core/texture_set_draw.cpp)
-
-target_include_directories(ProjectDS PUBLIC include ${HASHLIB_INC} ${OOZLIB_INC})
+        src/decima/file_types/core/texture_set_draw.cpp
+        src/decima/file_types/pod/reference.cpp
+        src/decima/file_types/core/collection.cpp)
 
 target_link_libraries(ProjectDS PRIVATE oodle hash imgui glfw glad)
 target_include_directories(ProjectDS PRIVATE include)
