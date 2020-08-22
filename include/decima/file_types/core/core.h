@@ -15,10 +15,11 @@ class ProjectDS;
 
 namespace Decima {
     class ArchiveArray;
-    struct __attribute__((packed)) CoreHeader {
+
+    DECIMA_PACK(struct CoreHeader {
         std::uint64_t file_type;
         std::uint32_t file_size;
-    };
+    });
 
     class CoreFile {
     public:

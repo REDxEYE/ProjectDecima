@@ -164,7 +164,7 @@ void Decima::Texture::draw_preview(float preview_width, float preview_height, fl
             if (!full_path.empty()) {
                 full_path += ".tga";
 
-                struct __attribute__((packed)) {
+                DECIMA_PACK(struct TGAHeader {
                     std::uint8_t id_length;
                     std::uint8_t color_map_type;
                     std::uint8_t image_type;
@@ -179,18 +179,20 @@ void Decima::Texture::draw_preview(float preview_width, float preview_height, fl
                     std::uint8_t image_descriptor;
                 });
 
+                TGAHeader tga_header { 0 };
                 tga_header.image_type = 2;
                 tga_header.width = width;
                 tga_header.height = height;
                 tga_header.pixel_depth = 32;
                 tga_header.image_descriptor = 8;
 
-                struct __attribute__((packed)) {
+                DECIMA_PACK(struct TGAFooter {
                     std::uint32_t extension_offset;
                     std::uint32_t dev_area_offset;
                     std::int8_t signature[18];
                 });
 
+                TGAFooter tga_footer { 0 };
                 std::memcpy(tga_footer.signature, "TRUEVISION-XFILE.", 18);
 
                 std::vector<std::uint32_t> buffer;
