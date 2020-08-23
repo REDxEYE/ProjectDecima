@@ -2,8 +2,8 @@
 // Created by MED45 on 03.08.2020.
 //
 
-#ifndef PROJECTDS_ARCHIVE_FILE_H
-#define PROJECTDS_ARCHIVE_FILE_H
+#ifndef PROJECTDS_CORE_FILE_H
+#define PROJECTDS_CORE_FILE_H
 
 #include <cstdint>
 #include <vector>
@@ -55,4 +55,4 @@ namespace Decima {
 
 }
 
-#endif //PROJECTDS_ARCHIVE_FILE_H
+#endif //PROJECTDS_CORE_FILE_H

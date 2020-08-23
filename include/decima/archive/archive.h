@@ -11,7 +11,7 @@
 #include "mio.hpp"
 #include "decima/constants.hpp"
 #include "archive_structs.hpp"
-#include "archive_file.h"
+#include "core_file.h"
 
 namespace Decima {
 

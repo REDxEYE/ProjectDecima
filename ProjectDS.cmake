@@ -3,7 +3,7 @@ add_executable(ProjectDS
         src/decima/archive/archive.cpp
         src/decima/archive/archive_array.cpp
         src/decima/archive/archive_tree.cpp
-        src/decima/archive/archive_file.cpp
+        src/decima/archive/core_file.cpp
         src/utils.cpp
         src/app.cpp
         src/projectds_app.cpp

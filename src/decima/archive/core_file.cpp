@@ -2,7 +2,7 @@
 // Created by i.getsman on 04.08.2020.
 //
 
-#include "decima/archive/archive_file.h"
+#include "decima/archive/core_file.h"
 #include "decima/archive/archive.h"
 #include "utils.h"
 
