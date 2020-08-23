@@ -29,8 +29,8 @@ namespace Decima {
         std::vector<uint8_t> storage;
 
         [[nodiscard]] inline bool is_valid() const { return file_entry != nullptr; };
-        void unpack(uint32_t size); //TODO: size min = find minimal size
-        void decrypt(uint32_t size); //TODO: size = any
+        void unpack(); //TODO: size min = find minimal size
+        void decrypt(); //TODO: size = any
         void get_raw();
     private:
 

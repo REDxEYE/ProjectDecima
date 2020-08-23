@@ -18,7 +18,7 @@ Decima::ArchiveArray::ArchiveArray(const std::string& _workdir) {
 void Decima::ArchiveArray::read_prefetch_file() {
 
     auto prefetch_data = query_file("prefetch/fullgame.prefetch");
-    prefetch_data.unpack(0);
+    prefetch_data.unpack();
 
     Source source(prefetch_data.storage, 1024);
     prefetch.parse(*this, source);

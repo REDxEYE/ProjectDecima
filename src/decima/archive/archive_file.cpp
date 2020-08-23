@@ -9,14 +9,14 @@
 #include <md5.h>
 #include "MurmurHash3.h"
 
-void Decima::CompressedFile::unpack(uint32_t size) {
+void Decima::CompressedFile::unpack() {
     uint64_t required_size = 0;
     auto [chunk_entry_begin, chunk_entry_end] = chunk_range;
     for (auto chunk_entry = chunk_entry_begin; chunk_entry != chunk_entry_end; ++chunk_entry) {
         required_size += chunk_entry->uncompressed_size;
     }
     if (encrypted)
-        decrypt(size);
+        decrypt();
     else
         get_raw();
     std::vector<uint8_t> data_in(storage);
@@ -37,7 +37,7 @@ void Decima::CompressedFile::unpack(uint32_t size) {
     storage.erase(storage.begin() + file_entry->size, storage.begin() + storage.size());
 }
 
-void Decima::CompressedFile::decrypt(uint32_t size) {
+void Decima::CompressedFile::decrypt() {
     auto [chunk_entry_begin, chunk_entry_end] = chunk_range;
     get_raw();
     uint64_t out_pos = 0;

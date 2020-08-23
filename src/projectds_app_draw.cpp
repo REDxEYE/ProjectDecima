@@ -50,7 +50,7 @@ static void show_export_selection_dialog(ProjectDS& self) {
             std::filesystem::create_directories(full_path.parent_path());
 
             auto file = self.archive_array.query_file(filename);
-            file.unpack(0);
+            file.unpack();
             std::ofstream output_file { full_path, std::ios::binary };
             output_file.write(reinterpret_cast<const char*>(file.storage.data()), file.storage.size());
 
@@ -178,7 +178,7 @@ void ProjectDS::draw_filepreview() {
 
                 if (selected_file_changed) {
                     selection_info.file = archive_array.query_file(selection_info.selected_file);
-                    selection_info.file.unpack(0);
+                    selection_info.file.unpack();
                     selection_info.preview_file = selection_info.selected_file;
                     selection_info.preview_file_size = selection_info.file.storage.size();
                     selection_info.preview_file_offset = 0;
@@ -288,7 +288,7 @@ void ProjectDS::draw_export() {
                     auto file = archive_array.query_file(hash);
 
                     if (file.file_entry) {
-                        file.unpack(0);
+                        file.unpack();
                         Decima::Source stream(file.storage, 1024);
 
                         std::cout << "Processing file '" << path << "' (size: " << file.file_entry->size << ")\n";
