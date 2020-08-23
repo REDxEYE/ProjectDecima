@@ -7,12 +7,12 @@
 #include "decima/file_types/core/core.h"
 
 namespace Decima {
-    void CoreFile::parse(ArchiveArray& archives, Source& stream) {
+    void CoreEntry::parse(ArchiveArray& archives, Source& stream) {
         header = stream.read<decltype(header)>();
         guid.parse(stream);
     }
 
-    uint64_t CoreFile::peek_header(Source& stream) {
+    uint64_t CoreEntry::peek_header(Source& stream) {
         auto magic = stream.read<std::uint64_t>();
         stream.seek(ash::seek_dir::cur, -8);
         return magic;

@@ -21,7 +21,7 @@ namespace Decima {
         std::uint32_t file_size;
     });
 
-    class CoreFile {
+    class CoreEntry {
     public:
         CoreHeader header {};
         GUID guid {};

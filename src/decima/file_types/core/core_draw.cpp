@@ -6,7 +6,7 @@
 #include "decima/constants.hpp"
 #include "projectds_app.hpp"
 
-void Decima::CoreFile::draw() {
+void Decima::CoreEntry::draw() {
     ImGui::TextDisabled("Default handler");
     ImGui::Columns(2);
     ImGui::SetColumnWidth(-1, 200);

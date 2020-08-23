@@ -2,7 +2,7 @@
 #include "decima/file_types/core/collection.hpp"
 
 void Decima::Collection::parse(ArchiveArray& archives, Source& stream) {
-    CoreFile::parse(archives, stream);
+    CoreEntry::parse(archives, stream);
 
     const auto count = stream.read<std::uint32_t>();
 

@@ -4,7 +4,7 @@
 #include "decima/file_types/pod/reference.hpp"
 
 namespace Decima {
-    class Collection : public CoreFile {
+    class Collection : public CoreEntry {
     public:
         void parse(ArchiveArray& archives, Source& stream) override;
         void draw() override;

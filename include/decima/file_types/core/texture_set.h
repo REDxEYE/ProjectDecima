@@ -36,7 +36,7 @@ namespace Decima {
         void parse(Source& stream);
     };
 
-    class TextureSet : public CoreFile {
+    class TextureSet : public CoreEntry {
         CoreHeader header;
         uint32_t file_count;
         std::vector<TextureGUIDEntry> file_entries;

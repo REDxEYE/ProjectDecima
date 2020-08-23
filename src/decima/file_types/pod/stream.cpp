@@ -8,7 +8,7 @@ void Decima::Stream::parse(ArchiveArray& archives, Source& stream) {
     m_size = stream.read<std::uint32_t>();
 
     auto stream_file = archives.query_file(m_name.data() + ".core.stream");
-    stream_file.unpack(0);
+    stream_file.unpack();
     m_data = std::move(stream_file.storage);
 }
 

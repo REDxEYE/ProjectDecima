@@ -8,7 +8,7 @@
 #include "core.h"
 
 namespace Decima {
-    class Translation : public CoreFile {
+    class Translation : public CoreEntry {
     public:
         static constexpr const char* languages[] {
             "English",

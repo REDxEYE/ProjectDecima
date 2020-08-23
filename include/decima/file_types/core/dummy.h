@@ -8,7 +8,7 @@
 #include "core.h"
 
 namespace Decima {
-    class Dummy : public Decima::CoreFile {
+    class Dummy : public Decima::CoreEntry {
     public:
         void parse(ArchiveArray& archives, Source& stream) override;
     };

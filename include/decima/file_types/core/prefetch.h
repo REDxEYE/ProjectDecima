@@ -12,7 +12,7 @@
 #include "decima/file_types/pod/string.hpp"
 
 namespace Decima {
-    class Prefetch : public CoreFile {
+    class Prefetch : public CoreEntry {
     public:
         uint32_t string_count = 0;
         uint32_t file_sizes_count = 0;

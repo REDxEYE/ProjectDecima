@@ -29,7 +29,7 @@ static const std::unordered_map<Decima::TexturePixelFormat, TexturePixelFormatIn
 };
 
 void Decima::Texture::parse(ArchiveArray& archives, Source& stream) {
-    CoreFile::parse(archives, stream);
+    CoreEntry::parse(archives, stream);
     unk1 = stream.read<decltype(unk1)>();
     width = stream.read<decltype(width)>();
     height = stream.read<decltype(height)>();

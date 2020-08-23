@@ -23,7 +23,7 @@ namespace Decima {
 
     std::ostream& operator<<(std::ostream& os, Decima::TexturePixelFormat fmt);
 
-    class Texture : public CoreFile {
+    class Texture : public CoreEntry {
     public:
         ~Texture();
 
