@@ -11,7 +11,7 @@
 
 void Decima::CoreFile::unpack() {
     uint64_t required_size = 0;
-    auto [chunk_entry_begin, chunk_entry_end] = chunk_range;
+    auto [chunk_entry_begin, chunk_entry_end] = get_chunk_boundaries();
     for (auto chunk_entry = chunk_entry_begin; chunk_entry != chunk_entry_end; ++chunk_entry) {
         required_size += chunk_entry->uncompressed_size;
     }
