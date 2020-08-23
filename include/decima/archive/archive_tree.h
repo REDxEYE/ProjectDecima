@@ -15,7 +15,7 @@
 
 #include "archive_array.h"
 #include "decima/file_types/core/core.h"
-#include "core_file.h"
+#include "decima/core_file.h"
 
 struct SelectionInfo {
     SelectionInfo() = default;
