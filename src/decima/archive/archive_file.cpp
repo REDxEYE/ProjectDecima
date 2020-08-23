@@ -38,7 +38,7 @@ void Decima::CoreFile::unpack() {
 }
 
 void Decima::CoreFile::decrypt() {
-    auto [chunk_entry_begin, chunk_entry_end] = chunk_range;
+    auto [chunk_entry_begin, chunk_entry_end] = get_chunk_boundaries();
     get_raw();
     uint64_t out_pos = 0;
     for (auto chunk_entry = chunk_entry_begin; chunk_entry != chunk_entry_end; ++chunk_entry) {
@@ -67,7 +67,7 @@ Decima::CoreFile::CoreFile(FileEntry* file_entry_, mio::mmap_source* filebuffer_
 
 void Decima::CoreFile::get_raw() {
     uint64_t required_size = 0;
-    auto [chunk_entry_begin, chunk_entry_end] = chunk_range;
+    auto [chunk_entry_begin, chunk_entry_end] = get_chunk_boundaries();
     for (auto chunk_entry = chunk_entry_begin; chunk_entry != chunk_entry_end; ++chunk_entry) {
         required_size += chunk_entry->compressed_size;
     }

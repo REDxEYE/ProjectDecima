@@ -86,24 +86,7 @@ void Decima::Archive::decrypt(uint32_t key_1, uint32_t key_2, uint32_t* data) {
     data[7] ^= iv[7];
 }
 
-std::pair<std::vector<Decima::ChunkEntry>::iterator, std::vector<Decima::ChunkEntry>::iterator>
-Decima::Archive::get_mio_boundaries(int32_t file_id) {
-    if (file_id == -1)
-        return { chunk_table.end(), chunk_table.end() };
 
-    const auto& file_entry = content_table.at(file_id);
-
-    const auto file_offset = file_entry.offset;
-    const auto file_size = file_entry.size;
-
-    const auto first_chunk = calculate_first_containing_chunk(file_offset, header.max_chunk_size);
-    const auto last_chunk = calculate_last_containing_chunk(file_offset, file_size, header.max_chunk_size);
-
-    const auto first_chunk_row = chunk_id_by_offset(first_chunk);
-    const auto last_chunk_row = chunk_id_by_offset(last_chunk);
-
-    return { chunk_table.begin() + first_chunk_row, chunk_table.begin() + last_chunk_row + 1 };
-}
 
 [[maybe_unused]] uint64_t Decima::Archive::get_file_index(const std::string& file_name) const {
     uint64_t hash = hash_string(sanitize_name(file_name), seed);
