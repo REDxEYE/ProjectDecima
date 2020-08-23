@@ -14,11 +14,11 @@
 namespace Decima {
     class Archive;
 
-    class CompressedFile {
+    class CoreFile {
     public:
-        CompressedFile(FileEntry* file_entry_, mio::mmap_source* filebuffer_, Archive* archive_, bool encrypted_);
+        CoreFile(FileEntry* file_entry_, mio::mmap_source* filebuffer_, Archive* archive_, bool encrypted_);
 
-        CompressedFile() = default;
+        CoreFile() = default;
 
         std::pair<std::vector<ChunkEntry>::iterator, std::vector<ChunkEntry>::iterator> chunk_range;
         FileEntry* file_entry = nullptr;

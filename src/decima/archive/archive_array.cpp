@@ -81,16 +81,16 @@ Decima::ArchiveArray::get_file_entry(uint64_t file_hash) {
     return std::nullopt;
 }
 
-Decima::CompressedFile Decima::ArchiveArray::query_file(uint64_t file_hash) {
+Decima::CoreFile Decima::ArchiveArray::query_file(uint64_t file_hash) {
     auto archive_id = hash_to_archive.find(file_hash);
     if (archive_id != hash_to_archive.end()) {
         auto& archive = archives[archive_id->second];
         return std::move(archive.query_file(file_hash));
     }
-    return Decima::CompressedFile(nullptr, nullptr, nullptr, true);
+    return Decima::CoreFile(nullptr, nullptr, nullptr, true);
 }
 
-Decima::CompressedFile Decima::ArchiveArray::query_file(const std::string& file_name) {
+Decima::CoreFile Decima::ArchiveArray::query_file(const std::string& file_name) {
     uint64_t hash = hash_string(sanitize_name(file_name), seed);
     return std::move(query_file(hash));
 }

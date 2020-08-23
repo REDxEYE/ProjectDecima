@@ -37,9 +37,9 @@ namespace Decima {
 
         [[nodiscard]] bool is_valid() const;
 
-        [[maybe_unused]] Decima::CompressedFile query_file(uint64_t file_hash);
+        [[maybe_unused]] Decima::CoreFile query_file(uint64_t file_hash);
 
-        [[maybe_unused]] Decima::CompressedFile query_file(const std::string& file_name);
+        [[maybe_unused]] Decima::CoreFile query_file(const std::string& file_name);
 
     private:
         static void decrypt(uint32_t key_1, uint32_t key_2, uint32_t* data);

@@ -9,7 +9,7 @@
 #include <md5.h>
 #include "MurmurHash3.h"
 
-void Decima::CompressedFile::unpack() {
+void Decima::CoreFile::unpack() {
     uint64_t required_size = 0;
     auto [chunk_entry_begin, chunk_entry_end] = chunk_range;
     for (auto chunk_entry = chunk_entry_begin; chunk_entry != chunk_entry_end; ++chunk_entry) {
@@ -37,7 +37,7 @@ void Decima::CompressedFile::unpack() {
     storage.erase(storage.begin() + file_entry->size, storage.begin() + storage.size());
 }
 
-void Decima::CompressedFile::decrypt() {
+void Decima::CoreFile::decrypt() {
     auto [chunk_entry_begin, chunk_entry_end] = chunk_range;
     get_raw();
     uint64_t out_pos = 0;
@@ -58,14 +58,14 @@ void Decima::CompressedFile::decrypt() {
     }
 }
 
-Decima::CompressedFile::CompressedFile(FileEntry* file_entry_, mio::mmap_source* filebuffer_, Archive* archive_, bool encrypted_) {
+Decima::CoreFile::CoreFile(FileEntry* file_entry_, mio::mmap_source* filebuffer_, Archive* archive_, bool encrypted_) {
     file_entry = file_entry_;
     filebuffer = filebuffer_;
     archive = archive_;
     encrypted = encrypted_;
 }
 
-void Decima::CompressedFile::get_raw() {
+void Decima::CoreFile::get_raw() {
     uint64_t required_size = 0;
     auto [chunk_entry_begin, chunk_entry_end] = chunk_range;
     for (auto chunk_entry = chunk_entry_begin; chunk_entry != chunk_entry_end; ++chunk_entry) {

@@ -128,21 +128,21 @@ uint64_t Decima::Archive::chunk_id_by_offset(uint64_t offset) {
     return -1;
 }
 
-Decima::CompressedFile Decima::Archive::query_file(uint64_t file_hash) {
+Decima::CoreFile Decima::Archive::query_file(uint64_t file_hash) {
     //    log("Archive", "Queried " + uint64_to_hex(file_hash) + " file");
     auto file_id = get_file_index(file_hash);
     if (file_id == -1) {
-        return Decima::CompressedFile(nullptr, nullptr, nullptr, true);
+        return Decima::CoreFile(nullptr, nullptr, nullptr, true);
     }
     auto& file_entry = content_table.at(file_id);
-    Decima::CompressedFile file(&file_entry, &filebuffer, this, is_encrypted());
+    Decima::CoreFile file(&file_entry, &filebuffer, this, is_encrypted());
 
     file.chunk_range = get_mio_boundaries(file_id);
 
     return file;
 }
 
-[[maybe_unused]] Decima::CompressedFile Decima::Archive::query_file(const std::string& file_name) {
+[[maybe_unused]] Decima::CoreFile Decima::Archive::query_file(const std::string& file_name) {
     log("Archive", "Queried " + file_name + " file");
     return query_file(hash_string(sanitize_name(file_name), seed));
 }

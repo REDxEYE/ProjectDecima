@@ -31,8 +31,8 @@ namespace Decima {
         void open(const std::string& _workdir);
 
         //TODO: replace std::vector<uint8_t> with Decima::File
-        Decima::CompressedFile query_file(uint64_t file_hash);
-        Decima::CompressedFile query_file(const std::string& file_name);
+        Decima::CoreFile query_file(uint64_t file_hash);
+        Decima::CoreFile query_file(const std::string& file_name);
 
         std::optional<std::reference_wrapper<FileEntry>> get_file_entry(const std::string& file_name);
 

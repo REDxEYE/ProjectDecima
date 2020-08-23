@@ -24,7 +24,7 @@ struct SelectionInfo {
     std::uint64_t preview_file_offset { 0 };
     std::uint64_t selected_file { 0 };
     std::unordered_set<std::uint64_t> selected_files;
-    Decima::CompressedFile file;
+    Decima::CoreFile file;
 };
 
 struct FileInfo {
