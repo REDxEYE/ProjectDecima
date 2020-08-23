@@ -98,29 +98,17 @@ uint64_t Decima::Archive::get_file_index(uint64_t file_hash) const {
         if (content_table[i].hash == file_hash)
             return i;
     }
-
     return -1;
 }
 
-uint64_t Decima::Archive::chunk_id_by_offset(uint64_t offset) {
-    for (std::size_t i = 0; i < chunk_table.size(); i++) {
-        if (chunk_table[i].uncompressed_offset == offset)
-            return i;
-    }
-
-    return -1;
-}
 
 Decima::CoreFile Decima::Archive::query_file(uint64_t file_hash) {
-    //    log("Archive", "Queried " + uint64_to_hex(file_hash) + " file");
     auto file_id = get_file_index(file_hash);
     if (file_id == -1) {
         return Decima::CoreFile(nullptr, nullptr, nullptr, true);
     }
     auto& file_entry = content_table.at(file_id);
     Decima::CoreFile file(&file_entry, &filebuffer, this, is_encrypted());
-
-    file.chunk_range = get_mio_boundaries(file_id);
 
     return file;
 }

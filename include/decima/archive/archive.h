@@ -11,12 +11,9 @@
 #include "mio.hpp"
 #include "decima/constants.hpp"
 #include "archive_structs.hpp"
-#include "core_file.h"
+#include "decima/core_file.h"
 
 namespace Decima {
-
-
-    class ArchiveArray;
 
     class Archive {
         mio::mmap_source filebuffer;
@@ -44,16 +41,13 @@ namespace Decima {
     private:
         static void decrypt(uint32_t key_1, uint32_t key_2, uint32_t* data);
 
-        uint64_t chunk_id_by_offset(uint64_t offset);
-
-        std::pair<std::vector<ChunkEntry>::iterator, std::vector<ChunkEntry>::iterator>
-        get_mio_boundaries(int32_t file_id);
 
         [[maybe_unused]] [[nodiscard]] uint64_t get_file_index(uint64_t file_hash) const;
 
         [[maybe_unused]] [[nodiscard]] uint64_t get_file_index(const std::string& file_name) const;
 
-        friend ArchiveArray;
+        friend class ArchiveArray;
+        friend class CoreFile;
     };
 
 
