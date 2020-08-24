@@ -2,8 +2,8 @@
 // Created by MED45 on 06.08.2020.
 //
 
-#ifndef PROJECTDS_DUMMY_H
-#define PROJECTDS_DUMMY_H
+#ifndef PROJECTDS_DUMMY_ENTRY_H
+#define PROJECTDS_DUMMY_ENTRY_H
 
 #include "entry.h"
 
@@ -14,4 +14,4 @@ namespace Decima {
     };
 }
 
-#endif //PROJECTDS_DUMMY_H
+#endif //PROJECTDS_DUMMY_ENTRY_H

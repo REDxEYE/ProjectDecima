@@ -2,7 +2,7 @@
 // Created by MED45 on 06.08.2020.
 //
 
-#include "decima/file_types/core/dummy.h"
+#include "decima/file_types/core/dummy_entry.h"
 
 void Decima::Dummy::parse(ArchiveArray& archives, Source& stream) {
     CoreEntry::parse(archives, stream);

@@ -9,7 +9,7 @@
 #include "utils.h"
 #include "portable-file-dialogs.h"
 
-#include "decima/file_types/core/dummy.h"
+#include "decima/file_types/core/dummy_entry.h"
 
 static void show_data_selection_dialog(ProjectDS& self) {
     auto folder = pfd::select_folder("Select Death Stranding data folder!").result();

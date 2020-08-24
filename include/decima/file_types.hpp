@@ -9,7 +9,7 @@
 
 #include "decima/file_types/core/entry.h"
 #include "decima/file_types/core/collection.hpp"
-#include "decima/file_types/core/dummy.h"
+#include "decima/file_types/core/dummy_entry.h"
 #include "decima/file_types/core/translation.hpp"
 #include "decima/file_types/core/prefetch.h"
 #include "decima/file_types/core/texture.h"
