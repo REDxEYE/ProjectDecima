@@ -13,6 +13,7 @@
 #include "mio.hpp"
 
 #include "decima/archive/archive_structs.hpp"
+#include "decima/file_types/core/core.h"
 
 namespace Decima {
     class Archive;
@@ -30,7 +31,12 @@ namespace Decima {
 
         std::vector<uint8_t> storage;
 
+        std::vector<std::shared_ptr<CoreEntry>> entries;
+
+        void parse();
+
         [[nodiscard]] inline bool is_valid() const { return file_entry != nullptr; };
+
         void unpack();
 
     private:

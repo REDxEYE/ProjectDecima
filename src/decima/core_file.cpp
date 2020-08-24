@@ -6,11 +6,11 @@
 #include "decima/core_file.h"
 
 #include <iostream>
-#include <filesystem>
 #include <md5.h>
 #include <MurmurHash3.h>
 
 #include "decima/archive/archive.h"
+#include "decima/file_types.hpp"
 #include "utils.h"
 
 void Decima::CoreFile::unpack() {
@@ -86,4 +86,9 @@ void Decima::CoreFile::decrypt_chunk(uint8_t* data, const Decima::ChunkEntry& ch
     for (int i = 0; i < chunk_entry.compressed_size; i++) {
         data[i] ^= digest[i % 16];
     }
+}
+
+void Decima::CoreFile::parse() {
+    Decima::Source stream(storage, 1024);
+    entries.clear();
 }
