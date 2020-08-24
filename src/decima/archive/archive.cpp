@@ -25,15 +25,15 @@ bool Decima::Archive::open() {
         return false;
 
     memcpy(&header, filebuffer.data(), sizeof(ArchiveHeader));
-    memcpy(&content_info, filebuffer.data(), sizeof(ArchiveContentInfo));
+    memcpy(&content_info, filebuffer.data() + sizeof(ArchiveHeader), sizeof(ArchiveContentInfo));
 
     if (!is_valid())
         return false;
 
     if (is_encrypted())
-        decrypt(header.key, header.key + 1, (uint32_t*) &content_table);
+        decrypt(header.key, header.key + 1, (uint32_t*)&content_info);
 
-    std::size_t read_offset = sizeof(header);
+    std::size_t read_offset = sizeof(ArchiveHeader) + sizeof(ArchiveContentInfo);
 
     content_table.resize(content_info.content_table_size);
     memcpy(content_table.data(), filebuffer.data() + read_offset,
