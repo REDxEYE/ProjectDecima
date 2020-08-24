@@ -6,7 +6,7 @@
 namespace Decima {
     class Collection : public CoreEntry {
     public:
-        void parse(ArchiveArray& archives, Source& stream) override;
+        void parse(ArchiveArray& archives, Source& stream, CoreFile* core_file) override;
         void draw() override;
 
         std::vector<Reference> refs;

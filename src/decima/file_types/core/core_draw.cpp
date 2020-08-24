@@ -36,3 +36,4 @@ void Decima::CoreEntry::draw() {
 
     ImGui::Columns(1);
 }
+

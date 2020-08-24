@@ -21,7 +21,7 @@ void Decima::ArchiveArray::read_prefetch_file() {
     prefetch_data.unpack();
 
     Source source(prefetch_data.storage, 1024);
-    prefetch.parse(*this, source);
+    prefetch.parse(*this, source, nullptr);
 
     for (const auto& string : prefetch.strings) {
         uint64_t hash = hash_string(sanitize_name(string.data()), seed);

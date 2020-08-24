@@ -294,7 +294,7 @@ void ProjectDS::draw_export() {
 
                         while (!stream.eof()) {
                             Decima::Dummy dummy;
-                            dummy.parse(archive_array, stream);
+                            dummy.parse(archive_array, stream, nullptr);
 
                             output_file << path << '_' << dummy.guid << '\n';
                         }

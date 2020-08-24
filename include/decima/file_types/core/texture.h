@@ -47,7 +47,7 @@ namespace Decima {
         std::vector<unsigned int> mip_textures;
         int mip_index;
 
-        void parse(ArchiveArray& archives, Source& stream) override;
+        void parse(ArchiveArray& archives, Source& stream, CoreFile* core_file) override;
         void draw() override;
 
     private:

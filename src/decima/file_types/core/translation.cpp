@@ -4,8 +4,8 @@
 
 #include "decima/file_types/core/translation.hpp"
 
-void Decima::Translation::parse(ArchiveArray& archives, Source& stream) {
-    CoreEntry::parse(archives, stream);
+void Decima::Translation::parse(ArchiveArray& archives, Source& stream, CoreFile* core_file) {
+    CoreEntry::parse(archives, stream, nullptr);
 
     for (uint32_t i = 0; i < std::size(languages); i++) {
         translations[i] = Decima::read_string(stream);

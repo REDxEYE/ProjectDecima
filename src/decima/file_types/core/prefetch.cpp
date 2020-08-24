@@ -2,10 +2,11 @@
 // Created by MED45 on 26.07.2020.
 //
 
+#include <decima/core_file.h>
 #include "decima/file_types/core/prefetch.h"
 
-void Decima::Prefetch::parse(ArchiveArray& archives, Source& stream) {
-    CoreEntry::parse(archives, stream);
+void Decima::Prefetch::parse(ArchiveArray& archives, Source& stream, CoreFile* core_file) {
+    CoreEntry::parse(archives, stream, nullptr);
     string_count = stream.read<decltype(string_count)>();
     strings.resize(string_count);
 

@@ -5,6 +5,7 @@
 #ifndef PROJECTDS_TEXTURE_SET_H
 #define PROJECTDS_TEXTURE_SET_H
 
+#include <decima/core_file.h>
 #include "decima/file_types/core/entry.h"
 #include "decima/file_types/pod/pod.hpp"
 #include "decima/file_types/pod/string.hpp"
@@ -45,7 +46,7 @@ namespace Decima {
         std::vector<SrcEntry> src_entries;
         uint8_t unk2;
     public:
-        void parse(ArchiveArray& archives, Source& stream) override;
+        void parse(ArchiveArray& archives, Source& stream, CoreFile* core_file) override;
         void draw() override;
     };
 }

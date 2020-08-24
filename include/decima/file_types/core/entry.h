@@ -15,6 +15,7 @@ class ProjectDS;
 
 namespace Decima {
     class ArchiveArray;
+    class CoreFile;
 
     DECIMA_PACK(struct CoreHeader {
         std::uint64_t file_type;
@@ -29,9 +30,11 @@ namespace Decima {
 
         static uint64_t peek_header(Source& stream);
 
-        virtual void parse(ArchiveArray& archives, Source& stream);
+        virtual void parse(ArchiveArray& archives, Source& stream, CoreFile* core_file);
 
         virtual void draw();
+
+
     };
 
     std::string read_string(Source& stream, const std::string& default_value = "<empty>");

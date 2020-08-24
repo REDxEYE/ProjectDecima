@@ -5,6 +5,7 @@
 #ifndef PROJECTDS_TRANSLATION_HPP
 #define PROJECTDS_TRANSLATION_HPP
 
+#include <decima/core_file.h>
 #include "entry.h"
 
 namespace Decima {
@@ -47,7 +48,7 @@ namespace Decima {
         std::string comments[std::size(languages)];
         std::uint8_t flags[std::size(languages)];
 
-        void parse(ArchiveArray& archives, Source& stream) override;
+        void parse(ArchiveArray& archives, Source& stream, CoreFile* core_file) override;
         void draw() override;
     };
 

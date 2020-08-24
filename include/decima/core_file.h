@@ -14,6 +14,7 @@
 
 #include "decima/archive/archive_structs.hpp"
 #include "decima/file_types/core/entry.h"
+#include "decima/file_types/pod/reference.hpp"
 
 namespace Decima {
     class Archive;

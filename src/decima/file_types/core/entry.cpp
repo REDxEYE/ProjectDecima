@@ -7,7 +7,7 @@
 #include "decima/file_types/core/entry.h"
 
 namespace Decima {
-    void CoreEntry::parse(ArchiveArray& archives, Source& stream) {
+    void CoreEntry::parse(ArchiveArray& archives, Source& stream, CoreFile* core_file) {
         header = stream.read<decltype(header)>();
         guid.parse(stream);
     }
@@ -31,3 +31,4 @@ namespace Decima {
         return default_value;
     }
 }
+

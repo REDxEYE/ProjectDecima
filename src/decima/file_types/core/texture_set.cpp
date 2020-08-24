@@ -4,8 +4,8 @@
 
 #include "decima/file_types/core/texture_set.h"
 
-void Decima::TextureSet::parse(Decima::ArchiveArray& archives, Decima::Source& stream) {
-    CoreEntry::parse(archives, stream);
+void Decima::TextureSet::parse(ArchiveArray& archives, Source& stream, CoreFile* core_file) {
+    CoreEntry::parse(archives, stream, nullptr);
     file_count = stream.read<uint32_t>();
     file_entries.resize(file_count);
     for (auto& file_entry : file_entries) {
