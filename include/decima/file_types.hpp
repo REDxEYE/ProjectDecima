@@ -17,11 +17,11 @@
 
 
 template<class Base, typename... Args>
-using Constructor = std::function<std::unique_ptr<Base>(Args&& ...)>;
+using Constructor = std::function<std::shared_ptr<Base>(Args&& ...)>;
 
 template<class T, typename... Args>
-static std::unique_ptr<Decima::CoreEntry> construct(Args&& ... args) {
-    return std::make_unique<T>(std::forward<Args>(args)...);
+static std::shared_ptr<Decima::CoreEntry> construct(Args&& ... args) {
+    return std::make_shared<T>(std::forward<Args>(args)...);
 }
 
 static const std::map<std::uint64_t, Constructor<Decima::CoreEntry>> types = {

@@ -31,7 +31,7 @@ namespace Decima {
 
         std::vector<uint8_t> storage;
 
-        std::vector<std::unique_ptr<CoreEntry>> entries;
+        std::vector<std::shared_ptr<CoreEntry>> entries;
 
         void parse(ArchiveArray& archive_array);
 
