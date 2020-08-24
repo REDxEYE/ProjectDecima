@@ -8,15 +8,21 @@
 #include "decima/constants.hpp"
 
 namespace Decima {
+
     struct ArchiveHeader {
         Version version; //0x20304050
         uint32_t key;
+    };
+
+    struct ArchiveContentInfo {
+
         uint64_t file_size;
         uint64_t data_size;
         uint64_t content_table_size;
         uint32_t chunk_table_size;
         uint32_t max_chunk_size;
     };
+
     struct FileEntry {
         uint32_t entry_num;
         uint32_t key;

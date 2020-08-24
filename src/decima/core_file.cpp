@@ -38,7 +38,7 @@ void Decima::CoreFile::unpack() {
             out_offset += chunk_entry->uncompressed_size;
         }
     }
-    const auto file_position = file_entry->offset % archive->header.max_chunk_size;
+    const auto file_position = file_entry->offset % archive->content_info.max_chunk_size;
     storage.erase(storage.begin(), storage.begin() + file_position);
     storage.erase(storage.begin() + file_entry->size, storage.begin() + storage.size());
 }
@@ -56,8 +56,8 @@ std::pair<std::vector<Decima::ChunkEntry>::iterator, std::vector<Decima::ChunkEn
     const auto file_offset = file_entry->offset;
     const auto file_size = file_entry->size;
 
-    const auto first_chunk = calculate_first_containing_chunk(file_offset, archive->header.max_chunk_size);
-    const auto last_chunk = calculate_last_containing_chunk(file_offset, file_size, archive->header.max_chunk_size);
+    const auto first_chunk = calculate_first_containing_chunk(file_offset, archive->content_info.max_chunk_size);
+    const auto last_chunk = calculate_last_containing_chunk(file_offset, file_size, archive->content_info.max_chunk_size);
 
     const auto first_chunk_row = chunk_id_by_offset(first_chunk);
     const auto last_chunk_row = chunk_id_by_offset(last_chunk);

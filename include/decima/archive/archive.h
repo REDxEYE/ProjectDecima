@@ -23,6 +23,7 @@ namespace Decima {
         std::vector<Decima::FileEntry> content_table;
         std::string filepath;
         Decima::ArchiveHeader header = {};
+        Decima::ArchiveContentInfo content_info = {};
 
         Archive(const std::string& workdir, const std::string& filename);
 

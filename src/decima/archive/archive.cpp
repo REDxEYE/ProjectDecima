@@ -12,10 +12,10 @@
 #include <md5.h>
 
 Decima::Archive::Archive(const std::string& workdir, const std::string& filename)
-    : filepath(workdir + "\\" + filename) { }
+        : filepath(workdir + "\\" + filename) {}
 
 Decima::Archive::Archive(const std::string& workdir, uint64_t filehash)
-    : Archive(workdir, uint64_to_hex(filehash) + ".bin") { }
+        : Archive(workdir, uint64_to_hex(filehash) + ".bin") {}
 
 bool Decima::Archive::open() {
     std::error_code error;
@@ -25,32 +25,34 @@ bool Decima::Archive::open() {
         return false;
 
     memcpy(&header, filebuffer.data(), sizeof(ArchiveHeader));
+    memcpy(&content_table, filebuffer.data(), sizeof(ArchiveContentInfo));
 
     if (!is_valid())
         return false;
 
     if (is_encrypted())
-        decrypt(header.key, header.key + 1, (uint32_t*)&header + 2);
+        decrypt(header.key, header.key + 1, (uint32_t*) &content_table);
 
     std::size_t read_offset = sizeof(header);
 
-    content_table.resize(header.content_table_size);
+    content_table.resize(content_info.content_table_size);
     memcpy(content_table.data(), filebuffer.data() + read_offset,
-        sizeof(FileEntry) * header.content_table_size);
+           sizeof(FileEntry) * content_info.content_table_size);
 
-    read_offset += sizeof(FileEntry) * header.content_table_size;
+    read_offset += sizeof(FileEntry) * content_info.content_table_size;
 
-    chunk_table.resize(header.chunk_table_size);
-    memcpy(chunk_table.data(), filebuffer.data() + read_offset, sizeof(chunk_table.front()) * header.chunk_table_size);
+    chunk_table.resize(content_info.chunk_table_size);
+    memcpy(chunk_table.data(), filebuffer.data() + read_offset,
+           sizeof(chunk_table.front()) * content_info.chunk_table_size);
 
     if (is_encrypted()) {
         for (auto& file_entry : content_table) {
-            decrypt(file_entry.key, file_entry.key2, (uint32_t*)&file_entry);
+            decrypt(file_entry.key, file_entry.key2, (uint32_t*) &file_entry);
         }
 
         for (auto& chunk : chunk_table) {
             auto saved_key = chunk.key_1;
-            decrypt(chunk.key_1, chunk.key_2, (uint32_t*)&chunk);
+            decrypt(chunk.key_1, chunk.key_2, (uint32_t*) &chunk);
             chunk.key_1 = saved_key;
         }
     }
@@ -68,8 +70,8 @@ bool Decima::Archive::is_encrypted() const {
 
 void Decima::Archive::decrypt(uint32_t key_1, uint32_t key_2, uint32_t* data) {
     const std::uint32_t key[8] = {
-        key_1, encryption_key_1[1], encryption_key_1[2], encryption_key_1[3],
-        key_2, encryption_key_1[1], encryption_key_1[2], encryption_key_1[3]
+            key_1, encryption_key_1[1], encryption_key_1[2], encryption_key_1[3],
+            key_2, encryption_key_1[1], encryption_key_1[2], encryption_key_1[3]
     };
 
     std::uint32_t iv[8];
@@ -85,7 +87,6 @@ void Decima::Archive::decrypt(uint32_t key_1, uint32_t key_2, uint32_t* data) {
     data[6] ^= iv[6];
     data[7] ^= iv[7];
 }
-
 
 
 [[maybe_unused]] uint64_t Decima::Archive::get_file_index(const std::string& file_name) const {
