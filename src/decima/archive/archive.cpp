@@ -25,7 +25,7 @@ bool Decima::Archive::open() {
         return false;
 
     memcpy(&header, filebuffer.data(), sizeof(ArchiveHeader));
-    memcpy(&content_table, filebuffer.data(), sizeof(ArchiveContentInfo));
+    memcpy(&content_info, filebuffer.data(), sizeof(ArchiveContentInfo));
 
     if (!is_valid())
         return false;
