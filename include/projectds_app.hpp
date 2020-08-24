@@ -34,7 +34,6 @@ public:
     std::vector<const char*> file_names;
     FileTree root_tree;
     SelectionInfo selection_info;
-    std::vector<std::unique_ptr<Decima::CoreEntry>> parsed_files;
     ImGuiTextFilter filter;
     MemoryEditor file_viewer;
 
@@ -56,8 +55,6 @@ protected:
     void begin_frame_user() override;
 
     void end_frame_user() override;
-
-    void parse_core_file();
 };
 
 #endif //PROJECTDS_PROJECTDS_APP_HPP

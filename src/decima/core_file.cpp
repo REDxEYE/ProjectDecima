@@ -88,7 +88,19 @@ void Decima::CoreFile::decrypt_chunk(uint8_t* data, const Decima::ChunkEntry& ch
     }
 }
 
-void Decima::CoreFile::parse() {
+void Decima::CoreFile::parse(ArchiveArray& archive_array) {
+    unpack();
     Decima::Source stream(storage, 1024);
     entries.clear();
+
+    while (!stream.eof()){
+        const auto offset = stream.tell();
+        const auto magic = Decima::CoreEntry::peek_header(stream);
+
+        auto handler = get_handler(magic);
+        handler->parse(archive_array, stream);
+        handler->offset = offset;
+        entries.push_back(std::move(handler));
+    }
+
 }

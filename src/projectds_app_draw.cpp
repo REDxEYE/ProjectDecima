@@ -19,7 +19,7 @@ static void show_data_selection_dialog(ProjectDS& self) {
         self.file_names.clear();
         self.file_names.reserve(self.archive_array.hash_to_name.size());
 
-        for (const auto& [hash, path] : self.archive_array.hash_to_name) {
+        for (const auto&[hash, path] : self.archive_array.hash_to_name) {
             self.file_names.push_back(path.c_str());
 
             std::vector<std::string> split_path;
@@ -31,7 +31,7 @@ static void show_data_selection_dialog(ProjectDS& self) {
                 current_root = current_root->add_folder(*it);
 
             if (self.archive_array.hash_to_archive.find(hash) != self.archive_array.hash_to_archive.end())
-                current_root->add_file(split_path.back(), hash, { 0 });
+                current_root->add_file(split_path.back(), hash, {0});
         }
     }
 }
@@ -51,7 +51,7 @@ static void show_export_selection_dialog(ProjectDS& self) {
 
             auto file = self.archive_array.query_file(filename);
             file.unpack();
-            std::ofstream output_file { full_path, std::ios::binary };
+            std::ofstream output_file{full_path, std::ios::binary};
             output_file.write(reinterpret_cast<const char*>(file.storage.data()), file.storage.size());
 
             std::cout << "File was exported to: " << full_path << "\n";
@@ -102,12 +102,12 @@ void ProjectDS::draw_dockspace() {
     ImGui::SetNextWindowViewport(viewport->ID);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0.0f, 0.0f });
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0.0f, 0.0f});
     const auto dock_flags = ImGuiWindowFlags_MenuBar
-        | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar
-        | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove
-        | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus
-        | ImGuiWindowFlags_NoBackground;
+                            | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar
+                            | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove
+                            | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus
+                            | ImGuiWindowFlags_NoBackground;
     ImGui::Begin("DockSpace", nullptr, dock_flags);
     {
         ImGui::PopStyleVar(3);
@@ -178,12 +178,10 @@ void ProjectDS::draw_filepreview() {
 
                 if (selected_file_changed) {
                     selection_info.file = archive_array.query_file(selection_info.selected_file);
-                    selection_info.file.unpack();
+                    selection_info.file.parse(archive_array);
                     selection_info.preview_file = selection_info.selected_file;
                     selection_info.preview_file_size = selection_info.file.storage.size();
                     selection_info.preview_file_offset = 0;
-
-                    parse_core_file();
                 }
             } else {
                 ImGui::Text("Error getting file info!");
@@ -199,7 +197,7 @@ void ProjectDS::draw_filepreview() {
     ImGui::Begin("Normal View", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
     {
         if (selection_info.selected_file > 0) {
-            for (const auto& file : parsed_files) {
+            for (const auto& file : selection_info.file.entries) {
                 std::stringstream buffer;
                 buffer << '[' << file->guid << "] " << Decima::get_type_name(file->header.file_type);
 
@@ -207,7 +205,8 @@ void ProjectDS::draw_filepreview() {
 
                 if (ImGui::BeginPopupContextItem(buffer.str().c_str())) {
                     if (ImGui::Selectable("Highlight")) {
-                        selection_info.preview_file_offset = file->offset + sizeof(Decima::CoreHeader) + sizeof(Decima::GUID);
+                        selection_info.preview_file_offset =
+                                file->offset + sizeof(Decima::CoreHeader) + sizeof(Decima::GUID);
                         selection_info.preview_file_size = file->header.file_size - sizeof(Decima::GUID);
                     }
 
@@ -229,9 +228,9 @@ void ProjectDS::draw_filepreview() {
     {
         if (selection_info.selected_file > 0) {
             file_viewer.DrawContents(
-                selection_info.file.storage.data() + selection_info.preview_file_offset,
-                selection_info.preview_file_size,
-                0);
+                    selection_info.file.storage.data() + selection_info.preview_file_offset,
+                    selection_info.preview_file_size,
+                    0);
         }
     }
     ImGui::End();
@@ -245,7 +244,7 @@ void ProjectDS::draw_tree() {
 
             file_names.clear();
 
-            for (auto& [_, path] : archive_array.hash_to_name) {
+            for (auto&[_, path] : archive_array.hash_to_name) {
                 if (filter.PassFilter(path.c_str())) {
                     file_names.push_back(path.c_str());
                 }
@@ -266,7 +265,7 @@ void ProjectDS::draw_export() {
             const auto full_path = pfd::save_file("Choose destination file").result();
 
             if (!full_path.empty()) {
-                std::ofstream output_file { full_path };
+                std::ofstream output_file{full_path};
 
                 root_tree.visit([&](const auto& name, auto depth) {
                     output_file << std::string(depth * 2, ' ');
@@ -282,9 +281,9 @@ void ProjectDS::draw_export() {
             const auto full_path = pfd::save_file("Choose destination file").result();
 
             if (!full_path.empty()) {
-                std::ofstream output_file { full_path };
+                std::ofstream output_file{full_path};
 
-                for (auto& [hash, path] : archive_array.hash_to_name) {
+                for (auto&[hash, path] : archive_array.hash_to_name) {
                     auto file = archive_array.query_file(hash);
 
                     if (file.file_entry) {
@@ -310,7 +309,7 @@ void ProjectDS::draw_export() {
             const auto full_path = pfd::save_file("Choose destination file").result();
 
             if (!full_path.empty()) {
-                std::ofstream output_file { full_path };
+                std::ofstream output_file{full_path};
 
                 for (const auto& archive : archive_array.archives) {
                     output_file << archive.filepath << '\n';
@@ -345,7 +344,8 @@ void ProjectDS::draw_export() {
         if (ImGui::BeginPopup("AppendExportByName")) {
             static char path[512];
 
-            const auto submit = ImGui::InputText("File name", path, IM_ARRAYSIZE(path), ImGuiInputTextFlags_EnterReturnsTrue);
+            const auto submit = ImGui::InputText("File name", path, IM_ARRAYSIZE(path),
+                                                 ImGuiInputTextFlags_EnterReturnsTrue);
 
             if (submit || ImGui::Button("Add to selection!")) {
                 std::string str_path(path);
@@ -367,7 +367,8 @@ void ProjectDS::draw_export() {
         if (ImGui::BeginPopup("AppendExportByHash")) {
             static uint64_t file_hash;
 
-            const auto submit = ImGui::InputScalar("File hash", ImGuiDataType_U64, &file_hash, nullptr, nullptr, nullptr, ImGuiInputTextFlags_EnterReturnsTrue);
+            const auto submit = ImGui::InputScalar("File hash", ImGuiDataType_U64, &file_hash, nullptr, nullptr,
+                                                   nullptr, ImGuiInputTextFlags_EnterReturnsTrue);
 
             if (submit || ImGui::Button("Add to selection!")) {
                 if (archive_array.get_file_entry(file_hash).has_value()) {
