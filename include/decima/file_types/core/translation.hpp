@@ -5,7 +5,7 @@
 #ifndef PROJECTDS_TRANSLATION_HPP
 #define PROJECTDS_TRANSLATION_HPP
 
-#include "core.h"
+#include "entry.h"
 
 namespace Decima {
     class Translation : public CoreEntry {

@@ -5,7 +5,7 @@
 #ifndef PROJECTDS_DUMMY_H
 #define PROJECTDS_DUMMY_H
 
-#include "core.h"
+#include "entry.h"
 
 namespace Decima {
     class Dummy : public Decima::CoreEntry {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "decima/file_types/core/core.h"
+#include "decima/file_types/core/entry.h"
 #include "decima/file_types/pod/reference.hpp"
 
 namespace Decima {

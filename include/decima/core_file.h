@@ -13,7 +13,7 @@
 #include "mio.hpp"
 
 #include "decima/archive/archive_structs.hpp"
-#include "decima/file_types/core/core.h"
+#include "decima/file_types/core/entry.h"
 
 namespace Decima {
     class Archive;

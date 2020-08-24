@@ -2,8 +2,8 @@
 // Created by MED45 on 30.07.2020.
 //
 
-#ifndef PROJECTDS_CORE_H
-#define PROJECTDS_CORE_H
+#ifndef PROJECTDS_ENTRY_H
+#define PROJECTDS_ENTRY_H
 
 #include <cstdint>
 #include <vector>
@@ -36,4 +36,4 @@ namespace Decima {
 
     std::string read_string(Source& stream, const std::string& default_value = "<empty>");
 }
-#endif //PROJECTDS_CORE_H
+#endif //PROJECTDS_ENTRY_H

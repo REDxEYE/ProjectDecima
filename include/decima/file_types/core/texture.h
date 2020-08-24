@@ -6,7 +6,7 @@
 #define PROJECTDS_TEXTURE_H
 
 #include "decima/file_types/pod/stream.hpp"
-#include "decima/file_types/core/core.h"
+#include "decima/file_types/core/entry.h"
 
 namespace Decima {
     enum class TexturePixelFormat : uint8_t {

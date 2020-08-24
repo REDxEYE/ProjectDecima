@@ -14,7 +14,7 @@
 #include <imgui.h>
 
 #include "archive_array.h"
-#include "decima/file_types/core/core.h"
+#include "decima/file_types/core/entry.h"
 #include "decima/core_file.h"
 
 struct SelectionInfo {

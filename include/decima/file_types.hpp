@@ -7,7 +7,7 @@
 
 #include <map>
 
-#include "decima/file_types/core/core.h"
+#include "decima/file_types/core/entry.h"
 #include "decima/file_types/core/collection.hpp"
 #include "decima/file_types/core/dummy.h"
 #include "decima/file_types/core/translation.hpp"

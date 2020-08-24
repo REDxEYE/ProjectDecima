@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-#include "core.h"
+#include "entry.h"
 #include "decima/file_types/pod/string.hpp"
 
 namespace Decima {

@@ -5,7 +5,7 @@
 #ifndef PROJECTDS_TEXTURE_SET_H
 #define PROJECTDS_TEXTURE_SET_H
 
-#include "decima/file_types/core/core.h"
+#include "decima/file_types/core/entry.h"
 #include "decima/file_types/pod/pod.hpp"
 #include "decima/file_types/pod/string.hpp"
 #include "decima/file_types/pod/guid.hpp"

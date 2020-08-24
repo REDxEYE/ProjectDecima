@@ -4,7 +4,7 @@
 
 #include <iomanip>
 
-#include "decima/file_types/core/core.h"
+#include "decima/file_types/core/entry.h"
 
 namespace Decima {
     void CoreEntry::parse(ArchiveArray& archives, Source& stream) {
