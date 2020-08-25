@@ -16,10 +16,27 @@ void Decima::Texture::draw() {
     ImGui::NextColumn();
     ImGui::Separator();
 
-    ImGui::Text("Unk1");
+    ImGui::Text("Flags");
     ImGui::NextColumn();
-    ImGui::Text("%i", unk1);
+
+    if (static_cast<std::uint16_t>(flags) == 0) {
+        ImGui::TextDisabled("None");
+    } else {
+        std::stringstream buffer;
+
+        for (std::uint16_t flag = 1; flag < INT16_MAX + 1; flag <<= 1) {
+            if (static_cast<std::uint16_t>(flags) & flag) {
+                if (buffer.tellp() != 0)
+                    buffer << ", ";
+                buffer << static_cast<TextureFlags>(flag);
+            }
+        }
+
+        ImGui::Text("%s", buffer.str().c_str());
+    }
+
     ImGui::NextColumn();
+
     ImGui::Separator();
 
     ImGui::Text("Width");
@@ -124,7 +141,7 @@ void Decima::Texture::draw() {
         ImGui::Text("No external stream");
     }
 
-    draw_preview(256, 256, 128, 4);
+    draw_preview(256, 256 * (static_cast<std::uint16_t>(flags) & static_cast<std::uint16_t>(TextureFlags::Cubemap) ? 6 : 1), 128, 4);
 
     ImGui::NextColumn();
     ImGui::Columns(1);
@@ -280,6 +297,15 @@ namespace Decima {
             return os << "BC7";
         default:
             return os << "Unsupported: " << std::to_string(int(fmt));
+        }
+    }
+
+    std::ostream& operator<<(std::ostream& os, Decima::TextureFlags flags) {
+        switch (flags) {
+        case Decima::TextureFlags::Cubemap:
+            return os << "Cubemap";
+        default:
+            return os << "Unsupported: " << std::to_string(int(flags));
         }
     }
 }

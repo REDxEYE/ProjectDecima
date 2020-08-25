@@ -24,11 +24,17 @@ namespace Decima {
 
     std::ostream& operator<<(std::ostream& os, Decima::TexturePixelFormat fmt);
 
+    enum class TextureFlags : std::uint16_t {
+        Cubemap = 0x02
+    };
+
+    std::ostream& operator<<(std::ostream& os, Decima::TextureFlags fmt);
+
     class Texture : public CoreEntry {
     public:
         ~Texture();
 
-        std::uint16_t unk1 {};
+        TextureFlags flags {};
         std::uint16_t width {};
         std::uint16_t height {};
         std::uint16_t layers {};
