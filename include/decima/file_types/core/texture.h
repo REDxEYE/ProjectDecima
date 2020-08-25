@@ -18,6 +18,7 @@ namespace Decima {
         BC3 = 0x44,
         BC4 = 0x45,
         BC5 = 0x47,
+        BC6 = 0x49,
         BC7 = 0x4B,
     };
 

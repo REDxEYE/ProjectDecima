@@ -274,6 +274,8 @@ namespace Decima {
             return os << "BC4";
         case Decima::TexturePixelFormat::BC5:
             return os << "BC5";
+        case Decima::TexturePixelFormat::BC6:
+            return os << "BC6";
         case Decima::TexturePixelFormat::BC7:
             return os << "BC7";
         default:
