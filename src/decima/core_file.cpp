@@ -106,7 +106,7 @@ void Decima::CoreFile::parse(ArchiveArray& archive_array) {
         handler->offset = offset;
         entries.push_back(std::move(handler));
     }
-    Reference::resolve_global_refs(archive_array);
-    Reference::resolve_local_refs();
 
+//    Reference::resolve_global_refs(archive_array);
+//    Reference::resolve_local_refs();
 }
