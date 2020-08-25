@@ -1,6 +1,8 @@
 #pragma once
 
 #ifndef NOMINMAX
+#undef min
+#undef max
 #define NOMINMAX
 #endif
 
