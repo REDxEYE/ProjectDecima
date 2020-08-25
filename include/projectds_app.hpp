@@ -18,6 +18,7 @@ class ProjectDS : public App {
 public:
     enum class Popup {
         None,
+        About,
         AppendExportByName,
         AppendExportByHash,
         Shortcuts

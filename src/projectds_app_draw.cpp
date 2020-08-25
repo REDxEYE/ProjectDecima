@@ -167,6 +167,9 @@ void ProjectDS::draw_dockspace() {
             }
 
             if (ImGui::BeginMenu("Help")) {
+                if (ImGui::MenuItem("About"))
+                    current_popup = Popup::About;
+
                 if (ImGui::MenuItem("Shortcuts"))
                     current_popup = Popup::Shortcuts;
 
@@ -180,6 +183,11 @@ void ProjectDS::draw_dockspace() {
 
     if (current_popup == Popup::Shortcuts) {
         ImGui::OpenPopup("Shortcuts");
+        current_popup = Popup::None;
+    }
+
+    if (current_popup == Popup::About) {
+        ImGui::OpenPopup("About");
         current_popup = Popup::None;
     }
 
@@ -210,6 +218,56 @@ void ProjectDS::draw_dockspace() {
         ImGui::Columns(1);
 
         if (ImGui::Button("Got it", { -1, 0 }))
+            ImGui::CloseCurrentPopup();
+
+        ImGui::EndPopup();
+    }
+
+    ImGui::SetNextWindowSize({ 600, 0 }, ImGuiCond_Always);
+    ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Always, { 0.5, 0.5 });
+
+    if (ImGui::BeginPopupModal("About", nullptr, ImGuiWindowFlags_NoMove)) {
+        ImGui::Text("ProjectDecima " DECIMA_VERSION " (" __DATE__ ")");
+        ImGui::Separator();
+
+        ImGui::TextWrapped("This project is aimed to provide GUI for export/preview files inside Decima engine archives.");
+
+        if (ImGui::TreeNode("Show license")) {
+            ImGui::Text(R"(MIT License
+
+Copyright (c) 2020 REDxEYE & ShadelessFox
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.)");
+            ImGui::TreePop();
+        }
+
+        ImGui::Separator();
+
+        if (ImGui::Button("Source code", { -1, 0 }))
+            std::system("start https://github.com/REDxEYE/ProjectDecima");
+
+        if (ImGui::Button("Report problem", { -1, 0 }))
+            std::system("start https://github.com/REDxEYE/ProjectDecima/issues");
+
+        ImGui::Separator();
+
+        if (ImGui::Button("Close", { -1, 0 }))
             ImGui::CloseCurrentPopup();
 
         ImGui::EndPopup();
