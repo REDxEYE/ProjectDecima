@@ -14,19 +14,6 @@ ProjectDS::ProjectDS(const std::pair<uint32_t, uint32_t>& windowSize, const std:
     m_multi_viewport = imgui_multi_viewport;
 }
 
-void ProjectDS::init_user() {
-    App::init_user();
-    init_imgui();
-    init_filetype_handlers();
-    ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-    file_viewer.WriteFn = [](auto, auto, auto) {
-        /* Dummy write function because
-         * ReadOnly forbids any selection. */
-    };
-}
-
-
-
 void ProjectDS::begin_frame_user() {
     App::begin_frame_user();
     ImGui_ImplGlfw_NewFrame();

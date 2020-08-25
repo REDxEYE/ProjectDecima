@@ -19,7 +19,16 @@ public:
     enum class Popup {
         None,
         AppendExportByName,
-        AppendExportByHash
+        AppendExportByHash,
+        Shortcuts
+    };
+
+    struct ShortcutInfo {
+        std::string_view name;
+        std::string_view description;
+        std::size_t key;
+        ImGuiKeyModFlags mods;
+        std::function<void()> callback;
     };
 
 public:
@@ -29,6 +38,7 @@ public:
 public:
     bool m_multi_viewport;
     Popup current_popup = Popup::None;
+    std::vector<ShortcutInfo> shortcuts;
 
     Decima::ArchiveArray archive_array;
     std::vector<const char*> file_names;

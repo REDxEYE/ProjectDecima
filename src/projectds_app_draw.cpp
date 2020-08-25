@@ -19,7 +19,7 @@ static void show_data_selection_dialog(ProjectDS& self) {
         self.file_names.clear();
         self.file_names.reserve(self.archive_array.hash_to_name.size());
 
-        for (const auto&[hash, path] : self.archive_array.hash_to_name) {
+        for (const auto& [hash, path] : self.archive_array.hash_to_name) {
             self.file_names.push_back(path.c_str());
 
             std::vector<std::string> split_path;
@@ -31,7 +31,7 @@ static void show_data_selection_dialog(ProjectDS& self) {
                 current_root = current_root->add_folder(*it);
 
             if (self.archive_array.hash_to_archive.find(hash) != self.archive_array.hash_to_archive.end())
-                current_root->add_file(split_path.back(), hash, {0});
+                current_root->add_file(split_path.back(), hash, { 0 });
         }
     }
 }
@@ -51,12 +51,69 @@ static void show_export_selection_dialog(ProjectDS& self) {
 
             auto file = self.archive_array.query_file(filename);
             file.unpack();
-            std::ofstream output_file{full_path, std::ios::binary};
+            std::ofstream output_file { full_path, std::ios::binary };
             output_file.write(reinterpret_cast<const char*>(file.storage.data()), file.storage.size());
 
             std::cout << "File was exported to: " << full_path << "\n";
         }
     }
+}
+
+void ProjectDS::init_user() {
+    App::init_user();
+    init_imgui();
+    init_filetype_handlers();
+    ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+    file_viewer.WriteFn = [](auto, auto, auto) {
+        /* Dummy write function because
+         * ReadOnly forbids any selection. */
+    };
+
+    shortcuts.push_back(ShortcutInfo {
+        "Escape",
+        "Reset highlighted selection in raw view",
+        GLFW_KEY_ESCAPE,
+        ImGuiKeyModFlags_None,
+        [&] {
+            if (selection_info.preview_file != 0) {
+                selection_info.preview_file_size = selection_info.file.storage.size();
+                selection_info.preview_file_offset = 0;
+            }
+        },
+    });
+
+    shortcuts.push_back(ShortcutInfo {
+        "Ctrl+O",
+        "Open file dialog to select game folder",
+        GLFW_KEY_O,
+        ImGuiKeyModFlags_Ctrl,
+        [&] { show_data_selection_dialog(*this); },
+    });
+
+    shortcuts.push_back(ShortcutInfo {
+        "Ctrl+E",
+        "Export currently selected files",
+        GLFW_KEY_E,
+        ImGuiKeyModFlags_Ctrl,
+        [&] { show_export_selection_dialog(*this); },
+    });
+
+    shortcuts.push_back(ShortcutInfo {
+        "Ctrl+A",
+        "Add file to selection by its name",
+        GLFW_KEY_A,
+        ImGuiKeyModFlags_Ctrl,
+        [&] { current_popup = Popup::AppendExportByName; },
+    });
+
+    shortcuts.push_back(ShortcutInfo {
+        "Ctrl+Shift+A",
+        "Add file to selection by its hash",
+        GLFW_KEY_A,
+        ImGuiKeyModFlags_Ctrl | ImGuiKeyModFlags_Shift,
+        [&] { current_popup = Popup::AppendExportByHash; },
+    });
 }
 
 void ProjectDS::input_user() {
@@ -65,22 +122,9 @@ void ProjectDS::input_user() {
     if (io.WantCaptureKeyboard)
         return;
 
-    if (io.KeyCtrl) {
-        if (io.KeysDown[GLFW_KEY_O])
-            show_data_selection_dialog(*this);
-
-        if (io.KeysDown[GLFW_KEY_E])
-            show_export_selection_dialog(*this);
-
-        if (io.KeysDown[GLFW_KEY_A])
-            current_popup = io.KeyShift ? Popup::AppendExportByHash : Popup::AppendExportByName;
-    }
-
-    if (io.KeysDown[GLFW_KEY_ESCAPE]) {
-        if (selection_info.preview_file != 0) {
-            selection_info.preview_file_size = selection_info.file.storage.size();
-            selection_info.preview_file_offset = 0;
-        }
+    for (const auto& shortcut : shortcuts) {
+        if ((io.KeyMods & shortcut.mods) == shortcut.mods && io.KeysDown[shortcut.key])
+            shortcut.callback();
     }
 }
 
@@ -102,12 +146,12 @@ void ProjectDS::draw_dockspace() {
     ImGui::SetNextWindowViewport(viewport->ID);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0.0f, 0.0f});
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0.0f, 0.0f });
     const auto dock_flags = ImGuiWindowFlags_MenuBar
-                            | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar
-                            | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove
-                            | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus
-                            | ImGuiWindowFlags_NoBackground;
+        | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar
+        | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove
+        | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus
+        | ImGuiWindowFlags_NoBackground;
     ImGui::Begin("DockSpace", nullptr, dock_flags);
     {
         ImGui::PopStyleVar(3);
@@ -122,10 +166,54 @@ void ProjectDS::draw_dockspace() {
                 ImGui::EndMenu();
             }
 
+            if (ImGui::BeginMenu("Help")) {
+                if (ImGui::MenuItem("Shortcuts"))
+                    current_popup = Popup::Shortcuts;
+
+                ImGui::EndMenu();
+            }
+
             ImGui::EndMenuBar();
         }
     }
     ImGui::End();
+
+    if (current_popup == Popup::Shortcuts) {
+        ImGui::OpenPopup("Shortcuts");
+        current_popup = Popup::None;
+    }
+
+    ImGui::SetNextWindowSize({ 500, 0 }, ImGuiCond_Always);
+
+    if (ImGui::BeginPopupModal("Shortcuts", nullptr, ImGuiWindowFlags_NoMove)) {
+        ImGui::Columns(2);
+        {
+            ImGui::Text("Name");
+            ImGui::SetColumnWidth(-1, 150);
+            ImGui::NextColumn();
+
+            ImGui::Text("Description");
+            ImGui::NextColumn();
+
+            ImGui::Separator();
+
+            for (const auto& shortcut : shortcuts) {
+                ImGui::TextUnformatted(shortcut.name.data());
+                ImGui::NextColumn();
+
+                ImGui::TextWrapped("%s", shortcut.description.data());
+                ImGui::NextColumn();
+
+                ImGui::Separator();
+            }
+        }
+        ImGui::Columns(1);
+
+        if (ImGui::Button("Got it", { -1, 0 }))
+            ImGui::CloseCurrentPopup();
+
+        ImGui::EndPopup();
+    }
 }
 
 void ProjectDS::draw_filepreview() {
@@ -205,8 +293,7 @@ void ProjectDS::draw_filepreview() {
 
                 if (ImGui::BeginPopupContextItem(buffer.str().c_str())) {
                     if (ImGui::Selectable("Highlight")) {
-                        selection_info.preview_file_offset =
-                                file->offset + sizeof(Decima::CoreHeader) + sizeof(Decima::GUID);
+                        selection_info.preview_file_offset = file->offset + sizeof(Decima::CoreHeader) + sizeof(Decima::GUID);
                         selection_info.preview_file_size = file->header.file_size - sizeof(Decima::GUID);
                     }
 
@@ -228,9 +315,9 @@ void ProjectDS::draw_filepreview() {
     {
         if (selection_info.selected_file > 0) {
             file_viewer.DrawContents(
-                    selection_info.file.storage.data() + selection_info.preview_file_offset,
-                    selection_info.preview_file_size,
-                    0);
+                selection_info.file.storage.data() + selection_info.preview_file_offset,
+                selection_info.preview_file_size,
+                0);
         }
     }
     ImGui::End();
@@ -244,7 +331,7 @@ void ProjectDS::draw_tree() {
 
             file_names.clear();
 
-            for (auto&[_, path] : archive_array.hash_to_name) {
+            for (auto& [_, path] : archive_array.hash_to_name) {
                 if (filter.PassFilter(path.c_str())) {
                     file_names.push_back(path.c_str());
                 }
@@ -265,7 +352,7 @@ void ProjectDS::draw_export() {
             const auto full_path = pfd::save_file("Choose destination file").result();
 
             if (!full_path.empty()) {
-                std::ofstream output_file{full_path};
+                std::ofstream output_file { full_path };
 
                 root_tree.visit([&](const auto& name, auto depth) {
                     output_file << std::string(depth * 2, ' ');
@@ -281,9 +368,9 @@ void ProjectDS::draw_export() {
             const auto full_path = pfd::save_file("Choose destination file").result();
 
             if (!full_path.empty()) {
-                std::ofstream output_file{full_path};
+                std::ofstream output_file { full_path };
 
-                for (auto&[hash, path] : archive_array.hash_to_name) {
+                for (auto& [hash, path] : archive_array.hash_to_name) {
                     auto file = archive_array.query_file(hash);
 
                     if (file.file_entry) {
@@ -309,7 +396,7 @@ void ProjectDS::draw_export() {
             const auto full_path = pfd::save_file("Choose destination file").result();
 
             if (!full_path.empty()) {
-                std::ofstream output_file{full_path};
+                std::ofstream output_file { full_path };
 
                 for (const auto& archive : archive_array.archives) {
                     output_file << archive.filepath << '\n';
@@ -341,11 +428,16 @@ void ProjectDS::draw_export() {
             current_popup = Popup::None;
         }
 
+        if (current_popup == Popup::AppendExportByName) {
+            ImGui::OpenPopup("AppendExportByName");
+            current_popup = Popup::None;
+        }
+
         if (ImGui::BeginPopup("AppendExportByName")) {
             static char path[512];
 
             const auto submit = ImGui::InputText("File name", path, IM_ARRAYSIZE(path),
-                                                 ImGuiInputTextFlags_EnterReturnsTrue);
+                ImGuiInputTextFlags_EnterReturnsTrue);
 
             if (submit || ImGui::Button("Add to selection!")) {
                 std::string str_path(path);
@@ -368,7 +460,7 @@ void ProjectDS::draw_export() {
             static uint64_t file_hash;
 
             const auto submit = ImGui::InputScalar("File hash", ImGuiDataType_U64, &file_hash, nullptr, nullptr,
-                                                   nullptr, ImGuiInputTextFlags_EnterReturnsTrue);
+                nullptr, ImGuiInputTextFlags_EnterReturnsTrue);
 
             if (submit || ImGui::Button("Add to selection!")) {
                 if (archive_array.get_file_entry(file_hash).has_value()) {
