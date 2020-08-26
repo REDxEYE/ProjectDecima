@@ -1,12 +1,12 @@
 #pragma once
 
-#include "decima/file_types/pod/pod.hpp"
-
 #include <array>
 #include <functional>
 
+#include "decima/shared.hpp"
+
 namespace Decima {
-    class GUID : public POD {
+    class GUID {
     public:
         void parse(Source& stream);
         void draw();

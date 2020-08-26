@@ -5,17 +5,15 @@
 #ifndef PROJECTDS_TEXTURE_SET_H
 #define PROJECTDS_TEXTURE_SET_H
 
-#include <decima/core_file.h>
+#include <vector>
+
+#include "decima/core_file.h"
 #include "decima/file_types/core/entry.h"
-#include "decima/file_types/pod/pod.hpp"
 #include "decima/file_types/pod/string.hpp"
 #include "decima/file_types/pod/guid.hpp"
 
-#include "vector"
-
 namespace Decima {
-
-    struct TextureGUIDEntry : POD {
+    struct TextureGUIDEntry {
         uint32_t unk1 {};
         uint32_t unk2 {};
         uint32_t unk3 {};
@@ -25,7 +23,7 @@ namespace Decima {
         void parse(Source& stream);
     };
 
-    struct SrcEntry: POD {
+    struct SrcEntry {
         uint32_t slot_id {};
         StringHashed src_name;
         uint16_t unk1 {};

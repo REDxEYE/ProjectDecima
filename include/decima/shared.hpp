@@ -5,10 +5,16 @@
 #ifndef PROJECTDS_SHARED_HPP
 #define PROJECTDS_SHARED_HPP
 
+#include <optional>
+#include <type_traits>
+
 #include "ash.hpp"
 
 namespace Decima {
     using Source = ash::buffered_source<std::vector<uint8_t>>;
+
+    template <class T>
+    using OptionalRef = std::optional<std::reference_wrapper<T>>;
 }
 
 #ifdef _MSC_VER

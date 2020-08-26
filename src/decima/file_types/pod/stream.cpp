@@ -7,9 +7,10 @@ void Decima::Stream::parse(ArchiveArray& archives, Source& stream) {
     m_offs = stream.read<std::uint32_t>();
     m_size = stream.read<std::uint32_t>();
 
-    auto stream_file = archives.query_file(m_name.data() + ".core.stream");
+    auto& stream_file = archives.query_file(m_name.data() + ".core.stream").value().get();
     stream_file.unpack();
-    m_data = std::move(stream_file.storage);
+
+    m_data = stream_file.storage;
 }
 
 void Decima::Stream::draw() {

@@ -5,39 +5,32 @@
 #ifndef PROJECTDS_ARCHIVE_ARRAY_H
 #define PROJECTDS_ARCHIVE_ARRAY_H
 
-#include <unordered_map>
 #include <optional>
+#include <unordered_map>
 
+#include "decima/archive/archive.h"
 #include "decima/file_types/core/prefetch.h"
-#include "archive.h"
 
 namespace Decima {
     class ArchiveArray {
-
-        std::string workdir;
-
-        Prefetch prefetch;
-
     public:
-        std::unordered_map<uint64_t, uint32_t> hash_to_archive;
+        explicit ArchiveArray(const std::string& directory);
+
+        [[nodiscard]] Decima::OptionalRef<Decima::CoreFile> query_file(std::uint64_t hash);
+        [[nodiscard]] Decima::OptionalRef<Decima::CoreFile> query_file(const std::string& name);
+
+        [[nodiscard]] Decima::OptionalRef<Decima::FileEntry> get_file_entry(std::uint64_t hash);
+        [[nodiscard]] Decima::OptionalRef<Decima::FileEntry> get_file_entry(const std::string& name);
+
+        std::unordered_map<uint64_t, uint32_t> hash_to_archive_index;
         std::unordered_map<uint64_t, std::string> hash_to_name;
 
         std::vector<Archive> archives;
 
-        explicit ArchiveArray(const std::string& _workdir);
+    private:
+        std::string m_directory;
 
-        ArchiveArray() = default;
-
-        void open(const std::string& _workdir);
-
-        //TODO: replace std::vector<uint8_t> with Decima::File
-        Decima::CoreFile query_file(uint64_t file_hash);
-        Decima::CoreFile query_file(const std::string& file_name);
-
-        std::optional<std::reference_wrapper<FileEntry>> get_file_entry(const std::string& file_name);
-
-        std::optional<std::reference_wrapper<FileEntry>> get_file_entry(uint64_t file_hash);
-
+        void open();
         void read_prefetch_file();
     };
 

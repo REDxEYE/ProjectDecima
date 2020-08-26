@@ -1,7 +1,5 @@
 #pragma once
 
-
-#include "decima/file_types/pod/pod.hpp"
 #include "decima/file_types/pod/string.hpp"
 #include "decima/file_types/pod/guid.hpp"
 
@@ -14,8 +12,6 @@ namespace Decima {
     extern std::vector<Reference*> global_refs;
     extern std::vector<std::pair<Reference*, CoreFile*>> local_refs;
 
-
-
     enum class ReferenceLoadMode : std::uint8_t {
         NotPresent = 0x00,
         Embedded = 0x01,
@@ -26,10 +22,8 @@ namespace Decima {
 
     std::ostream& operator<<(std::ostream&, ReferenceLoadMode);
 
-    class Reference : public POD {
+    class Reference {
     public:
-        std::weak_ptr<CoreEntry> ref;
-
         void parse(Source& stream);
 
         void draw();
@@ -42,10 +36,6 @@ namespace Decima {
             }
         }
 
-        static void resolve_local_refs();
-
-        static void resolve_global_refs(ArchiveArray& arch_array);
-
         inline ReferenceLoadMode mode() const noexcept { return m_mode; }
 
         inline GUID guid() const noexcept { return m_guid; }
@@ -56,9 +46,5 @@ namespace Decima {
         ReferenceLoadMode m_mode;
         GUID m_guid;
         StringHashed m_file;
-
-        //temporary stuff TODO:refactor this
-
-
     };
 }

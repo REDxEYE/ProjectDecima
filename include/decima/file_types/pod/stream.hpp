@@ -1,11 +1,10 @@
 #pragma once
 
 #include "decima/archive/archive_array.h"
-#include "decima/file_types/pod/pod.hpp"
 #include "decima/file_types/pod/string.hpp"
 
 namespace Decima {
-    class Stream : public POD {
+    class Stream {
     public:
         void parse(ArchiveArray& archives, Source& stream);
         void draw();

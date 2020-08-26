@@ -1,9 +1,9 @@
 #pragma once
 
-#include "decima/file_types/pod/pod.hpp"
+#include "decima/shared.hpp"
 
 namespace Decima {
-    class String : public POD {
+    class String {
     public:
         void parse(Source& stream);
         void draw();
@@ -14,7 +14,7 @@ namespace Decima {
         std::string m_data;
     };
 
-    class StringHashed : public POD {
+    class StringHashed {
     public:
         void parse(Source& stream);
         void draw();

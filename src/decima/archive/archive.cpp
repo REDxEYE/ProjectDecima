@@ -2,81 +2,27 @@
 // Created by MED45 on 25.07.2020.
 //
 
-#include <iostream>
-#include <filesystem>
+#include <MurmurHash3.h>
 
 #include "decima/archive/archive.h"
-#include "utils.h"
 
-#include <MurmurHash3.h>
-#include <md5.h>
-
-Decima::Archive::Archive(const std::string& workdir, const std::string& filename)
-        : filepath(workdir + "\\" + filename) {}
-
-Decima::Archive::Archive(const std::string& workdir, uint64_t filehash)
-        : Archive(workdir, uint64_to_hex(filehash) + ".bin") {}
-
-bool Decima::Archive::open() {
-    std::error_code error;
-    filebuffer.map(filepath, error);
-
-    if (error)
-        return false;
-
-    memcpy(&header, filebuffer.data(), sizeof(ArchiveHeader));
-    memcpy(&content_info, filebuffer.data() + sizeof(ArchiveHeader), sizeof(ArchiveContentInfo));
-
-    if (!is_valid())
-        return false;
-
-    if (is_encrypted())
-        decrypt(header.key, header.key + 1, (uint32_t*)&content_info);
-
-    std::size_t read_offset = sizeof(ArchiveHeader) + sizeof(ArchiveContentInfo);
-
-    content_table.resize(content_info.content_table_size);
-    memcpy(content_table.data(), filebuffer.data() + read_offset,
-           sizeof(FileEntry) * content_info.content_table_size);
-
-    read_offset += sizeof(FileEntry) * content_info.content_table_size;
-
-    chunk_table.resize(content_info.chunk_table_size);
-    memcpy(chunk_table.data(), filebuffer.data() + read_offset,
-           sizeof(chunk_table.front()) * content_info.chunk_table_size);
-
-    if (is_encrypted()) {
-        for (auto& file_entry : content_table) {
-            decrypt(file_entry.key, file_entry.key2, (uint32_t*) &file_entry);
-        }
-
-        for (auto& chunk : chunk_table) {
-            auto saved_key = chunk.key_1;
-            decrypt(chunk.key_1, chunk.key_2, (uint32_t*) &chunk);
-            chunk.key_1 = saved_key;
-        }
-    }
-
-    return true;
+static inline bool is_valid(Decima::Version version) {
+    return version == Decima::Version::default_version || version == Decima::Version::encrypted_version;
 }
 
-bool Decima::Archive::is_valid() const {
-    return (header.version == Decima::Version::default_version || header.version == Decima::Version::encrypted_version);
+static inline bool is_encrypted(Decima::Version version) {
+    return version == Decima::Version::encrypted_version;
 }
 
-bool Decima::Archive::is_encrypted() const {
-    return header.version == Decima::Version::encrypted_version;
-}
-
-void Decima::Archive::decrypt(uint32_t key_1, uint32_t key_2, uint32_t* data) {
+static void decrypt(uint32_t key_1, uint32_t key_2, uint32_t* data) {
     const std::uint32_t key[8] = {
-            key_1, encryption_key_1[1], encryption_key_1[2], encryption_key_1[3],
-            key_2, encryption_key_1[1], encryption_key_1[2], encryption_key_1[3]
+        key_1, Decima::encryption_key_1[1], Decima::encryption_key_1[2], Decima::encryption_key_1[3],
+        key_2, Decima::encryption_key_1[1], Decima::encryption_key_1[2], Decima::encryption_key_1[3]
     };
 
     std::uint32_t iv[8];
-    MurmurHash3_x64_128(key, 16, seed, iv);
-    MurmurHash3_x64_128(key + 4, 16, seed, iv + 4);
+    MurmurHash3_x64_128(key, 16, Decima::seed, iv);
+    MurmurHash3_x64_128(key + 4, 16, Decima::seed, iv + 4);
 
     data[0] ^= iv[0];
     data[1] ^= iv[1];
@@ -88,33 +34,60 @@ void Decima::Archive::decrypt(uint32_t key_1, uint32_t key_2, uint32_t* data) {
     data[7] ^= iv[7];
 }
 
+Decima::Archive::Archive(const std::string& path)
+    : m_stream(path)
+    , path(path) { open(); }
 
-[[maybe_unused]] uint64_t Decima::Archive::get_file_index(const std::string& file_name) const {
-    uint64_t hash = hash_string(sanitize_name(file_name), seed);
-    return get_file_index(hash);
-}
+bool Decima::Archive::open() {
+    memcpy(&header, m_stream.data(), sizeof(ArchiveHeader));
+    memcpy(&content_info, m_stream.data() + sizeof(ArchiveHeader), sizeof(ArchiveContentInfo));
 
-uint64_t Decima::Archive::get_file_index(uint64_t file_hash) const {
-    for (std::size_t i = 0; i < content_table.size(); i++) {
-        if (content_table[i].hash == file_hash)
-            return i;
+    if (!is_valid(header.version))
+        return false;
+
+    if (is_encrypted(header.version))
+        decrypt(header.key, header.key + 1, (uint32_t*)&content_info);
+
+    std::size_t read_offset = sizeof(ArchiveHeader) + sizeof(ArchiveContentInfo);
+
+    content_table.resize(content_info.content_table_size);
+    memcpy(content_table.data(), m_stream.data() + read_offset, sizeof(FileEntry) * content_info.content_table_size);
+
+    read_offset += sizeof(FileEntry) * content_info.content_table_size;
+
+    chunk_table.resize(content_info.chunk_table_size);
+    memcpy(chunk_table.data(), m_stream.data() + read_offset, sizeof(chunk_table.front()) * content_info.chunk_table_size);
+
+    if (is_encrypted(header.version)) {
+        for (auto& file_entry : content_table) {
+            decrypt(file_entry.key, file_entry.key2, (uint32_t*)&file_entry);
+        }
+
+        for (auto& chunk : chunk_table) {
+            auto saved_key = chunk.key_1;
+            decrypt(chunk.key_1, chunk.key_2, (uint32_t*)&chunk);
+            chunk.key_1 = saved_key;
+        }
     }
-    return -1;
-}
 
-
-Decima::CoreFile Decima::Archive::query_file(uint64_t file_hash) {
-    auto file_id = get_file_index(file_hash);
-    if (file_id == -1) {
-        return Decima::CoreFile(nullptr, nullptr, nullptr, true);
+    for (std::size_t index = 0; index < content_table.size(); index++) {
+        m_hash_to_index.emplace(content_table.at(index).hash, index);
     }
-    auto& file_entry = content_table.at(file_id);
-    Decima::CoreFile file(&file_entry, &filebuffer, this, is_encrypted());
 
-    return file;
+    return true;
 }
 
-[[maybe_unused]] Decima::CoreFile Decima::Archive::query_file(const std::string& file_name) {
-    log("Archive", "Queried " + file_name + " file");
-    return query_file(hash_string(sanitize_name(file_name), seed));
+Decima::OptionalRef<Decima::CoreFile> Decima::Archive::query_file(std::uint64_t hash) {
+    if (auto index = m_hash_to_index.find(hash); index != m_hash_to_index.end()) {
+        auto cache = m_cache.find(index->second);
+
+        if (cache == m_cache.end()) {
+            Decima::CoreFile file(&content_table.at(index->second), &m_stream, this, is_encrypted(header.version));
+            cache = m_cache.emplace(index->second, std::move(file)).first;
+        }
+
+        return std::make_optional(std::ref(cache->second));
+    }
+
+    return {};
 }
