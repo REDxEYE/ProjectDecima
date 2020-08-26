@@ -73,7 +73,7 @@ void Decima::Texture::parse(ArchiveArray& archives, Source& stream, CoreFile* co
              * do that just for the sake of simplicity.
              */
             const auto mip_width = std::max(width >> mip, format_block_size);
-            const auto mip_height = std::max(height >> mip, format_block_size) * (static_cast<std::uint16_t>(flags) & static_cast<std::uint16_t>(TextureFlags::Cubemap) ? 6 : 1);
+            const auto mip_height = std::max(height >> mip, format_block_size);
             const auto mip_buffer_size = mip_width * mip_height * format_block_density / 8;
 
             if (mip == 0)

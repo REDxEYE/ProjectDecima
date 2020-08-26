@@ -141,7 +141,7 @@ void Decima::Texture::draw() {
         ImGui::Text("No external stream");
     }
 
-    draw_preview(256, 256 * (static_cast<std::uint16_t>(flags) & static_cast<std::uint16_t>(TextureFlags::Cubemap) ? 6 : 1), 128, 4);
+    draw_preview(256, 256, 128, 4);
 
     ImGui::NextColumn();
     ImGui::Columns(1);
