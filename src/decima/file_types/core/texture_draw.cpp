@@ -7,6 +7,8 @@
 
 #include <portable-file-dialogs.h>
 
+#include <fstream>
+
 void Decima::Texture::draw() {
     ImGui::Columns(2);
     ImGui::SetColumnWidth(-1, 200);
