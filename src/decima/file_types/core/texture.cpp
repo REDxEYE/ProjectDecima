@@ -97,7 +97,7 @@ void Decima::Texture::parse(ArchiveArray& archives, Source& stream, CoreFile* co
                  * formats for us at this moment, so let this be a
                  * feature for the future (badum-tss).
                  */
-                glTexImage2D(GL_TEXTURE_2D, 0, format_internal, mip_width, mip_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, stream_data);
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, mip_width, mip_height, 0, format_internal, GL_UNSIGNED_BYTE, stream_data);
             }
 
             glBindTexture(GL_TEXTURE_2D, 0);
