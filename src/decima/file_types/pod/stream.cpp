@@ -26,7 +26,7 @@ void Decima::Stream::draw() {
 
         ImGui::Text("Name");
         ImGui::NextColumn();
-        m_name.draw();
+        m_name.draw([](const auto& name) { return name + ".core.stream"; });
         ImGui::NextColumn();
 
         ImGui::Separator();

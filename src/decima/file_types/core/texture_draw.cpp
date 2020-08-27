@@ -90,11 +90,7 @@ void Decima::Texture::draw() {
 
     ImGui::Text("GUID");
     ImGui::NextColumn();
-    {
-        std::stringstream buffer;
-        buffer << file_guid;
-        ImGui::Text("%s", buffer.str().c_str());
-    }
+    file_guid.draw();
     ImGui::NextColumn();
     ImGui::Separator();
 
