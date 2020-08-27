@@ -11,7 +11,7 @@
 
 #include "decima/archive/archive.h"
 #include "decima/file_types.hpp"
-#include "utils.h"
+#include "utils.hpp"
 
 void Decima::CoreFile::unpack() {
     uint64_t uncompressed_size = 0;

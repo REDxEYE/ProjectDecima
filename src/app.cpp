@@ -7,7 +7,7 @@
 
 #include "app.hpp"
 
-#include "utils.h"
+#include "utils.hpp"
 
 App::App(std::pair<uint32_t, uint32_t> window_size, std::string title) {
     m_win_info.m_win_width = window_size.first;

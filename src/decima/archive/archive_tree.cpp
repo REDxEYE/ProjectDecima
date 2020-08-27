@@ -7,7 +7,7 @@
 #include "decima/archive/archive_tree.h"
 
 #include <imgui.h>
-#include "utils.h"
+#include "utils.hpp"
 
 FileTree* FileTree::add_folder(const std::string& name) {
     if (folders.find(name) == folders.end())

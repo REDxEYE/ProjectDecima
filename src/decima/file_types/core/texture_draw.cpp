@@ -2,10 +2,11 @@
 // Created by MED45 on 07.08.2020.
 //
 #include "decima/file_types/core/texture.h"
-#include "utils.h"
+#include "utils.hpp"
 #include "projectds_app.hpp"
 
 #include <portable-file-dialogs.h>
+#include <fstream>
 
 #include <fstream>
 

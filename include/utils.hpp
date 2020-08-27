@@ -2,8 +2,8 @@
 // Created by MED45 on 25.07.2020.
 //
 
-#ifndef PROJECTDS_UTILS_H
-#define PROJECTDS_UTILS_H
+#ifndef PROJECTDS_UTILS_HPP
+#define PROJECTDS_UTILS_HPP
 
 #include <string>
 #include <vector>
@@ -76,4 +76,4 @@ inline constexpr const char* filename(const char (&path)[Size]) {
 
 #define LOG(...) (log(filename(__FILE__), ':', __LINE__, ' ', __VA_ARGS__))
 
-#endif //PROJECTDS_UTILS_H
+#endif //PROJECTDS_UTILS_HPP

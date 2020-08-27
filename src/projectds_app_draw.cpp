@@ -7,7 +7,7 @@
 
 #include "projectds_app.hpp"
 
-#include "utils.h"
+#include "utils.hpp"
 #include "portable-file-dialogs.h"
 
 #include "decima/file_types/core/dummy_entry.h"

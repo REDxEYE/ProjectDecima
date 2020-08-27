@@ -3,7 +3,7 @@
 //
 #include <filesystem>
 
-#include "utils.h"
+#include "utils.hpp"
 #include <iostream>
 
 std::string uint64_to_hex(uint64_t value) {

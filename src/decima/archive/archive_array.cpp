@@ -8,7 +8,7 @@
 #include <thread>
 #include <mutex>
 
-#include "utils.h"
+#include "utils.hpp"
 #include "decima/archive/archive_array.h"
 
 Decima::ArchiveArray::ArchiveArray(const std::string& directory)
