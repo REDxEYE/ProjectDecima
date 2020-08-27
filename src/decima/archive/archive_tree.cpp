@@ -126,6 +126,9 @@ void FileTree::draw(SelectionInfo& selection, Decima::ArchiveArray& archive_arra
                 data.first->draw(selection, archive_array, false);
             } else {
                 ImGui::TextDisabled("Empty");
+                ImGui::NextColumn();
+                ImGui::NextColumn();
+                ImGui::NextColumn();
             }
             ImGui::TreePop();
         }
