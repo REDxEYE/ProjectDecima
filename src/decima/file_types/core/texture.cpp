@@ -10,22 +10,24 @@ struct TexturePixelFormatInfo {
     /* How many bits occupies one pixel */
     int block_density;
     /* Corresponding OpenGL internal format */
-    int format;
+    int internal_format;
+    /* Texture format */
+    int data_format;
     /* Is format whether compressed or not */
     bool compressed;
 };
 
 static const std::unordered_map<Decima::TexturePixelFormat, TexturePixelFormatInfo> format_info {
     // clang-format off
-    { Decima::TexturePixelFormat::BC1,     { 4, 4,  GL_COMPRESSED_RGBA_S3TC_DXT1_EXT,      true  } },
-    { Decima::TexturePixelFormat::BC3,     { 4, 8,  GL_COMPRESSED_RGBA_S3TC_DXT3_EXT,      true  } },
-    { Decima::TexturePixelFormat::BC4,     { 4, 4,  GL_COMPRESSED_RED_RGTC1,               true  } },
-    { Decima::TexturePixelFormat::BC5,     { 4, 8,  GL_COMPRESSED_RG_RGTC2,                true  } },
-    { Decima::TexturePixelFormat::BC6,     { 4, 8,  GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT, true  } },
-    { Decima::TexturePixelFormat::BC7,     { 4, 8,  GL_COMPRESSED_RGBA_BPTC_UNORM,         true  } },
-    { Decima::TexturePixelFormat::A8,      { 1, 8,  GL_R8,                                 false } },
-    { Decima::TexturePixelFormat::RGBA8,   { 1, 32, GL_RGBA8,                              false } },
-    { Decima::TexturePixelFormat::RGBA16F, { 1, 64, GL_RGBA16F,                            false } },
+    { Decima::TexturePixelFormat::BC1,     { 4, 4,  GL_COMPRESSED_RGBA_S3TC_DXT1_EXT,      0,          true  } },
+    { Decima::TexturePixelFormat::BC3,     { 4, 8,  GL_COMPRESSED_RGBA_S3TC_DXT3_EXT,      0,          true  } },
+    { Decima::TexturePixelFormat::BC4,     { 4, 4,  GL_COMPRESSED_RED_RGTC1,               0,          true  } },
+    { Decima::TexturePixelFormat::BC5,     { 4, 8,  GL_COMPRESSED_RG_RGTC2,                0,          true  } },
+    { Decima::TexturePixelFormat::BC6,     { 4, 8,  GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT, 0,          true  } },
+    { Decima::TexturePixelFormat::BC7,     { 4, 8,  GL_COMPRESSED_RGBA_BPTC_UNORM,         0,          true  } },
+    { Decima::TexturePixelFormat::A8,      { 1, 8,  GL_R8,                                 GL_RED,     false } },
+    { Decima::TexturePixelFormat::RGBA8,   { 1, 32, GL_RGBA8,                              GL_RGBA,    false } },
+    { Decima::TexturePixelFormat::RGBA16F, { 1, 64, GL_RGBA16F,                            GL_RGBA,    false } },
     // clang-format on
 };
 
@@ -61,7 +63,7 @@ void Decima::Texture::parse(ArchiveArray& archives, Source& stream, CoreFile* co
     stream.read(embedded_data);
 
     if (const auto format = format_info.find(pixel_format); format != format_info.end()) {
-        const auto [format_block_size, format_block_density, format_internal, format_compressed] = format->second;
+        const auto [format_block_size, format_block_density, format_type_internal, format_type_data, format_compressed] = format->second;
 
         const std::uint8_t* stream_data = nullptr;
 
@@ -89,7 +91,7 @@ void Decima::Texture::parse(ArchiveArray& archives, Source& stream, CoreFile* co
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
             if (format_compressed) {
-                glCompressedTexImage2D(GL_TEXTURE_2D, 0, format_internal, mip_width, mip_height, 0, mip_buffer_size, stream_data);
+                glCompressedTexImage2D(GL_TEXTURE_2D, 0, format_type_internal, mip_width, mip_height, 0, mip_buffer_size, stream_data);
             } else {
                 /*
                  * This is really only a specific case for RGBA8,
@@ -97,7 +99,7 @@ void Decima::Texture::parse(ArchiveArray& archives, Source& stream, CoreFile* co
                  * formats for us at this moment, so let this be a
                  * feature for the future (badum-tss).
                  */
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, mip_width, mip_height, 0, format_internal, GL_UNSIGNED_BYTE, stream_data);
+                glTexImage2D(GL_TEXTURE_2D, 0, format_type_internal, mip_width, mip_height, 0, format_type_data, GL_UNSIGNED_BYTE, stream_data);
             }
 
             glBindTexture(GL_TEXTURE_2D, 0);
