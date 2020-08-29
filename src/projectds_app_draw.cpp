@@ -168,6 +168,76 @@ void ProjectDS::draw_dockspace() {
                 ImGui::EndMenu();
             }
 
+            if (ImGui::BeginMenu("Debug")) {
+                if (ImGui::MenuItem("Dump all files` paths as a tree")) {
+                    const auto full_path = pfd::save_file("Choose destination file").result();
+
+                    if (!full_path.empty()) {
+                        std::ofstream output_file { full_path };
+
+                        root_tree.visit([&](const auto& name, auto depth) {
+                            output_file << std::string(depth * 2, ' ');
+                            output_file << name;
+                            output_file << '\n';
+                        });
+
+                        std::cout << "File was saved to: " << full_path << '\n';
+                    }
+                }
+
+                if (ImGui::MenuItem("Dump all files` full names")) {
+                    const auto full_path = pfd::save_file("Choose destination file").result();
+
+                    if (!full_path.empty()) {
+                        std::ofstream output_file { full_path };
+
+                        for (auto& [hash, path] : archive_array->hash_to_name) {
+                            auto file_ref = archive_array->query_file(hash);
+
+                            if (file_ref.has_value()) {
+                                auto file = file_ref.value().get();
+                                file.parse(*archive_array.get());
+
+                                LOG("Processing file '", path, "' (size: ", file.file_entry->size, ')');
+
+                                for (const auto& entry : file.entries) {
+                                    output_file << path << '_' << entry->guid << '\n';
+                                }
+                            }
+                        }
+
+                        std::cout << "File was saved to: " << full_path << '\n';
+                    }
+                }
+
+                if (ImGui::MenuItem("Dump all files` hashes")) {
+                    const auto full_path = pfd::save_file("Choose destination file").result();
+
+                    if (!full_path.empty()) {
+                        std::ofstream output_file { full_path };
+
+                        for (const auto& archive : archive_array->archives) {
+                            output_file << archive.path << '\n';
+
+                            for (const auto& entry : archive.content_table) {
+                                const auto name = archive_array->hash_to_name.find(entry.hash);
+
+                                if (name != archive_array->hash_to_name.end())
+                                    output_file << "  name: '" << name->second << "'\n";
+
+                                output_file << "  hash: '" << entry.hash << "'\n";
+                                output_file << "  size: '" << entry.size << "'\n";
+                                output_file << '\n';
+                            }
+                        }
+
+                        std::cout << "File was saved to: " << full_path << '\n';
+                    }
+                }
+
+                ImGui::EndMenu();
+            }
+
             if (ImGui::BeginMenu("Help")) {
                 if (ImGui::MenuItem("About"))
                     current_popup = Popup::About;
@@ -408,80 +478,29 @@ void ProjectDS::draw_tree() {
 void ProjectDS::draw_export() {
     ImGui::Begin("Export");
     {
-        if (ImGui::Button("Dump all files` paths as a tree")) {
-            const auto full_path = pfd::save_file("Choose destination file").result();
-
-            if (!full_path.empty()) {
-                std::ofstream output_file { full_path };
-
-                root_tree.visit([&](const auto& name, auto depth) {
-                    output_file << std::string(depth * 2, ' ');
-                    output_file << name;
-                    output_file << '\n';
-                });
-
-                std::cout << "File was saved to: " << full_path << '\n';
-            }
-        }
-
-        if (ImGui::Button("Dump all files` full names")) {
-            const auto full_path = pfd::save_file("Choose destination file").result();
-
-            if (!full_path.empty()) {
-                std::ofstream output_file { full_path };
-
-                for (auto& [hash, path] : archive_array->hash_to_name) {
-                    auto& file = archive_array->query_file(hash).value().get();
-
-                    if (file.file_entry) {
-                        file.unpack();
-                        Decima::Source stream(file.storage, 1024);
-
-                        std::cout << "Processing file '" << path << "' (size: " << file.file_entry->size << ")\n";
-
-                        while (!stream.eof()) {
-                            Decima::Dummy dummy;
-                            dummy.parse(*archive_array, stream, nullptr);
-
-                            output_file << path << '_' << dummy.guid << '\n';
-                        }
-                    }
-                }
-
-                std::cout << "File was saved to: " << full_path << '\n';
-            }
-        }
-
-        if (ImGui::Button("Dump all files` hashes")) {
-            const auto full_path = pfd::save_file("Choose destination file").result();
-
-            if (!full_path.empty()) {
-                std::ofstream output_file { full_path };
-
-                for (const auto& archive : archive_array->archives) {
-                    output_file << archive.path << '\n';
-
-                    for (const auto& entry : archive.content_table) {
-                        const auto name = archive_array->hash_to_name.find(entry.hash);
-
-                        if (name != archive_array->hash_to_name.end())
-                            output_file << "  name: '" << name->second << "'\n";
-
-                        output_file << "  hash: '" << entry.hash << "'\n";
-                        output_file << "  size: '" << entry.size << "'\n";
-                        output_file << '\n';
-                    }
-                }
-
-                std::cout << "File was saved to: " << full_path << '\n';
-            }
-        }
-
-        if (ImGui::Button("Add file by name"))
+        if (ImGui::Button("Add file by name", { -1, 0 }))
             current_popup = Popup::AppendExportByName;
 
-        if (ImGui::Button("Add file by hash"))
+        if (ImGui::Button("Add file by hash", { -1, 0 }))
             current_popup = Popup::AppendExportByHash;
+
+        if (ImGui::Button("Export selected items", { -1, 0 }))
+            show_export_selection_dialog(*this);
+
+        if (ImGui::PushItemWidth(-1), ImGui::ListBoxHeader("##", { 0, -1 })) {
+            for (const auto selected_file : selection_info.selected_files) {
+                if (archive_array->hash_to_name.find(selected_file) != archive_array->hash_to_name.end()) {
+                    if (ImGui::Selectable(archive_array->hash_to_name[selected_file].c_str()))
+                        selection_info.selected_file = selected_file;
+                } else {
+                    std::string new_name = "Hash: " + uint64_to_hex(selected_file);
+                    if (ImGui::Selectable(new_name.c_str()))
+                        selection_info.selected_file = selected_file;
+                }
+            }
+
+            ImGui::ListBoxFooter();
+        }
 
         if (current_popup == Popup::AppendExportByName) {
             ImGui::OpenPopup("AppendExportByName");
@@ -496,8 +515,7 @@ void ProjectDS::draw_export() {
         if (ImGui::BeginPopup("AppendExportByName")) {
             static char path[512];
 
-            const auto submit = ImGui::InputText("File name", path, IM_ARRAYSIZE(path),
-                ImGuiInputTextFlags_EnterReturnsTrue);
+            const auto submit = ImGui::InputText("File name", path, IM_ARRAYSIZE(path), ImGuiInputTextFlags_EnterReturnsTrue);
 
             if (submit || ImGui::Button("Add to selection!")) {
                 std::string str_path(path);
@@ -519,8 +537,7 @@ void ProjectDS::draw_export() {
         if (ImGui::BeginPopup("AppendExportByHash")) {
             static uint64_t file_hash;
 
-            const auto submit = ImGui::InputScalar("File hash", ImGuiDataType_U64, &file_hash, nullptr, nullptr,
-                nullptr, ImGuiInputTextFlags_EnterReturnsTrue);
+            const auto submit = ImGui::InputScalar("File hash", ImGuiDataType_U64, &file_hash, nullptr, nullptr, nullptr, ImGuiInputTextFlags_EnterReturnsTrue);
 
             if (submit || ImGui::Button("Add to selection!")) {
                 if (archive_array->get_file_entry(file_hash).has_value()) {
@@ -530,30 +547,6 @@ void ProjectDS::draw_export() {
             }
 
             ImGui::EndPopup();
-        }
-
-        if (ImGui::ListBoxHeader("Selected files")) {
-            for (const auto selected_file : selection_info.selected_files) {
-                if (archive_array->hash_to_name.find(selected_file) != archive_array->hash_to_name.end()) {
-                    if (ImGui::Selectable(archive_array->hash_to_name[selected_file].c_str()))
-                        selection_info.selected_file = selected_file;
-                } else {
-                    std::string new_name = "Hash: " + uint64_to_hex(selected_file);
-                    if (ImGui::Selectable(new_name.c_str()))
-                        selection_info.selected_file = selected_file;
-                }
-            }
-
-            ImGui::ListBoxFooter();
-        }
-
-        if (ImGui::Button("Export selected file(-s)")) {
-            show_export_selection_dialog(*this);
-        }
-
-        if (selection_info.selected_files.empty()) {
-            ImGui::SameLine();
-            ImGui::Text("No files selected");
         }
     }
     ImGui::End();
