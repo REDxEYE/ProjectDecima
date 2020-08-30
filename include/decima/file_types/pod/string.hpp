@@ -9,7 +9,7 @@ namespace Decima {
 
     class String {
     public:
-        void parse(Source& stream);
+        void parse(ash::buffer& buffer);
         void draw();
         void draw(StringMutator mutator);
 
@@ -21,15 +21,15 @@ namespace Decima {
 
     class StringHashed {
     public:
-        void parse(Source& stream);
+        void parse(ash::buffer& buffer);
         void draw();
         void draw(StringMutator mutator);
 
-        inline std::uint64_t hash() const noexcept { return m_hash; }
+        inline std::uint32_t hash() const noexcept { return m_hash; }
         inline const std::string& data() const noexcept { return m_data; }
 
     private:
-        std::uint64_t m_hash;
+        std::uint32_t m_hash;
         std::string m_data;
     };
 }

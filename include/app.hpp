@@ -1,9 +1,4 @@
-//
-// Created by i.getsman on 06.08.2020.
-//
-
-#ifndef PROJECTDS_APP_HPP
-#define PROJECTDS_APP_HPP
+#pragma once
 
 #include <string>
 #include <vector>
@@ -61,5 +56,3 @@ protected:
     WindowInfo m_win_info;
     GLFWwindow* m_window;
 };
-
-#endif //PROJECTDS_APP_HPP

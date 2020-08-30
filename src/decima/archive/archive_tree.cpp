@@ -4,7 +4,7 @@
 
 #include <filesystem>
 
-#include "decima/archive/archive_tree.h"
+#include "decima/archive/archive_tree.hpp"
 
 #include <imgui.h>
 #include "utils.hpp"

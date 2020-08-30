@@ -2,23 +2,18 @@
 // Created by MED45 on 26.07.2020.
 //
 
-#include <decima/core_file.h>
-#include "decima/file_types/core/prefetch.h"
+#include <decima/core_file.hpp>
+#include "decima/file_types/core/prefetch.hpp"
 
-void Decima::Prefetch::parse(ArchiveArray& archives, Source& stream, CoreFile* core_file) {
-    CoreEntry::parse(archives, stream, nullptr);
-    string_count = stream.read<decltype(string_count)>();
-    strings.resize(string_count);
+void Decima::Prefetch::parse(ArchiveArray& archives, ash::buffer& buffer, CoreFile* core_file) {
+    CoreEntry::parse(archives, buffer, nullptr);
 
-    std::for_each_n(strings.begin(), string_count, [&](auto& string) {
-        string.parse(stream);
-    });
+    strings.resize(buffer.get<std::uint32_t>());
+    std::for_each(strings.begin(), strings.end(), [&](auto& string) { string.parse(buffer); });
 
-    file_sizes_count = stream.read<decltype(file_sizes_count)>();
-    file_sizes.resize(file_sizes_count);
-    stream.read_exact(file_sizes);
+    file_sizes.resize(buffer.get<std::uint32_t>());
+    buffer.get(file_sizes);
 
-    indices_count = stream.read<decltype(indices_count)>();
-    indices.resize(file_sizes_count);
-    stream.read_exact(indices);
+    indices.resize(buffer.get<std::uint32_t>());
+    buffer.get(indices);
 }

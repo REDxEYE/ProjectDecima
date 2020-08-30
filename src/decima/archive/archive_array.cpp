@@ -3,13 +3,10 @@
 //
 
 #include <filesystem>
-#include <iostream>
 #include <optional>
-#include <thread>
-#include <mutex>
 
 #include "utils.hpp"
-#include "decima/archive/archive_array.h"
+#include "decima/archive/archive_array.hpp"
 
 Decima::ArchiveArray::ArchiveArray(const std::string& directory)
     : m_directory(directory) { open(); }
@@ -18,17 +15,16 @@ void Decima::ArchiveArray::read_prefetch_file() {
     auto& prefetch_data = query_file("prefetch/fullgame.prefetch").value().get();
     prefetch_data.unpack();
 
-    Source source(prefetch_data.storage, 1024);
+    ash::buffer buffer(prefetch_data.storage.data(), prefetch_data.storage.size());
 
     Prefetch prefetch;
-    prefetch.parse(*this, source, nullptr);
+    prefetch.parse(*this, buffer, nullptr);
 
     for (const auto& string : prefetch.strings) {
-        uint64_t hash = hash_string(sanitize_name(string.data()), seed);
-        hash_to_name.insert({ hash, string.data() });
+        hash_to_name.emplace(hash_string(sanitize_name(string.data()), seed), string.data());
     }
 
-    hash_to_name.insert({ 0x2fff5af65cd64c0a, "prefetch/fullgame.prefetch" });
+    hash_to_name.emplace(0x2fff5af65cd64c0a, "prefetch/fullgame.prefetch");
 }
 
 void Decima::ArchiveArray::open() {
@@ -36,28 +32,16 @@ void Decima::ArchiveArray::open() {
         archives.emplace_back(file.path().string());
     }
 
-    std::vector<std::thread> thread_pool;
-    std::mutex mutex;
-
-    for (std::size_t index = 0; index < archives.size(); index++) {
-        auto& archive = archives[index];
+    for (std::uint32_t index = 0; index < archives.size(); index++) {
+        auto& archive = archives.at(index);
 
         LOG("Loading archive ", std::filesystem::path(archive.path).stem().string(), " (", std::to_string(index + 1), '/', std::to_string(archives.size()), ')');
 
-        thread_pool.emplace_back([&](const auto id) {
-            archive.open();
+        archive.open();
 
-            std::lock_guard<std::mutex> lock { mutex };
-
-            for (const auto& entry : archive.content_table) {
-                hash_to_archive_index.emplace(entry.hash, id);
-            }
-        },
-            index);
-    }
-
-    for (auto& thread : thread_pool) {
-        thread.join();
+        for (const auto& entry : archive.content_table) {
+            hash_to_archive_index.emplace(entry.hash, index);
+        }
     }
 
     read_prefetch_file();

@@ -8,9 +8,9 @@
 #include "projectds_app.hpp"
 
 #include "utils.hpp"
-#include "portable-file-dialogs.h"
+#include "util/pfd.h"
 
-#include "decima/file_types/core/dummy_entry.h"
+#include "decima/file_types/core/entry_dummy.hpp"
 
 static void show_data_selection_dialog(ProjectDS& self) {
     auto folder = pfd::select_folder("Select Death Stranding data folder!").result();

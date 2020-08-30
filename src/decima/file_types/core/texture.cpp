@@ -1,7 +1,7 @@
 //
 // Created by MED45 on 07.08.2020.
 //
-#include "decima/file_types/core/texture.h"
+#include "decima/file_types/core/texture.hpp"
 #include <glad/glad.h>
 
 struct TexturePixelFormatInfo {
@@ -31,26 +31,26 @@ static const std::unordered_map<Decima::TexturePixelFormat, TexturePixelFormatIn
     // clang-format on
 };
 
-void Decima::Texture::parse(ArchiveArray& archives, Source& stream, CoreFile* core_file) {
-    CoreEntry::parse(archives, stream, nullptr);
-    flags = stream.read<decltype(flags)>();
-    width = stream.read<decltype(width)>();
-    height = stream.read<decltype(height)>();
-    layers = stream.read<decltype(layers)>();
-    total_mips = stream.read<decltype(total_mips)>();
-    pixel_format = stream.read<decltype(pixel_format)>();
-    unk2 = stream.read<decltype(unk2)>();
-    unk3 = stream.read<decltype(unk3)>();
-    file_guid.parse(stream);
-    buffer_size = stream.read<decltype(buffer_size)>();
-    total_size = stream.read<decltype(total_size)>();
-    stream_size = stream.read<decltype(stream_size)>();
-    stream_mips = stream.read<decltype(stream_mips)>();
-    unk4 = stream.read<decltype(unk4)>();
-    unk5 = stream.read<decltype(unk5)>();
+void Decima::Texture::parse(ArchiveArray& archives, ash::buffer& buffer, CoreFile* core_file) {
+    CoreEntry::parse(archives, buffer, nullptr);
+    flags = buffer.get<decltype(flags)>();
+    width = buffer.get<decltype(width)>();
+    height = buffer.get<decltype(height)>();
+    layers = buffer.get<decltype(layers)>();
+    total_mips = buffer.get<decltype(total_mips)>();
+    pixel_format = buffer.get<decltype(pixel_format)>();
+    unk2 = buffer.get<decltype(unk2)>();
+    unk3 = buffer.get<decltype(unk3)>();
+    file_guid.parse(buffer);
+    buffer_size = buffer.get<decltype(buffer_size)>();
+    total_size = buffer.get<decltype(total_size)>();
+    stream_size = buffer.get<decltype(stream_size)>();
+    stream_mips = buffer.get<decltype(stream_mips)>();
+    unk4 = buffer.get<decltype(unk4)>();
+    unk5 = buffer.get<decltype(unk5)>();
 
     if (stream_size > 0)
-        external_data.parse(archives, stream);
+        external_data.parse(archives, buffer);
 
     embedded_data.resize(total_size);
 
@@ -60,12 +60,13 @@ void Decima::Texture::parse(ArchiveArray& archives, Source& stream, CoreFile* co
      *  buffer. Add this workaround until we'll
      *  figure out what is happening.
      */
-    stream.read(embedded_data);
+
+    buffer.get(embedded_data.data(), std::min(embedded_data.size(), buffer.size()));
 
     if (const auto format = format_info.find(pixel_format); format != format_info.end()) {
         const auto [format_block_size, format_block_density, format_type_internal, format_type_data, format_compressed] = format->second;
 
-        const std::uint8_t* stream_data = nullptr;
+        const char* stream_data = nullptr;
 
         for (auto mip = 0; mip < total_mips; mip++) {
             /*

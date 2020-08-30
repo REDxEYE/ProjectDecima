@@ -8,7 +8,7 @@
 namespace Decima {
     class GUID {
     public:
-        void parse(Source& stream);
+        void parse(ash::buffer& buffer);
         void draw();
 
         inline std::array<std::uint8_t, 16> data() const noexcept { return m_data_1; }

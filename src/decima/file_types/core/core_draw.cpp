@@ -2,7 +2,7 @@
 // Created by i.getsman on 07.08.2020.
 //
 
-#include "decima/file_types/core/entry.h"
+#include "decima/file_types/core/entry.hpp"
 #include "decima/constants.hpp"
 #include "projectds_app.hpp"
 

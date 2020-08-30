@@ -1,12 +1,7 @@
-//
-// Created by i.getsman on 06.08.2020.
-//
+#pragma once
 
-#ifndef PROJECTDS_TRANSLATION_HPP
-#define PROJECTDS_TRANSLATION_HPP
-
-#include <decima/core_file.h>
-#include "entry.h"
+#include <decima/core_file.hpp>
+#include "entry.hpp"
 
 namespace Decima {
     class Translation : public CoreEntry {
@@ -48,9 +43,7 @@ namespace Decima {
         std::string comments[std::size(languages)];
         std::uint8_t flags[std::size(languages)];
 
-        void parse(ArchiveArray& archives, Source& stream, CoreFile* core_file) override;
+        void parse(ArchiveArray& archives, ash::buffer& buffer, CoreFile* core_file) override;
         void draw() override;
     };
-
 }
-#endif //PROJECTDS_TRANSLATION_HPP

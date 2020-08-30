@@ -1,17 +1,17 @@
 #include "decima/file_types/pod/reference.hpp"
-#include "decima/core_file.h"
-#include <decima/archive/archive_array.h>
+#include "decima/core_file.hpp"
+#include <decima/archive/archive_array.hpp>
 #include <imgui.h>
 
 std::vector<Decima::Reference*> Decima::global_refs {};
 std::vector<std::pair<Decima::Reference*, Decima::CoreFile*>> Decima::local_refs {};
 
-void Decima::Reference::parse(Source& stream) {
-    m_mode = stream.read<decltype(m_mode)>();
+void Decima::Reference::parse(ash::buffer& buffer) {
+    m_mode = buffer.get<decltype(m_mode)>();
     if (m_mode != ReferenceLoadMode::NotPresent)
-        m_guid.parse(stream);
+        m_guid.parse(buffer);
     if (m_mode >= ReferenceLoadMode::ImmediateCoreFile)
-        m_file.parse(stream);
+        m_file.parse(buffer);
 }
 
 void Decima::Reference::draw() {

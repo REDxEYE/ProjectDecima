@@ -1,15 +1,10 @@
-//
-// Created by MED45 on 26.07.2020.
-//
-
-#ifndef PROJECTDS_ARCHIVE_ARRAY_H
-#define PROJECTDS_ARCHIVE_ARRAY_H
+#pragma once
 
 #include <optional>
 #include <unordered_map>
 
-#include "decima/archive/archive.h"
-#include "decima/file_types/core/prefetch.h"
+#include "decima/archive/archive.hpp"
+#include "decima/file_types/core/prefetch.hpp"
 
 namespace Decima {
     class ArchiveArray {
@@ -35,5 +30,3 @@ namespace Decima {
     };
 
 }
-
-#endif //PROJECTDS_ARCHIVE_ARRAY_H

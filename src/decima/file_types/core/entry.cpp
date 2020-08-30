@@ -4,31 +4,27 @@
 
 #include <iomanip>
 
-#include "decima/file_types/core/entry.h"
+#include "decima/file_types/core/entry.hpp"
 
 namespace Decima {
-    void CoreEntry::parse(ArchiveArray& archives, Source& stream, CoreFile* core_file) {
-        header = stream.read<decltype(header)>();
-        guid.parse(stream);
+    void CoreEntry::parse(ArchiveArray& archives, ash::buffer& buffer, CoreFile* core_file) {
+        header = buffer.get<decltype(header)>();
+        guid.parse(buffer);
     }
 
-    uint64_t CoreEntry::peek_header(Source& stream) {
-        auto magic = stream.read<std::uint64_t>();
-        stream.seek(ash::seek_dir::cur, -8);
-        return magic;
+    CoreHeader CoreEntry::peek_header(ash::buffer buffer) {
+        return buffer.get<CoreHeader>();
     }
 
-    std::string read_string(Source& stream, const std::string& default_value) {
-        const auto length = stream.read<std::uint16_t>();
+    std::string read_string(ash::buffer& buffer, const std::string& default_value) {
+        const auto length = buffer.get<std::uint16_t>();
 
         if (length > 0) {
-            std::string buffer;
-            buffer.resize(length);
-            stream.read(buffer);
-            return buffer;
+            std::string string(length, '\0');
+            buffer.get(string);
+            return string;
         }
 
         return default_value;
     }
 }
-

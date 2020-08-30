@@ -4,7 +4,7 @@
 
 #include <MurmurHash3.h>
 
-#include "decima/archive/archive.h"
+#include "decima/archive/archive.hpp"
 
 static inline bool is_valid(Decima::Version version) {
     return version == Decima::Version::default_version || version == Decima::Version::encrypted_version;
@@ -82,7 +82,8 @@ Decima::OptionalRef<Decima::CoreFile> Decima::Archive::query_file(std::uint64_t 
         auto cache = m_cache.find(index->second);
 
         if (cache == m_cache.end()) {
-            Decima::CoreFile file(&content_table.at(index->second), &m_stream, this, is_encrypted(header.version));
+            ash::buffer buffer(m_stream.begin(), m_stream.end());
+            Decima::CoreFile file(&content_table.at(index->second), buffer, this, is_encrypted(header.version));
             cache = m_cache.emplace(index->second, std::move(file)).first;
         }
 

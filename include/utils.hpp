@@ -1,9 +1,4 @@
-//
-// Created by MED45 on 25.07.2020.
-//
-
-#ifndef PROJECTDS_UTILS_HPP
-#define PROJECTDS_UTILS_HPP
+#pragma once
 
 #include <string>
 #include <vector>
@@ -35,7 +30,7 @@ void split(const std::string& str, std::vector<std::string>& cont, char delim);
 inline std::string format_size(std::size_t size) noexcept {
     using FormatInfo = std::pair<std::string, std::size_t>;
 
-    static const std::array<FormatInfo, 5> formats = {
+    static const std::vector<FormatInfo> formats {
         FormatInfo { "B", 0 },
         FormatInfo { "KB", 2 },
         FormatInfo { "MB", 1 },
@@ -75,5 +70,3 @@ inline constexpr const char* filename(const char (&path)[Size]) {
 }
 
 #define LOG(...) (log(filename(__FILE__), ':', __LINE__, ' ', __VA_ARGS__))
-
-#endif //PROJECTDS_UTILS_HPP

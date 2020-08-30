@@ -1,12 +1,11 @@
-//
-// Created by MED45 on 07.08.2020.
-//
+#pragma once
 
-#ifndef PROJECTDS_TEXTURE_H
-#define PROJECTDS_TEXTURE_H
+#ifndef NOMINMAX
+    #define NOMINMAX
+#endif
 
 #include "decima/file_types/pod/stream.hpp"
-#include "decima/file_types/core/entry.h"
+#include "decima/file_types/core/entry.hpp"
 
 namespace Decima {
     enum class TexturePixelFormat : uint8_t {
@@ -50,15 +49,14 @@ namespace Decima {
         std::uint32_t unk4 {};
         std::uint32_t unk5 {};
         Decima::Stream external_data;
-        std::vector<std::uint8_t> embedded_data;
+        std::vector<char> embedded_data;
         std::vector<unsigned int> mip_textures;
         int mip_index;
 
-        void parse(ArchiveArray& archives, Source& stream, CoreFile* core_file) override;
+        void parse(ArchiveArray& archives, ash::buffer& buffer, CoreFile* core_file) override;
         void draw() override;
 
     private:
         void draw_preview(float preview_width, float preview_height, float zoom_region, float zoom_scale);
     };
 }
-#endif //PROJECTDS_TEXTURE_H

@@ -4,46 +4,41 @@
 
 #include "decima/file_types/core/texture_set.h"
 
-void Decima::TextureSet::parse(ArchiveArray& archives, Source& stream, CoreFile* core_file) {
-    CoreEntry::parse(archives, stream, nullptr);
-    file_count = stream.read<uint32_t>();
+void Decima::TextureSet::parse(ArchiveArray& archives, ash::buffer& buffer, CoreFile* core_file) {
+    CoreEntry::parse(archives, buffer, nullptr);
+    file_count = buffer.get<decltype(file_count)>();
     file_entries.resize(file_count);
     for (auto& file_entry : file_entries) {
-        file_entry.parse(stream);
+        file_entry.parse(buffer);
     }
-    unk1 = stream.read<uint32_t>();
-    src_count = stream.read<uint32_t>();
+    unk1 = buffer.get<decltype(unk1)>();
+    src_count = buffer.get<decltype(src_count)>();
     src_entries.resize(src_count);
     for (auto& src_entry : src_entries) {
-        src_entry.parse(stream);
+        src_entry.parse(buffer);
     }
-    unk2 = stream.read<uint8_t>();
+    unk2 = buffer.get<decltype(unk2)>();
 }
 
-void Decima::TextureGUIDEntry::parse(Decima::Source& stream) {
-    unk1 = stream.read<uint32_t>();
-    unk2 = stream.read<uint32_t>();
-    unk3 = stream.read<uint32_t>();
-    unk4 = stream.read<uint32_t>();
-    unk5 = stream.read<uint16_t>();
-    guid.parse(stream);
+void Decima::TextureGUIDEntry::parse(ash::buffer& buffer) {
+    unk1 = buffer.get<decltype(unk1)>();
+    unk2 = buffer.get<decltype(unk2)>();
+    unk3 = buffer.get<decltype(unk3)>();
+    unk4 = buffer.get<decltype(unk4)>();
+    unk5 = buffer.get<decltype(unk5)>();
+    guid.parse(buffer);
 }
 
-void Decima::SrcEntry::parse(Decima::Source& stream) {
-    slot_id = stream.read<uint32_t>();
-    src_name.parse(stream);
-    unk1 = stream.read<uint16_t>();
-    unk2[0] = stream.read<uint32_t>();
-    unk2[1] = stream.read<uint32_t>();
-    unk2[2] = stream.read<uint32_t>();
+void Decima::SrcEntry::parse(ash::buffer& buffer) {
+    slot_id = buffer.get<decltype(slot_id)>();
+    src_name.parse(buffer);
+    unk1 = buffer.get<decltype(unk1)>();
+    buffer.get(unk2, sizeof(unk2));
     if (unk1 == 0) {
-        unk_pad = stream.read<uint32_t>();
+        unk_pad = buffer.get<decltype(unk_pad)>();
     } else {
-        width = stream.read<uint32_t>();
-        height = stream.read<uint32_t>();
+        width = buffer.get<decltype(width)>();
+        height = buffer.get<decltype(height)>();
     }
-    unk3[0] = stream.read<float>();
-    unk3[1] = stream.read<float>();
-    unk3[2] = stream.read<float>();
-    unk3[3] = stream.read<float>();
+    buffer.get(unk3, sizeof(unk3));
 }

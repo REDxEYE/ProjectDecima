@@ -16,11 +16,12 @@ static void string_draw(const std::string& data) {
     string_draw(data, default_mutator);
 }
 
-void Decima::String::parse(Source& stream) {
-    const auto size = stream.read<std::uint32_t>();
+void Decima::String::parse(ash::buffer& buffer) {
+    const auto size = buffer.get<std::uint32_t>();
+
     if (size > 0) {
         m_data.resize(size);
-        stream.read_exact(m_data);
+        buffer.get(m_data);
     }
 }
 
@@ -32,12 +33,13 @@ void Decima::String::draw(Decima::StringMutator mutator) {
     string_draw(m_data, mutator);
 }
 
-void Decima::StringHashed::parse(Source& stream) {
-    const auto size = stream.read<std::uint32_t>();
-    m_hash = stream.read<std::uint32_t>();
+void Decima::StringHashed::parse(ash::buffer& buffer) {
+    const auto size = buffer.get<std::uint32_t>();
+    m_hash = buffer.get<decltype(m_hash)>();
+
     if (size > 0) {
         m_data.resize(size);
-        stream.read_exact(m_data);
+        buffer.get(m_data);
     }
 }
 

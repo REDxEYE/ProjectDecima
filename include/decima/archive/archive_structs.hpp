@@ -1,9 +1,4 @@
-//
-// Created by i.getsman on 04.08.2020.
-//
-
-#ifndef PROJECTDS_ARCHIVE_STRUCTS_HPP
-#define PROJECTDS_ARCHIVE_STRUCTS_HPP
+#pragma once
 
 #include "decima/constants.hpp"
 
@@ -40,5 +35,3 @@ namespace Decima {
         uint32_t key_2;
     };
 }
-
-#endif //PROJECTDS_ARCHIVE_STRUCTS_HPP

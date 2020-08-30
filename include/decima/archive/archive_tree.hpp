@@ -1,9 +1,4 @@
-//
-// Created by MED45 on 27.07.2020.
-//
-
-#ifndef PROJECTDS_ARCHIVE_TREE_H
-#define PROJECTDS_ARCHIVE_TREE_H
+#pragma once
 
 #include <unordered_set>
 #include <map>
@@ -13,9 +8,9 @@
 
 #include <imgui.h>
 
-#include "archive_array.h"
-#include "decima/file_types/core/entry.h"
-#include "decima/core_file.h"
+#include "archive_array.hpp"
+#include "decima/file_types/core/entry.hpp"
+#include "decima/core_file.hpp"
 
 struct SelectionInfo {
     SelectionInfo() = default;
@@ -62,5 +57,3 @@ public:
 
     void draw(SelectionInfo& selection, Decima::ArchiveArray& archive_array, bool draw_header = true);
 };
-
-#endif //PROJECTDS_ARCHIVE_TREE_H

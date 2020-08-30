@@ -1,9 +1,4 @@
-//
-// Created by MED45 on 30.07.2020.
-//
-
-#ifndef PROJECTDS_ENTRY_H
-#define PROJECTDS_ENTRY_H
+#pragma once
 
 #include <cstdint>
 #include <vector>
@@ -28,15 +23,12 @@ namespace Decima {
         GUID guid {};
         uint32_t offset {};
 
-        static uint64_t peek_header(Source& stream);
+        static CoreHeader peek_header(ash::buffer buffer);
 
-        virtual void parse(ArchiveArray& archives, Source& stream, CoreFile* core_file);
+        virtual void parse(ArchiveArray& archives, ash::buffer& buffer, CoreFile* core_file);
 
         virtual void draw();
-
-
     };
 
-    std::string read_string(Source& stream, const std::string& default_value = "<empty>");
+    std::string read_string(ash::buffer& buffer, const std::string& default_value = "<empty>");
 }
-#endif //PROJECTDS_ENTRY_H

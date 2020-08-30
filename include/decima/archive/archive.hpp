@@ -1,11 +1,13 @@
 #pragma once
 
 #include <vector>
-#include <mio.hpp>
+#include <util/mio.hpp>
 
 #include "decima/archive/archive_structs.hpp"
 #include "decima/constants.hpp"
-#include "decima/core_file.h"
+#include "decima/core_file.hpp"
+
+#include "util/buffer.hpp"
 
 namespace Decima {
     class Archive {

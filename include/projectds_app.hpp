@@ -1,17 +1,12 @@
-//
-// Created by i.getsman on 06.08.2020.
-//
-
-#ifndef PROJECTDS_PROJECTDS_APP_HPP
-#define PROJECTDS_PROJECTDS_APP_HPP
+#pragma once
 
 #include "app.hpp"
 
 #include <imgui.h>
 #include <imgui_memory_editor.h>
 
-#include "decima/archive/archive_array.h"
-#include "decima/archive/archive_tree.h"
+#include "decima/archive/archive_array.hpp"
+#include "decima/archive/archive_tree.hpp"
 #include "decima/constants.hpp"
 
 class ProjectDS : public App {
@@ -67,5 +62,3 @@ protected:
 
     void end_frame_user() override;
 };
-
-#endif //PROJECTDS_PROJECTDS_APP_HPP

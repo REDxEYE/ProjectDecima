@@ -1,9 +1,4 @@
-//
-// Created by i.getsman on 03.08.2020.
-//
-
-#ifndef PROJECTDS_CONSTANTS_HPP
-#define PROJECTDS_CONSTANTS_HPP
+#pragma once
 
 #include <cstdint>
 #include <string>
@@ -12,7 +7,6 @@
 #include "utils.hpp"
 
 namespace Decima {
-
     class FileMagics {
     };
 
@@ -25,10 +19,10 @@ namespace Decima {
         static constexpr uint64_t Shader = 0x16bb69a9e5aa0d9e;
         static constexpr uint64_t Collection = 0xf3586131b4f18516;
     };
+
     class ZeroDawn_FileMagics : public FileMagics {
     public:
         static constexpr uint64_t Texture = 0xf2e1afb7052b3866;
-
     };
 
     enum class Version : uint32_t {
@@ -56,7 +50,4 @@ namespace Decima {
             return known_file_types.at(magic);
         return "Unknown '" + uint64_to_hex(magic) + "'";
     }
-
 }
-
-#endif //PROJECTDS_CONSTANTS_HPP

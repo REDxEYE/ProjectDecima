@@ -1,11 +1,11 @@
 #include "decima/file_types/pod/stream.hpp"
 #include <imgui.h>
 
-void Decima::Stream::parse(ArchiveArray& archives, Source& stream) {
-    m_name.parse(stream);
-    stream.seek(ash::seek_dir::cur, 20);
-    m_offs = stream.read<std::uint32_t>();
-    m_size = stream.read<std::uint32_t>();
+void Decima::Stream::parse(ArchiveArray& archives, ash::buffer& buffer) {
+    m_name.parse(buffer);
+    buffer = buffer.skip(20);
+    m_offs = buffer.get<decltype(m_offs)>();
+    m_size = buffer.get<decltype(m_size)>();
 
     auto& stream_file = archives.query_file(m_name.data() + ".core.stream").value().get();
     stream_file.unpack();

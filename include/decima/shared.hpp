@@ -1,18 +1,11 @@
-//
-// Created by i.getsman on 30.07.2020.
-//
-
-#ifndef PROJECTDS_SHARED_HPP
-#define PROJECTDS_SHARED_HPP
+#pragma once
 
 #include <optional>
 #include <type_traits>
 
-#include "ash.hpp"
+#include "util/buffer.hpp"
 
 namespace Decima {
-    using Source = ash::buffered_source<std::vector<uint8_t>>;
-
     template <class T>
     using OptionalRef = std::optional<std::reference_wrapper<T>>;
 }
@@ -36,5 +29,3 @@ namespace Decima {
     __DECIMA_STR1(DECIMA_VERSION_MINOR) "." \
     __DECIMA_STR1(DECIMA_VERSION_MICRO)
 // clang-format on
-
-#endif //PROJECTDS_SHARED_HPP

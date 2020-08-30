@@ -24,7 +24,7 @@ namespace Decima {
 
     class Reference {
     public:
-        void parse(Source& stream);
+        void parse(ash::buffer& buffer);
 
         void draw();
 

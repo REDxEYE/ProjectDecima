@@ -1,14 +1,9 @@
-//
-// Created by MED45 on 11.08.2020.
-//
-
-#ifndef PROJECTDS_TEXTURE_SET_H
-#define PROJECTDS_TEXTURE_SET_H
+#pragma once
 
 #include <vector>
 
-#include "decima/core_file.h"
-#include "decima/file_types/core/entry.h"
+#include "decima/core_file.hpp"
+#include "decima/file_types/core/entry.hpp"
 #include "decima/file_types/pod/string.hpp"
 #include "decima/file_types/pod/guid.hpp"
 
@@ -20,7 +15,7 @@ namespace Decima {
         uint32_t unk4 {};
         uint16_t unk5 {};
         GUID guid {};
-        void parse(Source& stream);
+        void parse(ash::buffer& buffer);
     };
 
     struct SrcEntry {
@@ -28,11 +23,11 @@ namespace Decima {
         StringHashed src_name;
         uint16_t unk1 {};
         uint32_t unk2[3] {};
-        uint32_t unk_pad{};
+        uint32_t unk_pad {};
         uint32_t width {};
         uint32_t height {};
         float unk3[4] {};
-        void parse(Source& stream);
+        void parse(ash::buffer& buffer);
     };
 
     class TextureSet : public CoreEntry {
@@ -43,9 +38,9 @@ namespace Decima {
         uint32_t src_count;
         std::vector<SrcEntry> src_entries;
         uint8_t unk2;
+
     public:
-        void parse(ArchiveArray& archives, Source& stream, CoreFile* core_file) override;
+        void parse(ArchiveArray& archives, ash::buffer& buffer, CoreFile* core_file) override;
         void draw() override;
     };
 }
-#endif //PROJECTDS_TEXTURE_SET_H

@@ -2,10 +2,10 @@
 // Created by MED45 on 06.08.2020.
 //
 
-#include <decima/core_file.h>
-#include "decima/file_types/core/dummy_entry.h"
+#include <decima/core_file.hpp>
+#include "decima/file_types/core/entry_dummy.hpp"
 
-void Decima::Dummy::parse(ArchiveArray& archives, Source& stream, CoreFile* core_file) {
-    CoreEntry::parse(archives, stream, nullptr);
-    stream.seek(ash::seek_dir::cur, header.file_size - sizeof(Decima::GUID));
+void Decima::Dummy::parse(ArchiveArray& archives, ash::buffer& buffer, CoreFile* core_file) {
+    CoreEntry::parse(archives, buffer, nullptr);
+    buffer = buffer.skip(header.file_size - sizeof(Decima::GUID));
 }
