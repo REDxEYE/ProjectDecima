@@ -20,20 +20,26 @@ static void show_data_selection_dialog(ProjectDS& self) {
         self.file_names.clear();
         self.file_names.reserve(self.archive_array->hash_to_name.size());
 
-        for (const auto& [hash, path] : self.archive_array->hash_to_name) {
-            self.file_names.push_back(path.c_str());
+        std::thread([](ProjectDS& self) {
+            self.root_tree_constructing = true;
 
-            std::vector<std::string> split_path;
-            split(path, split_path, '/');
+            for (const auto& [hash, path] : self.archive_array->hash_to_name) {
+                self.file_names.push_back(path.c_str());
 
-            auto* current_root = &self.root_tree;
+                std::vector<std::string> split_path;
+                split(path, split_path, '/');
 
-            for (auto it = split_path.begin(); it != split_path.end() - 1; it++)
-                current_root = current_root->add_folder(*it);
+                auto* current_root = &self.root_tree;
 
-            if (self.archive_array->hash_to_archive_index.find(hash) != self.archive_array->hash_to_archive_index.end())
-                current_root->add_file(split_path.back(), hash, { 0 });
-        }
+                for (auto it = split_path.begin(); it != split_path.end() - 1; it++)
+                    current_root = current_root->add_folder(*it);
+
+                if (self.archive_array->hash_to_archive_index.find(hash) != self.archive_array->hash_to_archive_index.end())
+                    current_root->add_file(split_path.back(), hash, { 0 });
+            }
+
+            self.root_tree_constructing = false;
+        }, std::ref(self)).detach();
     }
 }
 
@@ -466,6 +472,12 @@ void ProjectDS::draw_tree() {
                     file_names.push_back(path.c_str());
                 }
             }
+        }
+
+        if (root_tree_constructing) {
+            ImGui::PushStyleColor(ImGuiCol_Text, 0xff99ffff);
+            ImGui::TextWrapped("File tree is still constructing, some files may be missing");
+            ImGui::PopStyleColor();
         }
 
         ImGui::BeginChild("FileTree");

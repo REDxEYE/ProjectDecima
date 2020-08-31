@@ -42,6 +42,7 @@ public:
     SelectionInfo selection_info;
     ImGuiTextFilter filter;
     MemoryEditor file_viewer;
+    bool root_tree_constructing { false };
 
     void init_user() override;
 

@@ -44,7 +44,11 @@ void Decima::ArchiveArray::open() {
         }
     }
 
+    LOG("Loading prefetch file");
+
     read_prefetch_file();
+
+    LOG("Done");
 }
 
 Decima::OptionalRef<Decima::FileEntry> Decima::ArchiveArray::get_file_entry(std::uint64_t hash) {
