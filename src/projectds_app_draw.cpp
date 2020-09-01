@@ -377,26 +377,46 @@ void ProjectDS::draw_filepreview() {
 
                 ImGui::Separator();
                 ImGui::Columns(2);
-                ImGui::Text("Size");
-                ImGui::NextColumn();
-                ImGui::Text("%u bytes", file_entry.size);
-                ImGui::Separator();
-                ImGui::NextColumn();
-                ImGui::Text("Hash");
-                ImGui::NextColumn();
-                ImGui::Text("%llX", file_entry.hash);
-                ImGui::Separator();
-                ImGui::NextColumn();
-                ImGui::Text("Entry ID");
-                ImGui::NextColumn();
-                ImGui::Text("%u", file_entry.entry_num);
-                ImGui::Separator();
-                ImGui::NextColumn();
-                ImGui::Text("Offset");
-                ImGui::NextColumn();
-                ImGui::Text("%llu", file_entry.offset);
+                {
+                    ImGui::Text("Archive ID");
+                    ImGui::NextColumn();
+
+                    ImGui::Text("%s", archive_array->archives.at(archive_array->hash_to_archive_index.at(selection_info.selected_file)).path.c_str());
+                    ImGui::NextColumn();
+
+                    ImGui::Separator();
+
+                    ImGui::Text("Size");
+                    ImGui::NextColumn();
+
+                    ImGui::Text("%u bytes", file_entry.size);
+                    ImGui::NextColumn();
+
+                    ImGui::Separator();
+
+                    ImGui::Text("Hash");
+                    ImGui::NextColumn();
+
+                    ImGui::Text("%llX", file_entry.hash);
+                    ImGui::NextColumn();
+
+                    ImGui::Separator();
+
+                    ImGui::Text("Entry ID");
+                    ImGui::NextColumn();
+
+                    ImGui::Text("%u", file_entry.entry_num);
+                    ImGui::NextColumn();
+
+                    ImGui::Separator();
+
+                    ImGui::Text("Offset");
+                    ImGui::NextColumn();
+
+                    ImGui::Text("%llu", file_entry.offset);
+                    ImGui::Separator();
+                }
                 ImGui::Columns(1);
-                ImGui::Separator();
 
                 const bool selected_file_changed = selection_info.preview_file != selection_info.selected_file;
 
