@@ -39,10 +39,11 @@ Decima::Archive::Archive(const std::string& path)
 
 bool Decima::Archive::open() {
     memcpy(&header, m_stream.data(), sizeof(ArchiveHeader));
-    memcpy(&content_info, m_stream.data() + sizeof(ArchiveHeader), sizeof(ArchiveContentInfo));
-
     if (!is_valid(header.version))
         return false;
+
+    memcpy(&content_info, m_stream.data() + sizeof(ArchiveHeader), sizeof(ArchiveContentInfo));
+
 
     if (is_encrypted(header.version))
         decrypt(header.key, header.key + 1, (uint32_t*)&content_info);
