@@ -41,7 +41,6 @@ Decima::Archive::Archive(const std::string& path)
 
 bool Decima::Archive::open() {
     ZoneScopedNS("Archive loading", 128);
-    TracyMessageL("Loading  Archive");
 
     memcpy(&header, m_stream.data(), sizeof(ArchiveHeader));
     if (!is_valid(header.version))
@@ -80,7 +79,6 @@ bool Decima::Archive::open() {
             }
         }
     }
-    TracyMessageL("Building hash to file index map");
     {
         ZoneScopedN("Hash to index map") for (std::size_t index = 0; index < content_table.size(); index++) {
             m_hash_to_index.emplace(content_table.at(index).hash, index);

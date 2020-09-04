@@ -24,7 +24,6 @@ static void show_data_selection_dialog(ProjectDS& self) {
         std::thread([](ProjectDS& self) {
             tracy::SetThreadName("Tree builder");
             self.root_tree_constructing = true;
-            TracyMessageL("Tree constructing");
             ZoneScopedNS("Tree constructing", 128);
             for (const auto& [hash, path] : self.archive_array->hash_to_name) {
                 self.file_names.push_back(path.c_str());

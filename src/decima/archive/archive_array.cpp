@@ -32,7 +32,6 @@ void Decima::ArchiveArray::read_prefetch_file() {
 void Decima::ArchiveArray::open() {
     {
         ZoneScopedNS("ArchiveSet loading", 128);
-        TracyMessageL("Loading ArchiveSet");
         for (const auto& file : std::filesystem::directory_iterator(m_directory)) {
             archives.emplace_back(file.path().string());
         }
@@ -53,7 +52,6 @@ void Decima::ArchiveArray::open() {
     }
 
     LOG("Loading prefetch file");
-    TracyMessageL("Loading prefetch file");
     read_prefetch_file();
 
     LOG("Done");
