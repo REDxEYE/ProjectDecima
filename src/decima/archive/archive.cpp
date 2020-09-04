@@ -2,6 +2,8 @@
 // Created by MED45 on 25.07.2020.
 //
 
+#include "Tracy.hpp"
+
 #include <MurmurHash3.h>
 
 #include "decima/archive/archive.hpp"
@@ -38,47 +40,57 @@ Decima::Archive::Archive(const std::string& path)
     , path(path) { open(); }
 
 bool Decima::Archive::open() {
+    ZoneScopedNS("Archive loading", 128);
+    TracyMessageL("Loading  Archive");
+
     memcpy(&header, m_stream.data(), sizeof(ArchiveHeader));
     if (!is_valid(header.version))
         return false;
 
     memcpy(&content_info, m_stream.data() + sizeof(ArchiveHeader), sizeof(ArchiveContentInfo));
 
-
     if (is_encrypted(header.version))
         decrypt(header.key, header.key + 1, (uint32_t*)&content_info);
 
     std::size_t read_offset = sizeof(ArchiveHeader) + sizeof(ArchiveContentInfo);
-
-    content_table.resize(content_info.content_table_size);
-    memcpy(content_table.data(), m_stream.data() + read_offset, sizeof(FileEntry) * content_info.content_table_size);
-
+    {
+        ZoneScopedNS("Entries reading", 128);
+        content_table.resize(content_info.content_table_size);
+        memcpy(content_table.data(), m_stream.data() + read_offset, sizeof(FileEntry) * content_info.content_table_size);
+    }
     read_offset += sizeof(FileEntry) * content_info.content_table_size;
-
-    chunk_table.resize(content_info.chunk_table_size);
-    memcpy(chunk_table.data(), m_stream.data() + read_offset, sizeof(chunk_table.front()) * content_info.chunk_table_size);
-
+    {
+        ZoneScopedNS("Chunks reading", 128);
+        chunk_table.resize(content_info.chunk_table_size);
+        memcpy(chunk_table.data(), m_stream.data() + read_offset, sizeof(chunk_table.front()) * content_info.chunk_table_size);
+    }
     if (is_encrypted(header.version)) {
-        for (auto& file_entry : content_table) {
-            decrypt(file_entry.key_0, file_entry.key_1, (uint32_t*)&file_entry);
+        {
+            ZoneScopedNS("Entry decrypting", 128);
+            for (auto& file_entry : content_table) {
+                decrypt(file_entry.key_0, file_entry.key_1, (uint32_t*)&file_entry);
+            }
         }
-
-        for (auto& chunk : chunk_table) {
-            auto saved_key = chunk.key_0;
-            decrypt(chunk.key_0, chunk.key_1, (uint32_t*)&chunk);
-            chunk.key_0 = saved_key;
+        {
+            ZoneScopedNS("Chunk info decrypting", 128);
+            for (auto& chunk : chunk_table) {
+                auto saved_key = chunk.key_0;
+                decrypt(chunk.key_0, chunk.key_1, (uint32_t*)&chunk);
+                chunk.key_0 = saved_key;
+            }
         }
     }
-
-    for (std::size_t index = 0; index < content_table.size(); index++) {
-        m_hash_to_index.emplace(content_table.at(index).hash, index);
+    TracyMessageL("Building hash to file index map");
+    {
+        ZoneScopedN("Hash to index map") for (std::size_t index = 0; index < content_table.size(); index++) {
+            m_hash_to_index.emplace(content_table.at(index).hash, index);
+        }
     }
-
     return true;
 }
 
 Decima::OptionalRef<Decima::CoreFile> Decima::Archive::query_file(std::uint64_t hash) {
-    if (auto index = m_hash_to_index.find(hash); index != m_hash_to_index.end()) {
+    ZoneScopedNS("File quering", 128) if (auto index = m_hash_to_index.find(hash); index != m_hash_to_index.end()) {
         auto cache = m_cache.find(index->second);
 
         if (cache == m_cache.end()) {

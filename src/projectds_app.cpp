@@ -37,6 +37,7 @@ void ProjectDS::end_frame_user() {
 }
 
 void ProjectDS::init_imgui() {
+    ZoneScopedN("IMGUI");
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 

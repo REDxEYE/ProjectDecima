@@ -4,14 +4,16 @@
 
 #include <filesystem>
 #include <optional>
+#include <utility>
 
 #include "utils.hpp"
 #include "decima/archive/archive_array.hpp"
 
-Decima::ArchiveArray::ArchiveArray(const std::string& directory)
-    : m_directory(directory) { open(); }
+Decima::ArchiveArray::ArchiveArray(std::string directory)
+    : m_directory(std::move(directory)) { open(); }
 
 void Decima::ArchiveArray::read_prefetch_file() {
+    ZoneScopedNS("Prefetch loading", 128);
     auto& prefetch_data = query_file("prefetch/fullgame.prefetch").value().get();
     prefetch_data.unpack();
 
@@ -28,24 +30,30 @@ void Decima::ArchiveArray::read_prefetch_file() {
 }
 
 void Decima::ArchiveArray::open() {
-    for (const auto& file : std::filesystem::directory_iterator(m_directory)) {
-        archives.emplace_back(file.path().string());
-    }
+    {
+        ZoneScopedNS("ArchiveSet loading", 128);
+        TracyMessageL("Loading ArchiveSet");
+        for (const auto& file : std::filesystem::directory_iterator(m_directory)) {
+            archives.emplace_back(file.path().string());
+        }
 
-    for (std::uint32_t index = 0; index < archives.size(); index++) {
-        auto& archive = archives.at(index);
+        for (std::uint32_t index = 0; index < archives.size(); index++) {
+            auto& archive = archives.at(index);
 
-        LOG("Loading archive ", std::filesystem::path(archive.path).stem().string(), " (", std::to_string(index + 1), '/', std::to_string(archives.size()), ')');
+            LOG("Loading archive ", std::filesystem::path(archive.path).stem().string(), " (", std::to_string(index + 1), '/', std::to_string(archives.size()), ')');
 
-        archive.open();
-
-        for (const auto& entry : archive.content_table) {
-            hash_to_archive_index.emplace(entry.hash, index);
+            archive.open();
+            {
+                ZoneScopedN("Hash to archive map");
+                for (const auto& entry : archive.content_table) {
+                    hash_to_archive_index.emplace(entry.hash, index);
+                }
+            }
         }
     }
 
     LOG("Loading prefetch file");
-
+    TracyMessageL("Loading prefetch file");
     read_prefetch_file();
 
     LOG("Done");

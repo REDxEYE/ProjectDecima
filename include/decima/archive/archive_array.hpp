@@ -1,5 +1,8 @@
 #pragma once
 
+#include "tracy_memdbg.hpp"
+
+
 #include <optional>
 #include <unordered_map>
 
@@ -9,7 +12,7 @@
 namespace Decima {
     class ArchiveArray {
     public:
-        explicit ArchiveArray(const std::string& directory);
+        explicit ArchiveArray(std::string  directory);
 
         [[nodiscard]] Decima::OptionalRef<Decima::CoreFile> query_file(std::uint64_t hash);
         [[nodiscard]] Decima::OptionalRef<Decima::CoreFile> query_file(const std::string& name);

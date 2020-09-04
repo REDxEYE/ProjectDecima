@@ -16,13 +16,16 @@ static void show_data_selection_dialog(ProjectDS& self) {
     auto folder = pfd::select_folder("Select Death Stranding data folder!").result();
 
     if (!folder.empty()) {
+
         self.archive_array = std::make_unique<Decima::ArchiveArray>(folder);
         self.file_names.clear();
         self.file_names.reserve(self.archive_array->hash_to_name.size());
 
         std::thread([](ProjectDS& self) {
+            tracy::SetThreadName("Tree builder");
             self.root_tree_constructing = true;
-
+            TracyMessageL("Tree constructing");
+            ZoneScopedNS("Tree constructing", 128);
             for (const auto& [hash, path] : self.archive_array->hash_to_name) {
                 self.file_names.push_back(path.c_str());
 
@@ -39,7 +42,9 @@ static void show_data_selection_dialog(ProjectDS& self) {
             }
 
             self.root_tree_constructing = false;
-        }, std::ref(self)).detach();
+        },
+            std::ref(self))
+            .detach();
     }
 }
 
@@ -68,6 +73,7 @@ static void show_export_selection_dialog(ProjectDS& self) {
 }
 
 void ProjectDS::init_user() {
+    ZoneScopedN("User code");
     App::init_user();
     init_imgui();
     init_filetype_handlers();

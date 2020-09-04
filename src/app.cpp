@@ -2,6 +2,8 @@
 // Created by i.getsman on 06.08.2020.
 //
 
+#include "tracy_memdbg.hpp"
+
 #include <functional>
 #include <iostream>
 
@@ -16,6 +18,7 @@ App::App(std::pair<uint32_t, uint32_t> window_size, std::string title) {
 }
 
 void App::init() {
+    ZoneScopedN("App Initialization");
     LOG("Initialization");
     init_glfw();
     init_opengl();
@@ -32,6 +35,7 @@ void App::run() {
 }
 
 void App::init_glfw() {
+    ZoneScopedN("GLFW");
     LOG("  GLFW Initialization");
     glfwInit();
     m_window = glfwCreateWindow(m_win_info.m_win_width, m_win_info.m_win_height, m_win_info.m_title.c_str(),
@@ -62,6 +66,7 @@ void App::glfw_error_handler(int error, const char* message) {
 }
 
 void App::init_opengl() {
+    ZoneScopedN("GLAD");
     LOG("  GLAD Initialization");
     gladLoadGL();
     glEnable(GL_DEBUG_OUTPUT);

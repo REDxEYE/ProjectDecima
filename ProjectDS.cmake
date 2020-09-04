@@ -23,10 +23,17 @@ add_executable(ProjectDS
         src/decima/file_types/core/texture_set.cpp
         src/decima/file_types/core/texture_set_draw.cpp
         src/decima/file_types/pod/reference.cpp
-        src/decima/file_types/core/collection.cpp)
+        src/decima/file_types/core/collection.cpp
+        libs/tracy/TracyClient.cpp
+        src/tracy_memdbg.cpp)
 
 target_link_libraries(ProjectDS PRIVATE oodle hash imgui glfw glad)
-target_include_directories(ProjectDS PRIVATE include)
+target_include_directories(ProjectDS PRIVATE include libs/tracy)
+
+if (TRACY_ENABLE)
+    message("Tracy profiler is enabled!")
+    add_definitions(-DTRACY_ENABLE)
+endif (TRACY_ENABLE)
 
 if (MSVC)
     target_compile_definitions(ProjectDS PUBLIC _CRT_SECURE_NO_WARNINGS)
