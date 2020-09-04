@@ -17,8 +17,8 @@ namespace Decima {
         [[nodiscard]] OptionalRef<Decima::CoreFile> query_file(std::uint64_t hash);
 
         std::string path;
-        Decima::ArchiveHeader header;
-        Decima::ArchiveContentInfo content_info;
+        Decima::ArchiveHeader header {};
+        Decima::ArchiveContentInfo content_info {};
         std::vector<Decima::ChunkEntry> chunk_table;
         std::vector<Decima::FileEntry> content_table;
 
