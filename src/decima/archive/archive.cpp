@@ -6,12 +6,11 @@
 
 #include "decima/archive/archive.hpp"
 
-static inline bool is_valid(Decima::Version version) {
-    return version == Decima::Version::default_version || version == Decima::Version::encrypted_version;
-}
-
 static inline bool is_encrypted(Decima::Version version) {
     return version == Decima::Version::encrypted_version;
+}
+static inline bool is_valid(Decima::Version version) {
+    return version == Decima::Version::default_version || is_encrypted(version);
 }
 
 static void decrypt(uint32_t key_1, uint32_t key_2, uint32_t* data) {
