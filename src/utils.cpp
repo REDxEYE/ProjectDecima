@@ -1,6 +1,7 @@
 //
 // Created by MED45 on 26.07.2020.
 //
+#include <cstdint>
 #include <filesystem>
 
 #include "utils.hpp"
@@ -13,11 +14,9 @@ std::string uint64_to_hex(uint64_t value) {
 }
 
 uint64_t hash_string(const std::string& filename, uint8_t seed) {
-    uint64_t hash;
-    uint8_t byte[16];
-    MurmurHash3_x64_128(filename.c_str(), (int32_t)filename.size() + 1, seed, &byte);
-    memcpy(&hash, byte, 8);
-    return hash;
+    std::uint64_t hash[2];
+    MurmurHash3_x64_128(filename.c_str(), (int32_t)filename.size() + 1, seed, &hash);
+    return hash[0];
 }
 
 uint64_t calculate_first_containing_chunk(uint64_t file_offset, int32_t chunk_size) {
@@ -29,8 +28,7 @@ uint64_t calculate_last_containing_chunk(uint64_t file_offset, int32_t file_size
 }
 
 bool decompress_chunk_data(const std::vector<uint8_t>& data, uint64_t decompressed_size, uint8_t* output) {
-    int res = Kraken_Decompress(data.data(), data.size(), output, decompressed_size);
-    return res != -1;
+    return decompress_chunk_data(data.data(), data.size(), decompressed_size, output);
 }
 
 bool decompress_chunk_data(const uint8_t* data, uint64_t data_size, uint64_t decompressed_size, uint8_t* output) {
