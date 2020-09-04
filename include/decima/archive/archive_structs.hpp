@@ -20,18 +20,18 @@ namespace Decima {
 
     struct FileEntry {
         uint32_t entry_num;
-        uint32_t key;
+        uint32_t key_0;
         uint64_t hash;
         uint64_t offset;
         uint32_t size;
-        uint32_t key2;
+        uint32_t key_1;
     };
     struct ChunkEntry {
         uint64_t uncompressed_offset; //relative offset once uncompressed
         uint32_t uncompressed_size;
-        uint32_t key_1;
+        uint32_t key_0;
         uint64_t compressed_offset;
         uint32_t compressed_size;
-        uint32_t key_2;
+        uint32_t key_1;
     };
 }

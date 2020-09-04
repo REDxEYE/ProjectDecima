@@ -60,13 +60,13 @@ bool Decima::Archive::open() {
 
     if (is_encrypted(header.version)) {
         for (auto& file_entry : content_table) {
-            decrypt(file_entry.key, file_entry.key2, (uint32_t*)&file_entry);
+            decrypt(file_entry.key_0, file_entry.key_1, (uint32_t*)&file_entry);
         }
 
         for (auto& chunk : chunk_table) {
-            auto saved_key = chunk.key_1;
-            decrypt(chunk.key_1, chunk.key_2, (uint32_t*)&chunk);
-            chunk.key_1 = saved_key;
+            auto saved_key = chunk.key_0;
+            decrypt(chunk.key_0, chunk.key_1, (uint32_t*)&chunk);
+            chunk.key_0 = saved_key;
         }
     }
 
