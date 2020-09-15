@@ -9,7 +9,8 @@
 namespace Decima {
     class ArchiveArray {
     public:
-        explicit ArchiveArray(const std::string& directory);
+        void load_archive(const std::string& path);
+        void load_prefetch();
 
         [[nodiscard]] Decima::OptionalRef<Decima::CoreFile> query_file(std::uint64_t hash);
         [[nodiscard]] Decima::OptionalRef<Decima::CoreFile> query_file(const std::string& name);
@@ -21,12 +22,5 @@ namespace Decima {
         std::unordered_map<uint64_t, std::string> hash_to_name;
 
         std::vector<Archive> archives;
-
-    private:
-        std::string m_directory;
-
-        void open();
-        void read_prefetch_file();
     };
-
 }

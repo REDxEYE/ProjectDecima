@@ -36,7 +36,7 @@ public:
     Popup current_popup = Popup::None;
     std::vector<ShortcutInfo> shortcuts;
 
-    std::unique_ptr<Decima::ArchiveArray> archive_array;
+    Decima::ArchiveArray archive_array;
     std::vector<const char*> file_names;
     FileTree root_tree;
     SelectionInfo selection_info;

@@ -10,20 +10,21 @@
 #include "utils.hpp"
 #include "util/pfd.h"
 
-#include "decima/file_types/core/entry_dummy.hpp"
-
 static void show_data_selection_dialog(ProjectDS& self) {
     auto folder = pfd::select_folder("Select Death Stranding data folder!").result();
 
     if (!folder.empty()) {
-        self.archive_array = std::make_unique<Decima::ArchiveArray>(folder);
+        for (auto file : std::filesystem::directory_iterator(folder))
+            self.archive_array.load_archive(file.path().string());
+        self.archive_array.load_prefetch();
+
         self.file_names.clear();
-        self.file_names.reserve(self.archive_array->hash_to_name.size());
+        self.file_names.reserve(self.archive_array.hash_to_name.size());
 
         std::thread([](ProjectDS& self) {
             self.root_tree_constructing = true;
 
-            for (const auto& [hash, path] : self.archive_array->hash_to_name) {
+            for (const auto& [hash, path] : self.archive_array.hash_to_name) {
                 self.file_names.push_back(path.c_str());
 
                 std::vector<std::string> split_path;
@@ -34,12 +35,14 @@ static void show_data_selection_dialog(ProjectDS& self) {
                 for (auto it = split_path.begin(); it != split_path.end() - 1; it++)
                     current_root = current_root->add_folder(*it);
 
-                if (self.archive_array->hash_to_archive_index.find(hash) != self.archive_array->hash_to_archive_index.end())
+                if (self.archive_array.hash_to_archive_index.find(hash) != self.archive_array.hash_to_archive_index.end())
                     current_root->add_file(split_path.back(), hash, { 0 });
             }
 
             self.root_tree_constructing = false;
-        }, std::ref(self)).detach();
+        },
+            std::ref(self))
+            .detach();
     }
 }
 
@@ -51,12 +54,12 @@ static void show_export_selection_dialog(ProjectDS& self) {
 
     if (!base_folder.empty()) {
         for (const auto selected_file : self.selection_info.selected_files) {
-            const auto filename = sanitize_name(self.archive_array->hash_to_name.at(selected_file));
+            const auto filename = sanitize_name(self.archive_array.hash_to_name.at(selected_file));
 
             std::filesystem::path full_path = std::filesystem::path(base_folder) / filename;
             std::filesystem::create_directories(full_path.parent_path());
 
-            auto& file = self.archive_array->query_file(filename).value().get();
+            auto& file = self.archive_array.query_file(filename).value().get();
             file.unpack();
 
             std::ofstream output_file { full_path, std::ios::binary };
@@ -197,12 +200,12 @@ void ProjectDS::draw_dockspace() {
                     if (!full_path.empty()) {
                         std::ofstream output_file { full_path };
 
-                        for (auto& [hash, path] : archive_array->hash_to_name) {
-                            auto file_ref = archive_array->query_file(hash);
+                        for (auto& [hash, path] : archive_array.hash_to_name) {
+                            auto file_ref = archive_array.query_file(hash);
 
                             if (file_ref.has_value()) {
                                 auto file = file_ref.value().get();
-                                file.parse(*archive_array.get());
+                                file.parse(archive_array);
 
                                 LOG("Processing file '", path, "' (size: ", file.file_entry->size, ')');
 
@@ -222,13 +225,13 @@ void ProjectDS::draw_dockspace() {
                     if (!full_path.empty()) {
                         std::ofstream output_file { full_path };
 
-                        for (const auto& archive : archive_array->archives) {
+                        for (const auto& archive : archive_array.archives) {
                             output_file << archive.path << '\n';
 
                             for (const auto& entry : archive.content_table) {
-                                const auto name = archive_array->hash_to_name.find(entry.hash);
+                                const auto name = archive_array.hash_to_name.find(entry.hash);
 
-                                if (name != archive_array->hash_to_name.end())
+                                if (name != archive_array.hash_to_name.end())
                                     output_file << "  name: '" << name->second << "'\n";
 
                                 output_file << "  hash: '" << entry.hash << "'\n";
@@ -356,14 +359,14 @@ void ProjectDS::draw_filepreview() {
     ImGui::Begin("File preview");
     {
         if (selection_info.selected_file > 0) {
-            const auto file_entry_opt = archive_array->get_file_entry(selection_info.selected_file);
+            const auto file_entry_opt = archive_array.get_file_entry(selection_info.selected_file);
 
             if (file_entry_opt.has_value()) {
                 const auto& file_entry = file_entry_opt.value().get();
 
                 std::string filename;
-                if (archive_array->hash_to_name.find(selection_info.selected_file) != archive_array->hash_to_name.end()) {
-                    filename = sanitize_name(archive_array->hash_to_name.at(selection_info.selected_file));
+                if (archive_array.hash_to_name.find(selection_info.selected_file) != archive_array.hash_to_name.end()) {
+                    filename = sanitize_name(archive_array.hash_to_name.at(selection_info.selected_file));
                 } else {
                     filename = uint64_to_hex(selection_info.selected_file);
                 }
@@ -381,7 +384,7 @@ void ProjectDS::draw_filepreview() {
                     ImGui::Text("Archive ID");
                     ImGui::NextColumn();
 
-                    ImGui::Text("%s", archive_array->archives.at(archive_array->hash_to_archive_index.at(selection_info.selected_file)).path.c_str());
+                    ImGui::Text("%s", archive_array.archives.at(archive_array.hash_to_archive_index.at(selection_info.selected_file)).path.c_str());
                     ImGui::NextColumn();
 
                     ImGui::Separator();
@@ -421,8 +424,8 @@ void ProjectDS::draw_filepreview() {
                 const bool selected_file_changed = selection_info.preview_file != selection_info.selected_file;
 
                 if (selected_file_changed) {
-                    selection_info.file = &archive_array->query_file(selection_info.selected_file).value().get();
-                    selection_info.file->parse(*archive_array);
+                    selection_info.file = &archive_array.query_file(selection_info.selected_file).value().get();
+                    selection_info.file->parse(archive_array);
                     selection_info.preview_file = selection_info.selected_file;
                     selection_info.preview_file_size = selection_info.file->storage.size();
                     selection_info.preview_file_offset = 0;
@@ -487,7 +490,7 @@ void ProjectDS::draw_tree() {
 
             file_names.clear();
 
-            for (auto& [_, path] : archive_array->hash_to_name) {
+            for (auto& [_, path] : archive_array.hash_to_name) {
                 if (filter.PassFilter(path.c_str())) {
                     file_names.push_back(path.c_str());
                 }
@@ -501,7 +504,7 @@ void ProjectDS::draw_tree() {
         }
 
         ImGui::BeginChild("FileTree");
-        root_tree.draw(selection_info, *archive_array);
+        root_tree.draw(selection_info, archive_array);
         ImGui::EndChild();
     }
     ImGui::End();
@@ -521,8 +524,8 @@ void ProjectDS::draw_export() {
 
         if (ImGui::PushItemWidth(-1), ImGui::ListBoxHeader("##", { 0, -1 })) {
             for (const auto selected_file : selection_info.selected_files) {
-                if (archive_array->hash_to_name.find(selected_file) != archive_array->hash_to_name.end()) {
-                    if (ImGui::Selectable(archive_array->hash_to_name[selected_file].c_str()))
+                if (archive_array.hash_to_name.find(selected_file) != archive_array.hash_to_name.end()) {
+                    if (ImGui::Selectable(archive_array.hash_to_name[selected_file].c_str()))
                         selection_info.selected_file = selected_file;
                 } else {
                     std::string new_name = "Hash: " + uint64_to_hex(selected_file);
@@ -552,8 +555,8 @@ void ProjectDS::draw_export() {
             if (ImGui::Button("Add to selection!")) {
                 std::string str_path(path);
                 uint64_t file_hash = hash_string(sanitize_name(str_path), Decima::seed);
-                if (archive_array->get_file_entry(file_hash).has_value()) {
-                    archive_array->hash_to_name[file_hash] = str_path;
+                if (archive_array.get_file_entry(file_hash).has_value()) {
+                    archive_array.hash_to_name[file_hash] = str_path;
                     selection_info.selected_files.insert(file_hash);
                 }
             }
@@ -572,8 +575,8 @@ void ProjectDS::draw_export() {
             ImGui::InputScalar("File hash", ImGuiDataType_U64, &file_hash);
 
             if (ImGui::Button("Add to selection!")) {
-                if (archive_array->get_file_entry(file_hash).has_value()) {
-                    archive_array->hash_to_name[file_hash] = "HASH: " + uint64_to_hex(file_hash);
+                if (archive_array.get_file_entry(file_hash).has_value()) {
+                    archive_array.hash_to_name[file_hash] = "HASH: " + uint64_to_hex(file_hash);
                     selection_info.selected_files.insert(file_hash);
                 }
             }

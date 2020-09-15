@@ -8,10 +8,18 @@
 #include "utils.hpp"
 #include "decima/archive/archive_array.hpp"
 
-Decima::ArchiveArray::ArchiveArray(const std::string& directory)
-    : m_directory(directory) { open(); }
+void Decima::ArchiveArray::load_archive(const std::string& path) {
+    LOG("Loading archive ", std::filesystem::path(path).stem().string());
 
-void Decima::ArchiveArray::read_prefetch_file() {
+    auto& archive = archives.emplace_back(path);
+    archive.open();
+
+    for (const auto& entry : archive.content_table) {
+        hash_to_archive_index.emplace(entry.hash, archives.size() - 1);
+    }
+}
+
+void Decima::ArchiveArray::load_prefetch() {
     auto& prefetch_data = query_file("prefetch/fullgame.prefetch").value().get();
     prefetch_data.unpack();
 
@@ -25,30 +33,6 @@ void Decima::ArchiveArray::read_prefetch_file() {
     }
 
     hash_to_name.emplace(0x2fff5af65cd64c0a, "prefetch/fullgame.prefetch");
-}
-
-void Decima::ArchiveArray::open() {
-    for (const auto& file : std::filesystem::directory_iterator(m_directory)) {
-        archives.emplace_back(file.path().string());
-    }
-
-    for (std::uint32_t index = 0; index < archives.size(); index++) {
-        auto& archive = archives.at(index);
-
-        LOG("Loading archive ", std::filesystem::path(archive.path).stem().string(), " (", std::to_string(index + 1), '/', std::to_string(archives.size()), ')');
-
-        archive.open();
-
-        for (const auto& entry : archive.content_table) {
-            hash_to_archive_index.emplace(entry.hash, index);
-        }
-    }
-
-    LOG("Loading prefetch file");
-
-    read_prefetch_file();
-
-    LOG("Done");
 }
 
 Decima::OptionalRef<Decima::FileEntry> Decima::ArchiveArray::get_file_entry(std::uint64_t hash) {
