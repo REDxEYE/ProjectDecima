@@ -15,7 +15,7 @@ void Decima::ArchiveArray::load_archive(const std::string& path) {
     archive.open();
 
     for (const auto& entry : archive.content_table) {
-        hash_to_archive_index.emplace(entry.hash, archives.size() - 1);
+        hash_to_archive_index.emplace(entry.hash, static_cast<int>(archives.size() - 1));
     }
 }
 
