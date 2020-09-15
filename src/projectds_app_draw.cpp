@@ -452,8 +452,8 @@ void ProjectDS::draw_filepreview() {
 
                 if (ImGui::BeginPopupContextItem(buffer.str().c_str())) {
                     if (ImGui::Selectable("Highlight")) {
-                        selection_info.preview_file_offset = file->offset + sizeof(Decima::CoreHeader) + sizeof(Decima::GUID);
-                        selection_info.preview_file_size = file->header.file_size - sizeof(Decima::GUID);
+                        selection_info.preview_file_offset = file->offset;
+                        selection_info.preview_file_size = file->header.file_size + sizeof(Decima::CoreHeader);
                     }
 
                     ImGui::EndPopup();
