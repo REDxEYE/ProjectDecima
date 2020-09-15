@@ -23,12 +23,12 @@ namespace Decima {
         GUID guid {};
         uint32_t offset {};
 
-        static CoreHeader peek_header(ash::buffer buffer);
-
         virtual void parse(ArchiveArray& archives, ash::buffer& buffer, CoreFile* core_file);
 
         virtual void draw();
-    };
 
-    std::string read_string(ash::buffer& buffer, const std::string& default_value = "<empty>");
+        inline static CoreHeader peek_header(ash::buffer buffer) {
+            return buffer.get<CoreHeader>();
+        }
+    };
 }
