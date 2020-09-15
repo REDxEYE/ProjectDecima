@@ -92,19 +92,18 @@ void Decima::CoreFile::parse(ArchiveArray& archive_array) {
     unpack();
     entries.clear();
 
+    // TODO: This is shitty API I wrote, please replace this
     ash::buffer buffer(storage.data(), storage.size());
 
-    for (std::size_t offset = 0; offset < buffer.size();) {
+    while (buffer.size() > 0) {
         const auto entry_header = Decima::CoreEntry::peek_header(buffer);
+        const auto entry_offset = buffer.data() - storage.data();
 
         entries.push_back([&] {
             auto handler = get_handler(entry_header.file_type);
             handler->parse(archive_array, buffer, this);
-            handler->offset = offset;
-
+            handler->offset = entry_offset;
             return handler;
         }());
-
-        offset += entry_header.file_size + sizeof(Decima::GUID);
     }
 }
