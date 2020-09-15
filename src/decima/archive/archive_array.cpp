@@ -28,7 +28,7 @@ void Decima::ArchiveArray::load_prefetch() {
     Prefetch prefetch;
     prefetch.parse(*this, buffer, nullptr);
 
-    for (const auto& string : prefetch.strings) {
+    for (const auto& string : prefetch.paths) {
         hash_to_name.emplace(hash_string(sanitize_name(string.data()), seed), string.data());
     }
 

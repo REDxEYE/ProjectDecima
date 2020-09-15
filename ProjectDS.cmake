@@ -13,6 +13,7 @@ add_executable(ProjectDS
         src/decima/file_types/core/core_draw.cpp
         src/decima/file_types/core/dummy_entry.cpp
         src/decima/file_types/core/prefetch.cpp
+        src/decima/file_types/core/prefetch_draw.cpp
         src/decima/file_types/core/translation.cpp
         src/decima/file_types/core/translation_draw.cpp
         src/decima/file_types/core/texture.cpp

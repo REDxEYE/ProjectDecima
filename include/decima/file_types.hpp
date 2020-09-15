@@ -23,7 +23,8 @@ static const std::map<std::uint64_t, Constructor<Decima::CoreEntry>> types = {
     { Decima::DeathStranding_FileMagics::Translation, construct<Decima::Translation> },
     { Decima::DeathStranding_FileMagics::Texture,     construct<Decima::Texture>     },
     { Decima::DeathStranding_FileMagics::TextureSet,  construct<Decima::TextureSet>  },
-    { Decima::DeathStranding_FileMagics::Collection,  construct<Decima::Collection>  }
+    { Decima::DeathStranding_FileMagics::Collection,  construct<Decima::Collection>  },
+    { Decima::DeathStranding_FileMagics::Prefetch,    construct<Decima::Prefetch>    },
     // clang-format on
 };
 
