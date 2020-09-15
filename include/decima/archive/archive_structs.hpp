@@ -5,7 +5,7 @@
 namespace Decima {
 
     struct ArchiveHeader {
-        Version version; //0x20304050 or 0x21304050
+        FileType type;
         uint32_t key;
     };
 

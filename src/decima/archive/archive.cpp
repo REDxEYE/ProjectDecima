@@ -6,11 +6,11 @@
 
 #include "decima/archive/archive.hpp"
 
-static inline bool is_encrypted(Decima::Version version) {
-    return version == Decima::Version::encrypted_version;
+static inline bool is_encrypted(Decima::FileType version) {
+    return version == Decima::FileType::archive_contents_encrypted;
 }
-static inline bool is_valid(Decima::Version version) {
-    return version == Decima::Version::default_version || is_encrypted(version);
+static inline bool is_valid(Decima::FileType version) {
+    return version == Decima::FileType::archive_contents_default || is_encrypted(version);
 }
 
 static void decrypt(uint32_t key_1, uint32_t key_2, uint32_t* data) {
@@ -39,13 +39,13 @@ Decima::Archive::Archive(const std::string& path)
 
 bool Decima::Archive::open() {
     memcpy(&header, m_stream.data(), sizeof(ArchiveHeader));
-    if (!is_valid(header.version))
+    if (!is_valid(header.type))
         return false;
 
     memcpy(&content_info, m_stream.data() + sizeof(ArchiveHeader), sizeof(ArchiveContentInfo));
 
 
-    if (is_encrypted(header.version))
+    if (is_encrypted(header.type))
         decrypt(header.key, header.key + 1, (uint32_t*)&content_info);
 
     std::size_t read_offset = sizeof(ArchiveHeader) + sizeof(ArchiveContentInfo);
@@ -58,7 +58,7 @@ bool Decima::Archive::open() {
     chunk_table.resize(content_info.chunk_table_size);
     memcpy(chunk_table.data(), m_stream.data() + read_offset, sizeof(chunk_table.front()) * content_info.chunk_table_size);
 
-    if (is_encrypted(header.version)) {
+    if (is_encrypted(header.type)) {
         for (auto& file_entry : content_table) {
             decrypt(file_entry.key_0, file_entry.key_1, (uint32_t*)&file_entry);
         }
@@ -83,7 +83,7 @@ Decima::OptionalRef<Decima::CoreFile> Decima::Archive::query_file(std::uint64_t 
 
         if (cache == m_cache.end()) {
             ash::buffer buffer(m_stream.begin(), m_stream.end());
-            Decima::CoreFile file(&content_table.at(index->second), buffer, this, is_encrypted(header.version));
+            Decima::CoreFile file(&content_table.at(index->second), buffer, this, is_encrypted(header.type));
             cache = m_cache.emplace(index->second, std::move(file)).first;
         }
 

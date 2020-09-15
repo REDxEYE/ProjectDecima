@@ -25,9 +25,10 @@ namespace Decima {
         static constexpr uint64_t Texture = 0xf2e1afb7052b3866;
     };
 
-    enum class Version : uint32_t {
-        default_version = 0x20304050,
-        encrypted_version = 0x21304050
+    enum class FileType : std::uint32_t {
+        archive_contents_default = 0x20304050,
+        archive_contents_encrypted = 0x21304050,
+        archive_indices = 0x10203040,
     };
 
     static constexpr uint8_t seed = 0x2A;
