@@ -9,8 +9,6 @@
 #include "decima/archive/archive_array.hpp"
 
 void Decima::ArchiveArray::load_archive(const std::string& path) {
-    LOG("Loading archive ", std::filesystem::path(path).stem().string());
-
     auto& archive = archives.emplace_back(path);
     archive.open();
 

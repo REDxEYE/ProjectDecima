@@ -14,8 +14,11 @@ static void show_data_selection_dialog(ProjectDS& self) {
     auto folder = pfd::select_folder("Select Death Stranding data folder!").result();
 
     if (!folder.empty()) {
-        for (auto file : std::filesystem::directory_iterator(folder))
+        for (auto file : std::filesystem::directory_iterator(folder)) {
+            LOG("Loading archive ", file.path().stem().string());
             self.archive_array.load_archive(file.path().string());
+        }
+
         self.archive_array.load_prefetch();
 
         self.file_names.clear();
