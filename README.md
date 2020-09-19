@@ -1,4 +1,4 @@
-ProjectDecima is aimed to provide GUI for export/preview files inside Decima engine archives.
+ProjectDecima is aimed to provide GUI for export/preview files inside Decima engine manager.
 
 ![](https://i.imgur.com/cEQnB4K.png)
 

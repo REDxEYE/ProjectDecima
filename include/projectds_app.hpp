@@ -5,7 +5,7 @@
 #include <imgui.h>
 #include <imgui_memory_editor.h>
 
-#include "decima/archive/archive_array.hpp"
+#include "decima/archive/archive_manager.hpp"
 #include "decima/archive/archive_tree.hpp"
 #include "decima/constants.hpp"
 
@@ -36,7 +36,7 @@ public:
     Popup current_popup = Popup::None;
     std::vector<ShortcutInfo> shortcuts;
 
-    Decima::ArchiveArray archive_array;
+    Decima::ArchiveManager archive_array;
     std::vector<const char*> file_names;
     FileTree root_tree;
     SelectionInfo selection_info;

@@ -5,40 +5,41 @@
 #include <vector>
 #include <memory>
 
-#include "decima/archive/archive_structs.hpp"
-#include "decima/file_types/core/entry.hpp"
-#include "decima/file_types/pod/reference.hpp"
+#include "decima/serializable/object/object_dummy.hpp"
+#include "decima/serializable/reference.hpp"
 
 #include "util/buffer.hpp"
 
 namespace Decima {
     class Archive;
+    class ArchiveFileEntry;
+    class ArchiveChunkEntry;
 
     class CoreFile {
     public:
-        CoreFile(FileEntry* file_entry, ash::buffer file_buffer, Archive* archive, bool encrypted);
+        CoreFile(ArchiveFileEntry* file_entry, ash::buffer file_buffer, Archive* archive, bool encrypted);
 
-        FileEntry* file_entry;
+        ArchiveFileEntry* file_entry;
         ash::buffer file_buffer;
         Archive* archive;
         bool encrypted;
 
         std::vector<char> storage;
 
-        std::vector<std::shared_ptr<CoreEntry>> entries;
+        std::vector<std::shared_ptr<CoreObject>> entries;
 
-        void parse(ArchiveArray& archive_array);
+        void parse(ArchiveManager& archive_array);
 
         [[nodiscard]] inline bool is_valid() const { return file_entry != nullptr; };
 
         void unpack();
 
     private:
-        std::pair<std::vector<Decima::ChunkEntry>::iterator, std::vector<Decima::ChunkEntry>::iterator>
+        std::pair<std::vector<ArchiveChunkEntry>::iterator, std::vector<ArchiveChunkEntry>::iterator>
         get_chunk_boundaries();
 
         [[nodiscard]] std::uint64_t chunk_id_by_offset(uint64_t offset) const;
 
-        static void decrypt_chunk(uint8_t* data, const Decima::ChunkEntry& chunk_entry);
+        static void decrypt_chunk(uint8_t* data, const ArchiveChunkEntry& chunk_entry);
     };
 }

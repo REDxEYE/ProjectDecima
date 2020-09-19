@@ -59,7 +59,7 @@ void FileTree::reset_filter(bool state) {
     }
 }
 
-void FileTree::draw(SelectionInfo& selection, Decima::ArchiveArray& archive_array, bool draw_header) {
+void FileTree::draw(SelectionInfo& selection, Decima::ArchiveManager& archive_array, bool draw_header) {
     if (draw_header) {
         ImGui::Separator();
         ImGui::Columns(3);

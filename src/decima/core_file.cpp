@@ -42,13 +42,13 @@ void Decima::CoreFile::unpack() {
     storage.erase(storage.begin() + file_entry->size, storage.begin() + storage.size());
 }
 
-Decima::CoreFile::CoreFile(FileEntry* file_entry, ash::buffer file_buffer, Archive* archive, bool encrypted)
+Decima::CoreFile::CoreFile(ArchiveFileEntry* file_entry, ash::buffer file_buffer, Archive* archive, bool encrypted)
     : file_entry(file_entry)
     , file_buffer(file_buffer)
     , archive(archive)
     , encrypted(encrypted) { }
 
-std::pair<std::vector<Decima::ChunkEntry>::iterator, std::vector<Decima::ChunkEntry>::iterator>
+std::pair<std::vector<Decima::ArchiveChunkEntry>::iterator, std::vector<Decima::ArchiveChunkEntry>::iterator>
 Decima::CoreFile::get_chunk_boundaries() {
     auto& chunk_table = archive->chunk_table;
 
@@ -72,7 +72,7 @@ std::uint64_t Decima::CoreFile::chunk_id_by_offset(uint64_t offset) const {
     return -1;
 }
 
-void Decima::CoreFile::decrypt_chunk(uint8_t* data, const Decima::ChunkEntry& chunk_entry) {
+void Decima::CoreFile::decrypt_chunk(uint8_t* data, const Decima::ArchiveChunkEntry& chunk_entry) {
     uint32_t iv[4];
     MurmurHash3_x64_128(&chunk_entry, 0x10, Decima::seed, iv);
 
@@ -88,7 +88,7 @@ void Decima::CoreFile::decrypt_chunk(uint8_t* data, const Decima::ChunkEntry& ch
     }
 }
 
-void Decima::CoreFile::parse(ArchiveArray& archive_array) {
+void Decima::CoreFile::parse(ArchiveManager& archive_array) {
     unpack();
     entries.clear();
 
@@ -96,7 +96,7 @@ void Decima::CoreFile::parse(ArchiveArray& archive_array) {
     ash::buffer buffer(storage.data(), storage.size());
 
     while (buffer.size() > 0) {
-        const auto entry_header = Decima::CoreEntry::peek_header(buffer);
+        const auto entry_header = Decima::CoreObject::peek_header(buffer);
         const auto entry_offset = buffer.data() - storage.data();
 
         entries.push_back([&] {

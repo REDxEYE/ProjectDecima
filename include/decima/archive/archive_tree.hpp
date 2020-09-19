@@ -8,9 +8,8 @@
 
 #include <imgui.h>
 
-#include "archive_array.hpp"
-#include "decima/file_types/core/entry.hpp"
-#include "decima/core_file.hpp"
+#include "archive_manager.hpp"
+#include "decima/serializable/object/object_dummy.hpp"
 
 struct SelectionInfo {
     SelectionInfo() = default;
@@ -55,5 +54,5 @@ public:
         }
     }
 
-    void draw(SelectionInfo& selection, Decima::ArchiveArray& archive_array, bool draw_header = true);
+    void draw(SelectionInfo& selection, Decima::ArchiveManager& archive_array, bool draw_header = true);
 };

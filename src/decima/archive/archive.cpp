@@ -51,9 +51,9 @@ bool Decima::Archive::open() {
     std::size_t read_offset = sizeof(ArchiveHeader) + sizeof(ArchiveContentInfo);
 
     content_table.resize(content_info.content_table_size);
-    memcpy(content_table.data(), m_stream.data() + read_offset, sizeof(FileEntry) * content_info.content_table_size);
+    memcpy(content_table.data(), m_stream.data() + read_offset, sizeof(ArchiveFileEntry) * content_info.content_table_size);
 
-    read_offset += sizeof(FileEntry) * content_info.content_table_size;
+    read_offset += sizeof(ArchiveFileEntry) * content_info.content_table_size;
 
     chunk_table.resize(content_info.chunk_table_size);
     memcpy(chunk_table.data(), m_stream.data() + read_offset, sizeof(chunk_table.front()) * content_info.chunk_table_size);

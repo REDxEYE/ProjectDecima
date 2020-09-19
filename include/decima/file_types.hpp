@@ -1,24 +1,24 @@
 #pragma once
 
-#include <map>
+#include <unordered_map>
 
-#include "decima/file_types/core/entry.hpp"
-#include "decima/file_types/core/collection.hpp"
-#include "decima/file_types/core/entry_dummy.hpp"
-#include "decima/file_types/core/translation.hpp"
-#include "decima/file_types/core/prefetch.hpp"
-#include "decima/file_types/core/texture.hpp"
-#include "decima/file_types/core/texture_set.h"
+#include "decima/serializable/object/object.hpp"
+#include "decima/serializable/object/object_dummy.hpp"
+#include "decima/serializable/object/collection.hpp"
+#include "decima/serializable/object/translation.hpp"
+#include "decima/serializable/object/prefetch.hpp"
+#include "decima/serializable/object/texture.hpp"
+#include "decima/serializable/object/texture_set.hpp"
 
 template <class Base, typename... Args>
 using Constructor = std::function<std::shared_ptr<Base>(Args&&...)>;
 
 template <class T, typename... Args>
-static std::shared_ptr<Decima::CoreEntry> construct(Args&&... args) {
+static std::shared_ptr<Decima::CoreObject> construct(Args&&... args) {
     return std::make_shared<T>(std::forward<Args>(args)...);
 }
 
-static const std::map<std::uint64_t, Constructor<Decima::CoreEntry>> types = {
+static const std::unordered_map<std::uint64_t, Constructor<Decima::CoreObject>> types = {
     // clang-format off
     { Decima::DeathStranding_FileMagics::Translation, construct<Decima::Translation> },
     { Decima::DeathStranding_FileMagics::Texture,     construct<Decima::Texture>     },

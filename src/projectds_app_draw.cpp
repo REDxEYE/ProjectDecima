@@ -213,7 +213,7 @@ void ProjectDS::draw_dockspace() {
                                 LOG("Processing file '", path, "' (size: ", file.file_entry->size, ')');
 
                                 for (const auto& entry : file.entries) {
-                                    output_file << path << '_' << entry->guid << '\n';
+                                    output_file << path << '_' << Decima::to_string(entry->guid) << '\n';
                                 }
                             }
                         }
@@ -228,7 +228,7 @@ void ProjectDS::draw_dockspace() {
                     if (!full_path.empty()) {
                         std::ofstream output_file { full_path };
 
-                        for (const auto& archive : archive_array.archives) {
+                        for (const auto& archive : archive_array.manager) {
                             output_file << archive.path << '\n';
 
                             for (const auto& entry : archive.content_table) {
@@ -314,7 +314,7 @@ void ProjectDS::draw_dockspace() {
         ImGui::Text("ProjectDecima " DECIMA_VERSION " (" __DATE__ ")");
         ImGui::Separator();
 
-        ImGui::TextWrapped("This project is aimed to provide GUI for export/preview files inside Decima engine archives.");
+        ImGui::TextWrapped("This project is aimed to provide GUI for export/preview files inside Decima engine manager.");
 
         if (ImGui::TreeNode("Show license")) {
             ImGui::Text(R"(MIT License
@@ -387,7 +387,7 @@ void ProjectDS::draw_filepreview() {
                     ImGui::Text("Archive ID");
                     ImGui::NextColumn();
 
-                    ImGui::Text("%s", archive_array.archives.at(archive_array.hash_to_archive_index.at(selection_info.selected_file)).path.c_str());
+                    ImGui::Text("%s", archive_array.manager.at(archive_array.hash_to_archive_index.at(selection_info.selected_file)).path.c_str());
                     ImGui::NextColumn();
 
                     ImGui::Separator();
@@ -449,7 +449,7 @@ void ProjectDS::draw_filepreview() {
         if (selection_info.selected_file > 0) {
             for (const auto& file : selection_info.file->entries) {
                 std::stringstream buffer;
-                buffer << '[' << file->guid << "] " << Decima::get_type_name(file->header.file_type);
+                buffer << '[' << Decima::to_string(file->guid) << "] " << Decima::get_type_name(file->header.file_type);
 
                 const bool opened = ImGui::TreeNode(buffer.str().c_str());
 
