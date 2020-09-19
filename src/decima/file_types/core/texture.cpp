@@ -1,21 +1,6 @@
 #include "decima/file_types/core/texture.hpp"
 
-#include <glad/glad.h>
-
-struct TexturePixelFormatInfo {
-    /* This format's block size (in pixels) */
-    int block_size;
-    /* How many bits occupies one pixel */
-    int block_density;
-    /* Corresponding OpenGL internal format */
-    int internal_format;
-    /* Texture format */
-    int data_format;
-    /* Is format whether compressed or not */
-    bool compressed;
-};
-
-static const std::unordered_map<Decima::TexturePixelFormat, TexturePixelFormatInfo> format_info {
+const std::unordered_map<Decima::TexturePixelFormat, Decima::TexturePixelFormatInfo> Decima::texture_format_info  {
     // clang-format off
     { Decima::TexturePixelFormat::BC1,     { 4, 4,  GL_COMPRESSED_RGBA_S3TC_DXT1_EXT,      0,          true  } },
     { Decima::TexturePixelFormat::BC3,     { 4, 8,  GL_COMPRESSED_RGBA_S3TC_DXT3_EXT,      0,          true  } },
@@ -61,7 +46,7 @@ void Decima::Texture::parse(ArchiveArray& archives, ash::buffer& buffer, CoreFil
 
     buffer.get(embedded_data.data(), std::min(embedded_data.size(), buffer.size()));
 
-    if (const auto format = format_info.find(pixel_format); format != format_info.end()) {
+    if (const auto format = texture_format_info.find(pixel_format); format != texture_format_info.end()) {
         const auto [format_block_size, format_block_density, format_type_internal, format_type_data, format_compressed] = format->second;
 
         const char* stream_data = nullptr;

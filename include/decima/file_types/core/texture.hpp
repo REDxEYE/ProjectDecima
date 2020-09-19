@@ -7,6 +7,8 @@
 #include "decima/file_types/pod/stream.hpp"
 #include "decima/file_types/core/entry.hpp"
 
+#include <glad/glad.h>
+
 namespace Decima {
     enum class TexturePixelFormat : std::uint8_t {
         RGBA8 = 0xC,
@@ -27,6 +29,21 @@ namespace Decima {
         TexCubeMap = 2,
         Tex2DArray = 3
     };
+
+    struct TexturePixelFormatInfo {
+        /* This format's block size (in pixels) */
+        int block_size;
+        /* How many bits occupies one pixel */
+        int block_density;
+        /* Corresponding OpenGL internal format */
+        int internal_format;
+        /* Texture format */
+        int data_format;
+        /* Is format whether compressed or not */
+        bool compressed;
+    };
+
+    extern const std::unordered_map<TexturePixelFormat, TexturePixelFormatInfo> texture_format_info;
 
     class Texture : public CoreEntry {
     public:
