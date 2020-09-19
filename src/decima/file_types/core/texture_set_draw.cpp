@@ -326,6 +326,43 @@ void Decima::DecimaTextureSetTextureDescriptor::draw() {
 }
 
 void Decima::TextureSet::draw() {
+    ImGui::Columns(2);
+
+    {
+        ImGui::Text("Property");
+        ImGui::NextColumn();
+
+        ImGui::Text("Value");
+        ImGui::NextColumn();
+
+        ImGui::Separator();
+    }
+
+    ImGui::SetColumnWidth(0, 200);
+    ImGui::SetColumnWidth(1, ImGui::GetWindowWidth() - 200);
+
+    {
+        ImGui::Text("Mip-map mode");
+        ImGui::NextColumn();
+
+        ImGui::Text("%s", Decima::to_string(mip_map_mode).c_str());
+        ImGui::NextColumn();
+
+        ImGui::Separator();
+    }
+
+    {
+        ImGui::Text("Preset");
+        ImGui::NextColumn();
+
+        preset.draw();
+        ImGui::NextColumn();
+
+        ImGui::Separator();
+    }
+
+    ImGui::Columns(1);
+
     if (ImGui::TreeNodeEx("Entries", ImGuiTreeNodeFlags_SpanFullWidth)) {
         for (std::size_t entry_index = 0; entry_index < entries.size(); entry_index++) {
             const auto entry_name = "Entry #" + std::to_string(entry_index);
