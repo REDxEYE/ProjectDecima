@@ -9,6 +9,8 @@ std::string Decima::to_string(const Decima::TextureColorSpace& value) {
         return "Linear";
     case TextureColorSpace::SRGB:
         return "sRGB";
+    default:
+        return "Unknown: " + std::to_string(static_cast<std::size_t>(value));
     }
 }
 
@@ -47,6 +49,8 @@ std::string Decima::to_string(const Decima::TextureSetType& value) {
         return "Curvature";
     case TextureSetType::Luminance:
         return "Luminance";
+    default:
+        return "Unknown: " + std::to_string(static_cast<std::size_t>(value));
     }
 }
 
@@ -63,6 +67,8 @@ std::string Decima::to_string(const Decima::TextureSetStorageType& value) {
         return "B";
     case TextureSetStorageType::A:
         return "A";
+    default:
+        return "Unknown: " + std::to_string(static_cast<std::size_t>(value));
     }
 }
 
@@ -91,6 +97,8 @@ std::string Decima::to_string(const Decima::TextureSetQualityType& value) {
         return "Normal roughness (BC7)";
     case TextureSetQualityType::AlphaToCoverageBC4:
         return "Alpha to coverage (BC4)";
+    default:
+        return "Unknown: " + std::to_string(static_cast<std::size_t>(value));
     }
 }
 
@@ -105,6 +113,8 @@ std::string Decima::to_string(const Decima::TextureCompressionMethod& value) {
         return "Variable data";
     case TextureCompressionMethod::DefaultData:
         return "Default data";
+    default:
+        return "Unknown: " + std::to_string(static_cast<std::size_t>(value));
     }
 }
 
@@ -119,6 +129,8 @@ std::string Decima::to_string(const Decima::DecimaTextureMipMapMode& value) {
         return "Mirror";
     case DecimaTextureMipMapMode::ClampToBorder:
         return "Clamp to border";
+    default:
+        return "Unknown: " + std::to_string(static_cast<std::size_t>(value));
     }
 }
 

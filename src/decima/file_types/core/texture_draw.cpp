@@ -8,141 +8,233 @@
 #include <util/pfd.h>
 #include <fstream>
 
-#include <fstream>
+template <>
+std::string Decima::to_string(const TexturePixelFormat& value) {
+    switch (value) {
+    case Decima::TexturePixelFormat::RGBA8:
+        return "RGBA8";
+    case Decima::TexturePixelFormat::RGBA16F:
+        return "RGBA16F";
+    case Decima::TexturePixelFormat::A8:
+        return "A8";
+    case Decima::TexturePixelFormat::BC1:
+        return "BC1";
+    case Decima::TexturePixelFormat::BC2:
+        return "BC2";
+    case Decima::TexturePixelFormat::BC3:
+        return "BC3";
+    case Decima::TexturePixelFormat::BC4:
+        return "BC4";
+    case Decima::TexturePixelFormat::BC5:
+        return "BC5";
+    case Decima::TexturePixelFormat::BC6:
+        return "BC6";
+    case Decima::TexturePixelFormat::BC7:
+        return "BC7";
+    default:
+        return "Unknown: " + std::to_string(static_cast<std::size_t>(value));
+    }
+}
+
+template <>
+std::string Decima::to_string(const TextureType& value) {
+    switch (value) {
+    case TextureType::Tex2D:
+        return "2D";
+    case TextureType::Tex3D:
+        return "3D";
+    case TextureType::TexCubeMap:
+        return "CubeMap";
+    case TextureType::Tex2DArray:
+        return "2D Array";
+    default:
+        return "Unknown: " + std::to_string(static_cast<std::size_t>(value));
+    }
+}
 
 void Decima::Texture::draw() {
     ImGui::Columns(2);
-    ImGui::SetColumnWidth(-1, 200);
-    ImGui::Text("Prop");
-    ImGui::NextColumn();
-    ImGui::Text("Value");
-    ImGui::NextColumn();
-    ImGui::Separator();
 
-    ImGui::Text("Flags");
-    ImGui::NextColumn();
+    {
+        ImGui::Text("Property");
+        ImGui::NextColumn();
 
-    if (static_cast<std::uint16_t>(flags) == 0) {
-        ImGui::TextDisabled("None");
-    } else {
-        std::stringstream buffer;
+        ImGui::Text("Value");
+        ImGui::NextColumn();
 
-        for (std::uint16_t flag = 1; flag < INT16_MAX + 1; flag <<= 1) {
-            if (static_cast<std::uint16_t>(flags) & flag) {
-                if (buffer.tellp() != 0)
-                    buffer << ", ";
-                buffer << static_cast<TextureFlags>(flag);
-            }
+        ImGui::Separator();
+    }
+
+    ImGui::SetColumnWidth(0, 200);
+    ImGui::SetColumnWidth(1, ImGui::GetWindowWidth() - 200);
+
+    {
+        ImGui::Text("Type");
+        ImGui::NextColumn();
+
+        ImGui::Text("%s", Decima::to_string(type).c_str());
+        ImGui::NextColumn();
+
+        ImGui::Separator();
+    }
+
+    {
+        ImGui::Text("Width");
+        ImGui::NextColumn();
+
+        ImGui::Text("%u", width);
+        ImGui::NextColumn();
+
+        ImGui::Separator();
+    }
+
+    {
+        ImGui::Text("Height");
+        ImGui::NextColumn();
+
+        ImGui::Text("%u", height);
+        ImGui::NextColumn();
+
+        ImGui::Separator();
+    }
+
+    {
+        ImGui::Text("Layers");
+        ImGui::NextColumn();
+
+        ImGui::Text("%u", layers);
+        ImGui::NextColumn();
+
+        ImGui::Separator();
+    }
+
+    {
+        ImGui::Text("Total mip-maps");
+        ImGui::NextColumn();
+
+        ImGui::Text("%u", total_mips);
+        ImGui::NextColumn();
+
+        ImGui::Separator();
+    }
+
+    {
+        ImGui::Text("Format");
+        ImGui::NextColumn();
+
+        ImGui::Text("%s", Decima::to_string(pixel_format).c_str());
+        ImGui::NextColumn();
+
+        ImGui::Separator();
+    }
+
+    {
+        ImGui::Text("Unknown #0");
+        ImGui::NextColumn();
+
+        ImGui::Text("%u", unk_0);
+        ImGui::NextColumn();
+
+        ImGui::Separator();
+    }
+
+    {
+        ImGui::Text("Unknown #1");
+        ImGui::NextColumn();
+
+        ImGui::Text("%u", unk_1);
+        ImGui::NextColumn();
+
+        ImGui::Separator();
+    }
+
+    {
+        ImGui::Text("Unknown #2");
+        ImGui::NextColumn();
+
+        guid.draw();
+        ImGui::NextColumn();
+
+        ImGui::Separator();
+    }
+
+    {
+        ImGui::Text("Buffer size");
+        ImGui::NextColumn();
+
+        ImGui::Text("%u", buffer_size);
+        ImGui::NextColumn();
+
+        ImGui::Separator();
+    }
+
+    {
+        ImGui::Text("Total size");
+        ImGui::NextColumn();
+
+        ImGui::Text("%u", total_size);
+        ImGui::NextColumn();
+
+        ImGui::Separator();
+    }
+
+    {
+        ImGui::Text("Stream size");
+        ImGui::NextColumn();
+
+        ImGui::Text("%u", stream_size);
+        ImGui::NextColumn();
+
+        ImGui::Separator();
+    }
+
+    {
+        ImGui::Text("Stream mip-maps");
+        ImGui::NextColumn();
+
+        ImGui::Text("%u", stream_mips);
+        ImGui::NextColumn();
+
+        ImGui::Separator();
+    }
+
+    {
+        ImGui::Text("Unknown #3");
+        ImGui::NextColumn();
+
+        ImGui::Text("%u", unk_3);
+        ImGui::NextColumn();
+
+        ImGui::Separator();
+    }
+
+    {
+        ImGui::Text("Unknown #4");
+        ImGui::NextColumn();
+
+        ImGui::Text("%u", unk_4);
+        ImGui::NextColumn();
+
+        ImGui::Separator();
+    }
+
+    {
+        ImGui::Text("Stream");
+        ImGui::NextColumn();
+
+        if (stream_size > 0) {
+            ImGui::BeginChild(unk_2.hash(), { 0, 150 }, true);
+            external_data.draw();
+            ImGui::EndChild();
+        } else {
+            ImGui::Text("No external stream");
         }
 
-        ImGui::Text("%s", buffer.str().c_str());
+        draw_preview(256, 256, 128, 4);
+
+        ImGui::NextColumn();
     }
 
-    ImGui::NextColumn();
-
-    ImGui::Separator();
-
-    ImGui::Text("Width");
-    ImGui::NextColumn();
-    ImGui::Text("%i", width);
-    ImGui::NextColumn();
-    ImGui::Separator();
-
-    ImGui::Text("Height");
-    ImGui::NextColumn();
-    ImGui::Text("%i", height);
-    ImGui::NextColumn();
-    ImGui::Separator();
-
-    ImGui::Text("layers");
-    ImGui::NextColumn();
-    ImGui::Text("%i", layers);
-    ImGui::NextColumn();
-    ImGui::Separator();
-
-    ImGui::Text("Mip count");
-    ImGui::NextColumn();
-    ImGui::Text("%i", total_mips);
-    ImGui::NextColumn();
-    ImGui::Separator();
-
-    ImGui::Text("Pixel format");
-    ImGui::NextColumn();
-    {
-        std::stringstream buffer;
-        buffer << pixel_format;
-        ImGui::Text("%s", buffer.str().c_str());
-    }
-    ImGui::NextColumn();
-    ImGui::Separator();
-
-    ImGui::Text("unk2");
-    ImGui::NextColumn();
-    ImGui::Text("%i", unk2);
-    ImGui::NextColumn();
-    ImGui::Separator();
-
-    ImGui::Text("unk3");
-    ImGui::NextColumn();
-    ImGui::Text("%i", unk3);
-    ImGui::NextColumn();
-    ImGui::Separator();
-
-    ImGui::Text("GUID");
-    ImGui::NextColumn();
-    file_guid.draw();
-    ImGui::NextColumn();
-    ImGui::Separator();
-
-    ImGui::Text("buffer size");
-    ImGui::NextColumn();
-    ImGui::Text("%i", buffer_size);
-    ImGui::NextColumn();
-    ImGui::Separator();
-
-    ImGui::Text("total size");
-    ImGui::NextColumn();
-    ImGui::Text("%i", total_size);
-    ImGui::NextColumn();
-    ImGui::Separator();
-
-    ImGui::Text("Stream Size");
-    ImGui::NextColumn();
-    ImGui::Text("%i", stream_size);
-    ImGui::NextColumn();
-    ImGui::Separator();
-
-    ImGui::Text("Stream Mips");
-    ImGui::NextColumn();
-    ImGui::Text("%i", stream_mips);
-    ImGui::NextColumn();
-    ImGui::Separator();
-
-    ImGui::Text("unk4");
-    ImGui::NextColumn();
-    ImGui::Text("%i", unk4);
-    ImGui::NextColumn();
-    ImGui::Separator();
-
-    ImGui::Text("unk5");
-    ImGui::NextColumn();
-    ImGui::Text("%i", unk5);
-    ImGui::NextColumn();
-    ImGui::Separator();
-
-    ImGui::Text("Stream");
-    ImGui::NextColumn();
-    if (stream_size > 0) {
-        ImGui::BeginChild(file_guid.hash(), { 0, 150 }, true);
-        external_data.draw();
-        ImGui::EndChild();
-    } else {
-        ImGui::Text("No external stream");
-    }
-
-    draw_preview(256, 256, 128, 4);
-
-    ImGui::NextColumn();
     ImGui::Columns(1);
 }
 
@@ -268,43 +360,5 @@ void Decima::Texture::draw_preview(float preview_width, float preview_height, fl
         ImGui::Image(reinterpret_cast<ImTextureID>(static_cast<std::size_t>(mip_textures[mip_index])), ImVec2(zoom_region * zoom_scale, zoom_region * zoom_scale), uv0, uv1, tint, border);
 
         ImGui::EndTooltip();
-    }
-}
-
-namespace Decima {
-    std::ostream& operator<<(std::ostream& os, Decima::TexturePixelFormat fmt) {
-        switch (fmt) {
-        case Decima::TexturePixelFormat::RGBA8:
-            return os << "RGBA8";
-        case Decima::TexturePixelFormat::RGBA16F:
-            return os << "RGBA16F";
-        case Decima::TexturePixelFormat::A8:
-            return os << "A8";
-        case Decima::TexturePixelFormat::BC1:
-            return os << "BC1";
-        case Decima::TexturePixelFormat::BC2:
-            return os << "BC2";
-        case Decima::TexturePixelFormat::BC3:
-            return os << "BC3";
-        case Decima::TexturePixelFormat::BC4:
-            return os << "BC4";
-        case Decima::TexturePixelFormat::BC5:
-            return os << "BC5";
-        case Decima::TexturePixelFormat::BC6:
-            return os << "BC6";
-        case Decima::TexturePixelFormat::BC7:
-            return os << "BC7";
-        default:
-            return os << "Unsupported: " << std::to_string(int(fmt));
-        }
-    }
-
-    std::ostream& operator<<(std::ostream& os, Decima::TextureFlags flags) {
-        switch (flags) {
-        case Decima::TextureFlags::Cubemap:
-            return os << "Cubemap";
-        default:
-            return os << "Unsupported: " << std::to_string(int(flags));
-        }
     }
 }

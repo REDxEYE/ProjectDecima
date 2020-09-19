@@ -33,21 +33,21 @@ static const std::unordered_map<Decima::TexturePixelFormat, TexturePixelFormatIn
 
 void Decima::Texture::parse(ArchiveArray& archives, ash::buffer& buffer, CoreFile* core_file) {
     CoreEntry::parse(archives, buffer, nullptr);
-    flags = buffer.get<decltype(flags)>();
+    type = buffer.get<decltype(type)>();
     width = buffer.get<decltype(width)>();
     height = buffer.get<decltype(height)>();
     layers = buffer.get<decltype(layers)>();
     total_mips = buffer.get<decltype(total_mips)>();
     pixel_format = buffer.get<decltype(pixel_format)>();
-    unk2 = buffer.get<decltype(unk2)>();
-    unk3 = buffer.get<decltype(unk3)>();
-    file_guid.parse(buffer);
+    unk_0 = buffer.get<decltype(unk_0)>();
+    unk_1 = buffer.get<decltype(unk_1)>();
+    unk_2.parse(buffer);
     buffer_size = buffer.get<decltype(buffer_size)>();
     total_size = buffer.get<decltype(total_size)>();
     stream_size = buffer.get<decltype(stream_size)>();
     stream_mips = buffer.get<decltype(stream_mips)>();
-    unk4 = buffer.get<decltype(unk4)>();
-    unk5 = buffer.get<decltype(unk5)>();
+    unk_3 = buffer.get<decltype(unk_3)>();
+    unk_4 = buffer.get<decltype(unk_4)>();
 
     if (stream_size > 0)
         external_data.parse(archives, buffer);
