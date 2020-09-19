@@ -18,28 +18,23 @@ namespace Decima {
             "Korean",
             "Russian",
             "Polish",
-            "Norwegian",
-            "Finnish",
-            "Swedish",
             "Danish",
+            "Finnish",
+            "Norwegian",
+            "Swedish",
             "Japanese",
             "Spanish (Mexico)",
             "Portuguese (Brazil)",
             "Turkish",
             "Arabic",
             "Chinese (Simplified)",
-            "Unknown",
+            "English (UK)",
             "Greek",
             "Czech",
             "Hungarian"
         };
 
         std::string translations[std::size(languages)];
-
-        /*
-         * Not sure is this is a comment or something else.
-         * Let be comment for now.
-         */
         std::string comments[std::size(languages)];
         std::uint8_t flags[std::size(languages)];
 
