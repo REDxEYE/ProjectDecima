@@ -8,6 +8,9 @@
 namespace Decima {
     template <class T>
     using OptionalRef = std::optional<std::reference_wrapper<T>>;
+
+    template <typename T>
+    std::string to_string(const T&);
 }
 
 #ifdef _MSC_VER
