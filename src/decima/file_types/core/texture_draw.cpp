@@ -1,12 +1,10 @@
-//
-// Created by MED45 on 07.08.2020.
-//
 #include "decima/file_types/core/texture.hpp"
-#include "utils.hpp"
-#include "projectds_app.hpp"
 
 #include <util/pfd.h>
 #include <fstream>
+
+#include "utils.hpp"
+#include "projectds_app.hpp"
 
 template <>
 std::string Decima::to_string(const TexturePixelFormat& value) {

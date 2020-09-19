@@ -13,8 +13,6 @@ namespace Decima {
         SRGB = 1
     };
 
-    std::ostream& operator<<(std::ostream& os, Decima::TextureColorSpace);
-
     enum class TextureSetType : std::uint32_t {
         Invalid = 0,
         Color = 1,
@@ -34,8 +32,6 @@ namespace Decima {
         Luminance = 15
     };
 
-    std::ostream& operator<<(std::ostream& os, Decima::TextureSetType);
-
     enum class TextureSetStorageType : std::uint32_t {
         RGB = 0,
         R = 1,
@@ -43,8 +39,6 @@ namespace Decima {
         B = 3,
         A = 4
     };
-
-    std::ostream& operator<<(std::ostream& os, Decima::TextureSetStorageType);
 
     enum class TextureSetQualityType : std::uint32_t {
         Default = 0,
@@ -60,16 +54,12 @@ namespace Decima {
         AlphaToCoverageBC4 = 10
     };
 
-    std::ostream& operator<<(std::ostream& os, Decima::TextureSetQualityType);
-
     enum class TextureCompressionMethod : std::uint32_t {
         PerceptualData = 0,
         NormalData = 1,
         VariableData = 2,
         DefaultData = 3
     };
-
-    std::ostream& operator<<(std::ostream& os, Decima::TextureCompressionMethod);
 
     enum class DecimaTextureMipMapMode : std::uint32_t {
         Wrap = 0,
@@ -78,30 +68,35 @@ namespace Decima {
         ClampToBorder = 3
     };
 
-    std::ostream& operator<<(std::ostream& os, Decima::DecimaTextureMipMapMode);
-
     class TextureDefaultColor {
     public:
-        float rgba[4];
-
         void parse(ash::buffer& buffer);
         void draw();
+
+    private:
+        float rgba[4];
     };
 
     class DecimaTextureSetEntry {
     public:
+        void parse(ash::buffer& buffer);
+        void draw();
+
+    private:
         TextureCompressionMethod compression_method;
         std::uint8_t create_mip_maps;
         TextureColorSpace color_space;
         std::uint32_t packing_info;
         TextureSetType texture_type;
         Reference texture;
-
-        void parse(ash::buffer& buffer);
-        void draw();
     };
 
     struct DecimaTextureSetTextureDescriptor {
+    public:
+        void parse(ash::buffer& buffer);
+        void draw();
+
+    private:
         TextureSetType texture_type;
         StringHashed path;
         std::uint8_t active;
@@ -112,19 +107,17 @@ namespace Decima {
         std::uint32_t width {};
         std::uint32_t height {};
         TextureDefaultColor default_color;
-
-        void parse(ash::buffer& buffer);
-        void draw();
     };
 
     class TextureSet : public CoreEntry {
+    public:
+        void parse(ArchiveArray& archives, ash::buffer& buffer, CoreFile* core_file) override;
+        void draw() override;
+
+    private:
         std::vector<DecimaTextureSetEntry> entries;
         DecimaTextureMipMapMode mip_map_mode;
         std::vector<DecimaTextureSetTextureDescriptor> descriptors;
         Reference preset;
-
-    public:
-        void parse(ArchiveArray& archives, ash::buffer& buffer, CoreFile* core_file) override;
-        void draw() override;
     };
 }

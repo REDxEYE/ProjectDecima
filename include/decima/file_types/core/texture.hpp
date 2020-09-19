@@ -8,7 +8,7 @@
 #include "decima/file_types/core/entry.hpp"
 
 namespace Decima {
-    enum class TexturePixelFormat : uint8_t {
+    enum class TexturePixelFormat : std::uint8_t {
         RGBA8 = 0xC,
         RGBA16F = 0x13,
         A8 = 0x1F,

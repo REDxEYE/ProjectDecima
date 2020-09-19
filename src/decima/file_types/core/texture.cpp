@@ -1,7 +1,5 @@
-//
-// Created by MED45 on 07.08.2020.
-//
 #include "decima/file_types/core/texture.hpp"
+
 #include <glad/glad.h>
 
 struct TexturePixelFormatInfo {

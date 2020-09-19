@@ -1,7 +1,3 @@
-//
-// Created by MED45 on 11.08.2020.
-//
-
 #include "decima/file_types/core/texture_set.h"
 
 void Decima::TextureDefaultColor::parse(ash::buffer& buffer) {
