@@ -28,7 +28,7 @@ namespace Decima {
     };
 
     template <typename T>
-    class Array<T, std::enable_if_t<std::is_base_of_v<CoreSerializable, T>>> {
+    class Array<T, std::enable_if_t<std::is_base_of_v<CoreSerializable, T>>> : public CoreSerializable {
     public:
         inline void parse(ash::buffer& buffer) {
             std::uint32_t length = buffer.get<decltype(length)>();
@@ -45,7 +45,7 @@ namespace Decima {
     };
 
     template <typename T>
-    class Array<T, std::enable_if_t<std::is_base_of_v<CoreObject, T>>> {
+    class Array<T, std::enable_if_t<std::is_base_of_v<CoreObject, T>>> : public CoreSerializable {
     public:
         inline void parse(ArchiveManager& manager, ash::buffer& buffer) {
             std::uint32_t length = buffer.get<decltype(length)>();
