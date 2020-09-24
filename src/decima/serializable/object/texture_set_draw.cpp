@@ -172,24 +172,36 @@ void Decima::DecimaTextureSetTextureDescriptor::draw() {
         ImGui::Separator();
     }
 
-    {
-        ImGui::Text("Width");
-        ImGui::NextColumn();
+    if(active > 0) {
+        {
+            ImGui::Text("Width");
+            ImGui::NextColumn();
 
-        ImGui::Text("%u", width);
-        ImGui::NextColumn();
+            ImGui::Text("%u", width);
+            ImGui::NextColumn();
 
-        ImGui::Separator();
-    }
+            ImGui::Separator();
+        }
 
-    {
-        ImGui::Text("Height");
-        ImGui::NextColumn();
+        {
+            ImGui::Text("Height");
+            ImGui::NextColumn();
 
-        ImGui::Text("%u", height);
-        ImGui::NextColumn();
+            ImGui::Text("%u", height);
+            ImGui::NextColumn();
 
-        ImGui::Separator();
+            ImGui::Separator();
+        }
+    } else {
+        {
+            ImGui::Text("Unknown #0");
+            ImGui::NextColumn();
+
+            ImGui::Text("%u", unk_0);
+            ImGui::NextColumn();
+
+            ImGui::Separator();
+        }
     }
 
     {

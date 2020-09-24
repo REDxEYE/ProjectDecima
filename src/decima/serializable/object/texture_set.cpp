@@ -21,8 +21,12 @@ void Decima::DecimaTextureSetTextureDescriptor::parse(ash::buffer& buffer) {
     storage_type = buffer.get<decltype(storage_type)>();
     quality_type = buffer.get<decltype(quality_type)>();
     compression_method = buffer.get<decltype(compression_method)>();
-    width = buffer.get<decltype(width)>();
-    height = buffer.get<decltype(height)>();
+    if (active > 0) {
+        width = buffer.get<decltype(width)>();
+        height = buffer.get<decltype(height)>();
+    } else {
+        unk_0 = buffer.get<decltype(unk_0)>();
+    }
     default_color.parse(buffer);
 }
 

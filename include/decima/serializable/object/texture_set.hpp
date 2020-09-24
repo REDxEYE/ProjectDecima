@@ -106,6 +106,7 @@ namespace Decima {
         TextureCompressionMethod compression_method;
         std::uint32_t width {};
         std::uint32_t height {};
+        std::uint32_t unk_0 {};
         TextureDefaultColor default_color;
     };
 
