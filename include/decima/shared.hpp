@@ -24,7 +24,7 @@ namespace Decima {
 
 #define DECIMA_VERSION_MAJOR 0
 #define DECIMA_VERSION_MINOR 1
-#define DECIMA_VERSION_MICRO 6
+#define DECIMA_VERSION_MICRO 7
 
 // clang-format off
 #define DECIMA_VERSION \
