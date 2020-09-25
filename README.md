@@ -1,23 +1,22 @@
-ProjectDecima is aimed to provide GUI for export/preview files inside Decima engine manager.
+This project is aimed to provide graphical user interface for previewing, exporting and modifying game resources in research purposes.
 
-![](https://i.imgur.com/cEQnB4K.png)
+![The program interface showing texture of Sam's face](https://i.imgur.com/0yv9GsU.png)
 
-## Project is heavily inspired by:
-* [DecimaExplorer](https://github.com/Jayveer/Decima-Explorer) by [Jayveer](https://github.com/Jayveer)
-* [DecimaTools](https://github.com/Wunkolo/DecimaTools) by [Wunkolo](https://github.com/Wunkolo)
-* [ProjectZeroDawn](https://github.com/yretenai/ProjectZeroDawn) by [yretenai](https://github.com/yretenai)
+## People who made this project possible
+* [Wunkolo](https://github.com/Wunkolo) who reverse-engineered the format of game archives and extracted keys required for decryption
+* [Yretenai](https://github.com/yretenai) who at early steps gave basic understanding how game works
+* [Nukem9](https://github.com/Nukem9) who from nowhere kicked out the door and provided priceless intelligence about RTTI data that game uses to load its resources 
 
-## Requirements
-* Windows 10 64-bit
-* CMake 3.15 <=
+## Building
+### Requirements:
+* Windows 10 64-bit _(note: this is the only supported platform)_
+* CMake 3.10 or greater
 * Any of listed compilers:
   * Visual Studio 2019
   * Clang 
   * MinGW x64
 
-## Building
-**Note: This project supports x64 Windows 10 systems only.**
-
+### Steps:
 Open console and run following commands:
 1. ```git clone --recursive https://github.com/REDxEYE/ProjectDecima.git```
 1. ```cd ProjectDecima```
@@ -25,8 +24,7 @@ Open console and run following commands:
 1. ```cmake CMakeLists.txt -G "Visual Studio 16 2019" -B build```
 1. ```cmake --build build --config Release```
 
-## License
-
-* [Murmur3 implementation by PeterScott](https://github.com/PeterScott/murmur3/blob/master/murmur3.c)
-* [Modified MD5 implementation by pod32g](https://github.com/pod32g/MD5/blob/master/md5.c)
-* [mio Copyright (c) 2018 https://github.com/mandreyel/](https://github.com/mandreyel/mio)
+## Copyright
+* [Library 'imgui'](https://github.com/ocornut/imgui) by [ocornut](https://github.com/ocornut)
+* [Library 'mio'](https://github.com/mandreyel/mio) by [mandreyel](https://github.com/mandreyel)
+* All rights to the Decima Engine, its source code and all games based on this engine belong to their developers.
