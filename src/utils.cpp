@@ -19,18 +19,6 @@ uint64_t hash_string(const std::string& filename, uint8_t seed) {
     return hash[0];
 }
 
-uint64_t calculate_first_containing_chunk(uint64_t file_offset, int32_t chunk_size) {
-    return file_offset - (file_offset % chunk_size);
-}
-
-uint64_t calculate_last_containing_chunk(uint64_t file_offset, int32_t file_size, int32_t chunk_size) {
-    return calculate_first_containing_chunk(file_offset + file_size, chunk_size);
-}
-
-bool decompress_chunk_data(const std::vector<uint8_t>& data, uint64_t decompressed_size, uint8_t* output) {
-    return decompress_chunk_data(data.data(), data.size(), decompressed_size, output);
-}
-
 bool decompress_chunk_data(const uint8_t* data, uint64_t data_size, uint64_t decompressed_size, uint8_t* output) {
     int res = Kraken_Decompress(data, data_size, output, decompressed_size);
     return res != -1;

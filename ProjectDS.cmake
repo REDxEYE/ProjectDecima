@@ -8,7 +8,6 @@ add_executable(ProjectDS
         src/app.cpp
         src/projectds_app.cpp
         src/projectds_app_draw.cpp
-        src/projectds_app_utils.cpp
         src/decima/serializable/object/object.cpp
         src/decima/serializable/object/object_draw.cpp
         src/decima/serializable/object/object_dummy.cpp
