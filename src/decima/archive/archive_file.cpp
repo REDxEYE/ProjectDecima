@@ -76,7 +76,7 @@ Decima::CoreFile::CoreFile(Archive& archive, ArchiveFileEntry& entry, mio::mmap_
     , contents(unpack(archive, entry, source)) { }
 
 void Decima::CoreFile::parse(ArchiveManager& archive_array) {
-    assert(objects.empty());
+    objects.clear();
 
     // TODO: This is shitty API I wrote, please replace this
     ash::buffer buffer(contents.data(), contents.size());
