@@ -26,7 +26,7 @@ add_executable(ProjectDS
         src/decima/serializable/string.cpp
         src/decima/serializable/stream.cpp
         src/decima/serializable/guid.cpp
-        )
+        src/decima/serializable/handlers.cpp)
 
 target_link_libraries(ProjectDS PRIVATE oodle hash imgui glfw glad)
 target_include_directories(ProjectDS PRIVATE include)

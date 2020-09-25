@@ -1,6 +1,4 @@
-#pragma once
-
-#include <unordered_map>
+#include "decima/serializable/handlers.hpp"
 
 #include "decima/serializable/object/object.hpp"
 #include "decima/serializable/object/object_dummy.hpp"
@@ -10,15 +8,12 @@
 #include "decima/serializable/object/texture.hpp"
 #include "decima/serializable/object/texture_set.hpp"
 
-template <class Base, typename... Args>
-using Constructor = std::function<std::shared_ptr<Base>(Args&&...)>;
-
 template <class T, typename... Args>
-static std::shared_ptr<Decima::CoreObject> construct(Args&&... args) {
+inline static std::shared_ptr<Decima::CoreObject> construct(Args&&... args) {
     return std::make_shared<T>(std::forward<Args>(args)...);
 }
 
-static const std::unordered_map<std::uint64_t, Constructor<Decima::CoreObject>> types = {
+static const std::unordered_map<std::uint64_t, Decima::Handler<Decima::CoreObject>> handlers {
     // clang-format off
     { Decima::DeathStranding_FileMagics::Translation, construct<Decima::Translation> },
     { Decima::DeathStranding_FileMagics::Texture,     construct<Decima::Texture>     },
@@ -28,7 +23,7 @@ static const std::unordered_map<std::uint64_t, Constructor<Decima::CoreObject>> 
     // clang-format on
 };
 
-static auto get_handler(std::uint64_t hash) noexcept {
-    const auto handler = types.find(hash);
-    return handler != types.end() ? handler->second() : construct<Decima::Dummy>();
+std::invoke_result_t<Decima::Handler<Decima::CoreObject>> Decima::get_handler(std::uint64_t hash) {
+    const auto handler = handlers.find(hash);
+    return handler != handlers.end() ? handler->second() : construct<Decima::Dummy>();
 }
