@@ -19,9 +19,8 @@ void Decima::ArchiveManager::load_archive(const std::string& path) {
 
 void Decima::ArchiveManager::load_prefetch() {
     auto& prefetch_data = query_file("prefetch/fullgame.prefetch").value().get();
-    prefetch_data.unpack();
 
-    ash::buffer buffer(prefetch_data.storage.data(), prefetch_data.storage.size());
+    ash::buffer buffer(prefetch_data.contents.data(), prefetch_data.contents.size());
 
     Prefetch prefetch;
     prefetch.parse(*this, buffer, nullptr);

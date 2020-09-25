@@ -9,9 +9,7 @@ void Decima::Stream::parse(ArchiveManager& manager, ash::buffer& buffer) {
     m_size = buffer.get<decltype(m_size)>();
 
     auto& stream_file = manager.query_file(m_name.data() + ".core.stream").value().get();
-    stream_file.unpack();
-
-    m_data = stream_file.storage;
+    m_data = stream_file.contents;
 }
 
 void Decima::Stream::draw() {

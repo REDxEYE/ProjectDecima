@@ -4,7 +4,7 @@
 #include <util/mio.hpp>
 
 #include "decima/constants.hpp"
-#include "decima/core_file.hpp"
+#include "archive_file.hpp"
 
 #include "util/buffer.hpp"
 

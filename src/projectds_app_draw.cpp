@@ -63,10 +63,9 @@ static void show_export_selection_dialog(ProjectDS& self) {
             std::filesystem::create_directories(full_path.parent_path());
 
             auto& file = self.archive_array.query_file(filename).value().get();
-            file.unpack();
 
             std::ofstream output_file { full_path, std::ios::binary };
-            output_file.write(reinterpret_cast<const char*>(file.storage.data()), file.storage.size());
+            output_file.write(reinterpret_cast<const char*>(file.contents.data()), file.contents.size());
 
             std::cout << "File was exported to: " << full_path << "\n";
         }
@@ -91,7 +90,7 @@ void ProjectDS::init_user() {
         ImGuiKeyModFlags_None,
         [&] {
             if (selection_info.preview_file != 0) {
-                selection_info.preview_file_size = selection_info.file->storage.size();
+                selection_info.preview_file_size = selection_info.file->contents.size();
                 selection_info.preview_file_offset = 0;
             }
         },
@@ -360,7 +359,7 @@ void ProjectDS::draw_filepreview() {
                     selection_info.file = &archive_array.query_file(selection_info.selected_file).value().get();
                     selection_info.file->parse(archive_array);
                     selection_info.preview_file = selection_info.selected_file;
-                    selection_info.preview_file_size = selection_info.file->storage.size();
+                    selection_info.preview_file_size = selection_info.file->contents.size();
                     selection_info.preview_file_offset = 0;
                 }
             } else {
@@ -377,7 +376,7 @@ void ProjectDS::draw_filepreview() {
     ImGui::Begin("Normal View", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
     {
         if (selection_info.selected_file > 0) {
-            for (const auto& file : selection_info.file->entries) {
+            for (const auto& file : selection_info.file->objects) {
                 std::stringstream buffer;
                 buffer << '[' << Decima::to_string(file->guid) << "] " << Decima::get_type_name(file->header.file_type);
 
@@ -407,7 +406,7 @@ void ProjectDS::draw_filepreview() {
     {
         if (selection_info.selected_file > 0) {
             file_viewer.DrawContents(
-                selection_info.file->storage.data() + selection_info.preview_file_offset,
+                selection_info.file->contents.data() + selection_info.preview_file_offset,
                 selection_info.preview_file_size,
                 0);
         }
