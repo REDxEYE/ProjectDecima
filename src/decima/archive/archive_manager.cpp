@@ -12,7 +12,7 @@ void Decima::ArchiveManager::load_archive(const std::string& path) {
     auto& archive = manager.emplace_back(path);
     archive.open();
 
-    for (const auto& entry : archive.content_table) {
+    for (const auto& entry : archive.file_entries) {
         hash_to_archive_index.emplace(entry.hash, static_cast<int>(manager.size() - 1));
     }
 }
@@ -37,7 +37,7 @@ Decima::OptionalRef<Decima::ArchiveFileEntry> Decima::ArchiveManager::get_file_e
         auto& archive = manager.at(archive_id->second);
         auto file_id = archive.m_hash_to_index.find(hash)->second;
 
-        return std::make_optional(std::ref(archive.content_table.at(file_id)));
+        return std::make_optional(std::ref(archive.file_entries.at(file_id)));
     }
 
     return {};

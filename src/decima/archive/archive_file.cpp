@@ -18,7 +18,7 @@ static void decrypt_chunk(uint8_t* data, const Decima::ArchiveChunkEntry& chunk_
 
     uint8_t digest[16];
     md5Hash((md5_byte_t*)iv, 16, digest);
-    for (int i = 0; i < chunk_entry.compressed_size; i++) {
+    for (uint32_t i = 0; i < chunk_entry.compressed_span.size; i++) {
         data[i] ^= digest[i % 16];
     }
 }
@@ -29,43 +29,43 @@ std::vector<char> unpack(const Decima::Archive& archive, const Decima::ArchiveFi
     };
 
     auto chunk_from_offset = [&](std::uint64_t offset) {
-        auto index = std::find_if(archive.chunk_table.begin(), archive.chunk_table.end(), [&](const auto& item) {
-            return item.uncompressed_offset == offset;
+        auto index = std::find_if(archive.chunk_entries.begin(), archive.chunk_entries.end(), [&](const auto& item) {
+            return item.decompressed_span.offset == offset;
         });
 
-        return std::distance(archive.chunk_table.begin(), index);
+        return std::distance(archive.chunk_entries.begin(), index);
     };
 
     auto [chunk_entry_begin, chunk_entry_end] = [&] {
-        auto first_chunk_offset = aligned_offset(entry.offset, archive.content_info.max_chunk_size);
-        auto last_chunk_offset = aligned_offset(entry.offset + entry.size, archive.content_info.max_chunk_size);
+        auto first_chunk_offset = aligned_offset(entry.span.offset, archive.header.chunk_maximum_size);
+        auto last_chunk_offset = aligned_offset(entry.span.offset + entry.span.size, archive.header.chunk_maximum_size);
 
         return std::make_pair(
-            archive.chunk_table.begin() + chunk_from_offset(first_chunk_offset),
-            archive.chunk_table.begin() + chunk_from_offset(last_chunk_offset) + 1);
+            archive.chunk_entries.begin() + chunk_from_offset(first_chunk_offset),
+            archive.chunk_entries.begin() + chunk_from_offset(last_chunk_offset) + 1);
     }();
 
     auto decompressed_size = std::accumulate(chunk_entry_begin, chunk_entry_end, 0, [](const auto acc, const auto& item) {
-        return acc + item.uncompressed_size;
+        return acc + item.decompressed_span.size;
     });
 
     std::vector<char> buffer_decompressed(decompressed_size);
     std::size_t buffer_decompressed_offset = 0;
 
     for (auto chunk_entry = chunk_entry_begin; chunk_entry != chunk_entry_end; ++chunk_entry) {
-        std::vector<std::uint8_t> data_buffer(chunk_entry->compressed_size);
-        memcpy(data_buffer.data(), source.data() + chunk_entry->compressed_offset, chunk_entry->compressed_size);
+        std::vector<std::uint8_t> data_buffer(chunk_entry->compressed_span.size);
+        memcpy(data_buffer.data(), source.data() + chunk_entry->compressed_span.offset, chunk_entry->compressed_span.size);
 
-        if (archive.header.type == Decima::FileType::archive_contents_encrypted)
+        if (archive.header.type == Decima::ArchiveType::Encrypted)
             decrypt_chunk(data_buffer.data(), *chunk_entry);
 
-        decompress_chunk_data((std::uint8_t*)data_buffer.data(), chunk_entry->compressed_size, chunk_entry->uncompressed_size, (std::uint8_t*)&buffer_decompressed.at(buffer_decompressed_offset));
-        buffer_decompressed_offset += chunk_entry->uncompressed_size;
+        decompress_chunk_data((std::uint8_t*)data_buffer.data(), chunk_entry->compressed_span.size, chunk_entry->decompressed_span.size, (std::uint8_t*)&buffer_decompressed.at(buffer_decompressed_offset));
+        buffer_decompressed_offset += chunk_entry->decompressed_span.size;
     }
 
-    auto file_position = entry.offset & (archive.content_info.max_chunk_size - 1);
+    auto file_position = entry.span.offset & (archive.header.chunk_maximum_size - 1);
     buffer_decompressed.erase(buffer_decompressed.begin(), buffer_decompressed.begin() + file_position);
-    buffer_decompressed.erase(buffer_decompressed.begin() + entry.size, buffer_decompressed.begin() + buffer_decompressed.size());
+    buffer_decompressed.erase(buffer_decompressed.begin() + entry.span.size, buffer_decompressed.begin() + buffer_decompressed.size());
 
     return buffer_decompressed;
 }

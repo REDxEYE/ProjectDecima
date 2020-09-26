@@ -9,35 +9,59 @@
 #include "util/buffer.hpp"
 
 namespace Decima {
-    struct ArchiveHeader {
-        FileType type;
+    enum class ArchiveType : uint32_t {
+        /** Regular type of the archive, not encrypted */
+        Regular = 0x20304050,
+        /** Regular type of the archive, encrypted with [key] */
+        Encrypted = 0x21304050,
+    };
+
+    class ArchiveHeader {
+    public:
+        /** Type of this archive file, either regular or encrypted */
+        ArchiveType type;
+        /** Key used to decrypt contents of this archive */
+        uint32_t key;
+        /** Total size of this archive file, in bytes */
+        uint64_t file_size;
+        /** Total size of uncompressed files, in bytes */
+        uint64_t data_size;
+        /** Count of file entries */
+        uint64_t file_entries_count;
+        /** Count of chunk entries */
+        uint32_t chunk_entries_count;
+        /** Maximum size of chunk, in bytes */
+        uint32_t chunk_maximum_size;
+    };
+
+    class ArchiveSpan {
+    public:
+        /** Starting offset of this span, in bytes */
+        uint64_t offset;
+        /** Size of this span, in bytes */
+        uint32_t size;
+        /** Key used to decrypt contents of this span */
         uint32_t key;
     };
 
-    struct ArchiveContentInfo {
-        std::uint64_t file_size;
-        std::uint64_t data_size;
-        std::uint64_t content_table_size;
-        std::uint32_t chunk_table_size;
-        std::uint32_t max_chunk_size;
+    class ArchiveFileEntry {
+    public:
+        /** Unique identifier of this file entry */
+        uint32_t index;
+        /** Key used to decrypt contents of this file entry */
+        uint32_t key;
+        /** Hash of the name of this file entry, obtained using MurMurHash3 algorithm */
+        uint64_t hash;
+        /** Span of the decompressed data of this file entry */
+        ArchiveSpan span;
     };
 
-    struct ArchiveFileEntry {
-        std::uint32_t entry_num;
-        std::uint32_t key_0;
-        std::uint64_t hash;
-        std::uint64_t offset;
-        std::uint32_t size;
-        std::uint32_t key_1;
-    };
-
-    struct ArchiveChunkEntry {
-        std::uint64_t uncompressed_offset;
-        std::uint32_t uncompressed_size;
-        std::uint32_t key_0;
-        std::uint64_t compressed_offset;
-        std::uint32_t compressed_size;
-        std::uint32_t key_1;
+    class ArchiveChunkEntry {
+    public:
+        /** Span of the decompressed data of this chunk entry */
+        ArchiveSpan decompressed_span;
+        /** Span of the compressed data of this chunk entry */
+        ArchiveSpan compressed_span;
     };
 
     class Archive {
@@ -48,9 +72,8 @@ namespace Decima {
 
         std::string path;
         Decima::ArchiveHeader header {};
-        Decima::ArchiveContentInfo content_info {};
-        std::vector<Decima::ArchiveChunkEntry> chunk_table;
-        std::vector<Decima::ArchiveFileEntry> content_table;
+        std::vector<Decima::ArchiveFileEntry> file_entries;
+        std::vector<Decima::ArchiveChunkEntry> chunk_entries;
 
     private:
         friend class ArchiveManager;

@@ -326,7 +326,7 @@ void ProjectDS::draw_filepreview() {
                     ImGui::Text("Size");
                     ImGui::NextColumn();
 
-                    ImGui::Text("%u bytes", file_entry.size);
+                    ImGui::Text("%u bytes", file_entry.span.size);
                     ImGui::NextColumn();
 
                     ImGui::Separator();
@@ -342,7 +342,7 @@ void ProjectDS::draw_filepreview() {
                     ImGui::Text("Entry ID");
                     ImGui::NextColumn();
 
-                    ImGui::Text("%u", file_entry.entry_num);
+                    ImGui::Text("%u", file_entry.index);
                     ImGui::NextColumn();
 
                     ImGui::Separator();
@@ -350,7 +350,7 @@ void ProjectDS::draw_filepreview() {
                     ImGui::Text("Offset");
                     ImGui::NextColumn();
 
-                    ImGui::Text("%llu", file_entry.offset);
+                    ImGui::Text("%llu", file_entry.span.offset);
                     ImGui::Separator();
                 }
                 ImGui::Columns(1);
