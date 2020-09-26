@@ -15,8 +15,10 @@ static void show_data_selection_dialog(ProjectDS& self) {
 
     if (!folder.empty()) {
         for (auto file : std::filesystem::directory_iterator(folder)) {
-            LOG("Loading archive ", file.path().stem().string());
-            self.archive_array.load_archive(file.path().string());
+            if (file.path().extension() == ".bin") {
+                LOG("Loading archive ", file.path().stem().string());
+                self.archive_array.load_archive(file.path().string());
+            }
         }
 
         self.archive_array.load_prefetch();
