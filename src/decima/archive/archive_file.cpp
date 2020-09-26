@@ -86,7 +86,7 @@ void Decima::CoreFile::parse(ArchiveManager& archive_array) {
         const auto entry_offset = buffer.data() - contents.data();
 
         objects.push_back([&] {
-            auto handler = Decima::get_handler(entry_header.file_type);
+            auto handler = Decima::get_type_handler(entry_header.file_type);
             handler->parse(archive_array, buffer, this);
             return std::make_pair(handler, entry_offset);
         }());
