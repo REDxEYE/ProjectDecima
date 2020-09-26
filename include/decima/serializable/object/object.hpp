@@ -30,8 +30,5 @@ namespace Decima {
     public:
         CoreHeader header;
         GUID guid;
-
-        // TODO: GUI-related. Must be removed
-        uint32_t offset;
     };
 }

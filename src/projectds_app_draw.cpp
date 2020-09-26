@@ -378,7 +378,7 @@ void ProjectDS::draw_filepreview() {
     ImGui::Begin("Normal View", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
     {
         if (selection_info.selected_file > 0) {
-            for (const auto& file : selection_info.file->objects) {
+            for (const auto& [file, file_offset] : selection_info.file->objects) {
                 std::stringstream buffer;
                 buffer << '[' << Decima::to_string(file->guid) << "] " << Decima::get_type_name(file->header.file_type);
 
@@ -386,7 +386,7 @@ void ProjectDS::draw_filepreview() {
 
                 if (ImGui::BeginPopupContextItem(buffer.str().c_str())) {
                     if (ImGui::Selectable("Highlight")) {
-                        selection_info.preview_file_offset = file->offset;
+                        selection_info.preview_file_offset = file_offset;
                         selection_info.preview_file_size = file->header.file_size + sizeof(Decima::CoreHeader);
                     }
 

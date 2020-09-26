@@ -27,6 +27,6 @@ namespace Decima {
 
     public:
         std::vector<char> contents;
-        std::vector<std::shared_ptr<CoreObject>> objects;
+        std::vector<std::pair<std::shared_ptr<CoreObject>, std::size_t>> objects;
     };
 }

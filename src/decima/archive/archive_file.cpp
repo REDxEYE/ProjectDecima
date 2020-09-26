@@ -88,8 +88,7 @@ void Decima::CoreFile::parse(ArchiveManager& archive_array) {
         objects.push_back([&] {
             auto handler = Decima::get_handler(entry_header.file_type);
             handler->parse(archive_array, buffer, this);
-            handler->offset = entry_offset;
-            return handler;
+            return std::make_pair(handler, entry_offset);
         }());
     }
 }
