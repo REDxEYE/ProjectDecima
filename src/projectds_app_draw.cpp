@@ -9,6 +9,7 @@
 
 #include "decima/serializable/handlers.hpp"
 #include "util/pfd.h"
+#include "utils.hpp"
 
 static void show_data_selection_dialog(ProjectDS& self) {
     auto folder = pfd::select_folder("Select Death Stranding data folder!").result();
@@ -16,7 +17,7 @@ static void show_data_selection_dialog(ProjectDS& self) {
     if (!folder.empty()) {
         for (auto file : std::filesystem::directory_iterator(folder)) {
             if (file.path().extension() == ".bin") {
-                LOG("Loading archive ", file.path().stem().string());
+                DECIMA_LOG("Loading archive ", file.path().stem().string());
                 self.archive_array.load_archive(file.path().string());
             }
         }
@@ -490,7 +491,7 @@ void ProjectDS::draw_export() {
 
             if (ImGui::Button("Add to selection!")) {
                 std::string str_path(path);
-                uint64_t file_hash = hash_string(sanitize_name(str_path), Decima::seed);
+                uint64_t file_hash = hash_string(sanitize_name(str_path), Decima::cipher_seed);
                 if (archive_array.get_file_entry(file_hash).has_value()) {
                     archive_array.hash_to_name[file_hash] = str_path;
                     selection_info.selected_files.insert(file_hash);

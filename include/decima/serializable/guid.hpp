@@ -4,6 +4,7 @@
 #include <functional>
 
 #include "decima/shared.hpp"
+#include "util/buffer.hpp"
 
 namespace Decima {
     class GUID {

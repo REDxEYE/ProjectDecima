@@ -8,6 +8,8 @@
 #include "decima/serializable/object/texture.hpp"
 #include "decima/serializable/object/texture_set.hpp"
 
+#include "utils.hpp"
+
 class FileMagics {
 };
 

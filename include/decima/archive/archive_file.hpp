@@ -4,12 +4,11 @@
 #include <cmath>
 #include <vector>
 #include <memory>
+
 #include <util/mio.hpp>
 
 #include "decima/serializable/object/object_dummy.hpp"
 #include "decima/serializable/reference.hpp"
-
-#include "util/buffer.hpp"
 
 namespace Decima {
     class Archive;

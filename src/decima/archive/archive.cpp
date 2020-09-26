@@ -8,13 +8,13 @@
 
 static void decrypt(uint32_t key_1, uint32_t key_2, uint32_t* data) {
     const std::uint32_t key[8] = {
-        key_1, Decima::encryption_key_1[1], Decima::encryption_key_1[2], Decima::encryption_key_1[3],
-        key_2, Decima::encryption_key_1[1], Decima::encryption_key_1[2], Decima::encryption_key_1[3]
+        key_1, Decima::plain_cipher_key[1], Decima::plain_cipher_key[2], Decima::plain_cipher_key[3],
+        key_2, Decima::plain_cipher_key[1], Decima::plain_cipher_key[2], Decima::plain_cipher_key[3]
     };
 
     std::uint32_t iv[8];
-    MurmurHash3_x64_128(key, 16, Decima::seed, iv);
-    MurmurHash3_x64_128(key + 4, 16, Decima::seed, iv + 4);
+    MurmurHash3_x64_128(key, 16, Decima::cipher_seed, iv);
+    MurmurHash3_x64_128(key + 4, 16, Decima::cipher_seed, iv + 4);
 
     data[0] ^= iv[0];
     data[1] ^= iv[1];

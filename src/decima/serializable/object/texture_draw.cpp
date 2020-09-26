@@ -283,7 +283,7 @@ void Decima::Texture::draw_preview(float preview_width, float preview_height, fl
                 writer.write(reinterpret_cast<const char*>(buffer.data()), buffer.size() * 4);
                 writer.write(reinterpret_cast<const char*>(&tga_footer), sizeof(tga_footer));
 
-                LOG("File was saved to: ", full_path);
+                DECIMA_LOG("File was saved to: ", full_path);
             }
         }
 

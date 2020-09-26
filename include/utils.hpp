@@ -13,8 +13,6 @@ uint64_t hash_string(const std::string& filename, uint8_t seed);
 
 std::string sanitize_name(const std::string& filename);
 
-bool decompress_chunk_data(const uint8_t* data, uint64_t data_size, uint64_t decompressed_size, uint8_t* output);
-
 void split(const std::string& str, std::vector<std::string>& cont, char delim);
 
 #include <array>
@@ -42,25 +40,3 @@ inline std::string format_size(std::size_t size) noexcept {
 
     return buffer.str();
 }
-
-#include <iostream>
-
-template <typename... Args>
-inline constexpr void log(Args&&... args) {
-    (std::cout << ... << args) << '\n';
-}
-
-template <std::size_t Size>
-inline constexpr const char* filename(const char (&path)[Size]) {
-    std::size_t separator_offset = 0;
-
-    for (std::size_t index = 0; index < Size; index++) {
-        if (path[index] == '/' || path[index] == '\\') {
-            separator_offset = index + 1;
-        }
-    }
-
-    return path + separator_offset;
-}
-
-#define LOG(...) (log(filename(__FILE__), ':', __LINE__, ' ', __VA_ARGS__))

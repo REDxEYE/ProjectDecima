@@ -26,7 +26,7 @@ void Decima::ArchiveManager::load_prefetch() {
     prefetch.parse(*this, buffer, nullptr);
 
     for (const auto& string : prefetch.paths.data()) {
-        hash_to_name.emplace(hash_string(sanitize_name(string.data()), seed), string.data());
+        hash_to_name.emplace(hash_string(sanitize_name(string.data()), cipher_seed), string.data());
     }
 
     hash_to_name.emplace(0x2fff5af65cd64c0a, "prefetch/fullgame.prefetch");
@@ -44,7 +44,7 @@ Decima::OptionalRef<Decima::ArchiveFileEntry> Decima::ArchiveManager::get_file_e
 }
 
 Decima::OptionalRef<Decima::ArchiveFileEntry> Decima::ArchiveManager::get_file_entry(const std::string& name) {
-    return get_file_entry(hash_string(sanitize_name(name), seed));
+    return get_file_entry(hash_string(sanitize_name(name), cipher_seed));
 }
 
 Decima::OptionalRef<Decima::CoreFile> Decima::ArchiveManager::query_file(std::uint64_t hash) {
@@ -55,5 +55,5 @@ Decima::OptionalRef<Decima::CoreFile> Decima::ArchiveManager::query_file(std::ui
 }
 
 Decima::OptionalRef<Decima::CoreFile> Decima::ArchiveManager::query_file(const std::string& name) {
-    return query_file(hash_string(sanitize_name(name), seed));
+    return query_file(hash_string(sanitize_name(name), cipher_seed));
 }

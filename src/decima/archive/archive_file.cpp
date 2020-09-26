@@ -3,18 +3,19 @@
 #include <numeric>
 #include <md5.h>
 #include <MurmurHash3.h>
+#include <Kraken.h>
 
 #include "decima/archive/archive.hpp"
 #include "decima/serializable/handlers.hpp"
 
 static void decrypt_chunk(uint8_t* data, const Decima::ArchiveChunkEntry& chunk_entry) {
     uint32_t iv[4];
-    MurmurHash3_x64_128(&chunk_entry, 0x10, Decima::seed, iv);
+    MurmurHash3_x64_128(&chunk_entry, 0x10, Decima::cipher_seed, iv);
 
-    iv[0] ^= Decima::encryption_key_2[0];
-    iv[1] ^= Decima::encryption_key_2[1];
-    iv[2] ^= Decima::encryption_key_2[2];
-    iv[3] ^= Decima::encryption_key_2[3];
+    iv[0] ^= Decima::chunk_cipher_key[0];
+    iv[1] ^= Decima::chunk_cipher_key[1];
+    iv[2] ^= Decima::chunk_cipher_key[2];
+    iv[3] ^= Decima::chunk_cipher_key[3];
 
     uint8_t digest[16];
     md5Hash((md5_byte_t*)iv, 16, digest);
@@ -59,7 +60,7 @@ std::vector<char> unpack(const Decima::Archive& archive, const Decima::ArchiveFi
         if (archive.header.type == Decima::ArchiveType::Encrypted)
             decrypt_chunk(data_buffer.data(), *chunk_entry);
 
-        decompress_chunk_data((std::uint8_t*)data_buffer.data(), chunk_entry->compressed_span.size, chunk_entry->decompressed_span.size, (std::uint8_t*)&buffer_decompressed.at(buffer_decompressed_offset));
+        Kraken_Decompress((std::uint8_t*)data_buffer.data(), chunk_entry->compressed_span.size, (std::uint8_t*)&buffer_decompressed.at(buffer_decompressed_offset), chunk_entry->decompressed_span.size);
         buffer_decompressed_offset += chunk_entry->decompressed_span.size;
     }
 

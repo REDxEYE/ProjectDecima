@@ -1,9 +1,10 @@
 #pragma once
 
+#include <functional>
+
 #include "decima/shared.hpp"
 #include "decima/serializable/serializable.hpp"
-
-#include <functional>
+#include "util/buffer.hpp"
 
 namespace Decima {
     using StringMutator = std::function<std::string(const std::string&)>;

@@ -1,11 +1,10 @@
 #pragma once
 
 #include <vector>
+
 #include <util/mio.hpp>
 
-#include "decima/constants.hpp"
 #include "archive_file.hpp"
-
 #include "util/buffer.hpp"
 
 namespace Decima {
