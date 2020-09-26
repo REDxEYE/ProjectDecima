@@ -9,11 +9,11 @@
 #include "decima/archive/archive_manager.hpp"
 
 void Decima::ArchiveManager::load_archive(const std::string& path) {
-    auto& archive = manager.emplace_back(path);
+    auto& archive = archives.emplace_back(path);
     archive.open();
 
     for (const auto& entry : archive.file_entries) {
-        hash_to_archive_index.emplace(entry.hash, static_cast<int>(manager.size() - 1));
+        hash_to_archive_index.emplace(entry.hash, static_cast<int>(archives.size() - 1));
     }
 }
 
@@ -34,7 +34,7 @@ void Decima::ArchiveManager::load_prefetch() {
 
 Decima::OptionalRef<Decima::ArchiveFileEntry> Decima::ArchiveManager::get_file_entry(std::uint64_t hash) {
     if (auto archive_id = hash_to_archive_index.find(hash); archive_id != hash_to_archive_index.end()) {
-        auto& archive = manager.at(archive_id->second);
+        auto& archive = archives.at(archive_id->second);
         auto file_id = archive.m_hash_to_index.find(hash)->second;
 
         return std::make_optional(std::ref(archive.file_entries.at(file_id)));
@@ -49,7 +49,7 @@ Decima::OptionalRef<Decima::ArchiveFileEntry> Decima::ArchiveManager::get_file_e
 
 Decima::OptionalRef<Decima::CoreFile> Decima::ArchiveManager::query_file(std::uint64_t hash) {
     if (auto archive_index = hash_to_archive_index.find(hash); archive_index != hash_to_archive_index.end())
-        return manager.at(archive_index->second).query_file(hash);
+        return archives.at(archive_index->second).query_file(hash);
 
     return {};
 }

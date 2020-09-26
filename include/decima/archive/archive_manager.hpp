@@ -20,6 +20,6 @@ namespace Decima {
         std::unordered_map<uint64_t, uint32_t> hash_to_archive_index;
         std::unordered_map<uint64_t, std::string> hash_to_name;
 
-        std::vector<Archive> manager;
+        std::vector<Archive> archives;
     };
 }
