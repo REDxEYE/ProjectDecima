@@ -19,18 +19,18 @@ void FileTree::add_file(const std::string& filename, uint64_t hash, Decima::Core
     files.emplace(filename, std::make_pair(FileInfo { hash, header }, true));
 }
 
-bool is_filter_matches(FileTree* root, const ImGuiTextFilter& filter) {
+bool is_filter_matches(FileTree& root, const ImGuiTextFilter& filter) {
     bool result = false;
 
-    for (auto& [name, data] : root->files) {
+    for (auto& [name, data] : root.files) {
         if (filter.PassFilter(name.c_str())) {
             data.second = true;
             result = true;
         }
     }
 
-    for (auto& [name, data] : root->folders) {
-        if (is_filter_matches(data.first.get(), filter)) {
+    for (auto& [name, data] : root.folders) {
+        if (is_filter_matches(*data.first, filter)) {
             data.second = true;
             result = true;
         }
@@ -39,28 +39,30 @@ bool is_filter_matches(FileTree* root, const ImGuiTextFilter& filter) {
     return result;
 }
 
-void FileTree::update_filter(const ImGuiTextFilter& filter) {
+FileTree::ExpandMode FileTree::apply_filter(const ImGuiTextFilter& filter) {
     if (filter.IsActive()) {
         reset_filter(false);
-        is_filter_matches(this, filter);
+        is_filter_matches(*this, filter);
     } else {
         reset_filter(true);
     }
+
+    return size() < ExpandThreshold ? ExpandMode::Show : ExpandMode::Hide;
 }
 
-void FileTree::reset_filter(bool state) {
+void FileTree::reset_filter(bool visibility) {
     for (auto& [_, data] : folders) {
-        data.first->reset_filter(state);
-        data.second = state;
+        data.first->reset_filter(visibility);
+        data.second = visibility;
     }
 
     for (auto& [_, data] : files) {
-        data.second = state;
+        data.second = visibility;
     }
 }
 
-void FileTree::draw(SelectionInfo& selection, Decima::ArchiveManager& archive_array, bool draw_header) {
-    if (draw_header) {
+void FileTree::draw(SelectionInfo& selection, Decima::ArchiveManager& archive_array, bool header, ExpandMode expand) {
+    if (header) {
         ImGui::Separator();
         ImGui::Columns(3);
         ImGui::Text("Name");
@@ -79,6 +81,9 @@ void FileTree::draw(SelectionInfo& selection, Decima::ArchiveManager& archive_ar
     for (auto& [name, data] : folders) {
         if (!data.second)
             continue;
+
+        if (expand != ExpandMode::None)
+            ImGui::SetNextItemOpen(expand == ExpandMode::Show, ImGuiCond_Always);
 
         const auto tree_name = name + "##" + std::to_string(folders.size());
         const auto show = ImGui::TreeNodeEx(tree_name.c_str(), ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick);
@@ -123,7 +128,7 @@ void FileTree::draw(SelectionInfo& selection, Decima::ArchiveManager& archive_ar
 
         if (show) {
             if (items_count > 0) {
-                data.first->draw(selection, archive_array, false);
+                data.first->draw(selection, archive_array, false, expand);
             } else {
                 ImGui::TextDisabled("Empty");
                 ImGui::NextColumn();
@@ -138,11 +143,14 @@ void FileTree::draw(SelectionInfo& selection, Decima::ArchiveManager& archive_ar
         if (!data.second)
             continue;
 
+        if (expand != ExpandMode::None)
+            ImGui::SetNextItemOpen(expand == ExpandMode::Show, ImGuiCond_Always);
+
         const auto is_selected = selection.selected_files.find(data.first.hash) != selection.selected_files.end();
 
         ImGui::TreeNodeEx(name.c_str(), ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_Leaf | static_cast<int>(is_selected));
 
-        if(ImGui::IsItemClicked(ImGuiMouseButton_Left)) {
+        if (ImGui::IsItemClicked(ImGuiMouseButton_Left)) {
             selection.selected_file = data.first.hash;
 
             if (ImGui::GetIO().KeyCtrl) {
@@ -171,7 +179,22 @@ void FileTree::draw(SelectionInfo& selection, Decima::ArchiveManager& archive_ar
         ImGui::NextColumn();
     }
 
-    if (draw_header) {
+    if (header) {
         ImGui::Columns(1);
     }
+}
+
+std::size_t FileTree::size() const {
+    std::size_t size = 0;
+
+    for (auto& [name, data] : files) {
+        if (data.second)
+            size += 1;
+    }
+
+    for (auto& [name, data] : folders) {
+        size += data.first.get()->size();
+    }
+
+    return size;
 }

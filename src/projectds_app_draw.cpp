@@ -417,8 +417,10 @@ void ProjectDS::draw_filepreview() {
 void ProjectDS::draw_tree() {
     ImGui::Begin("Trees");
     {
+        FileTree::ExpandMode expand_mode = FileTree::ExpandMode::None;
+
         if (filter.Draw()) {
-            root_tree.update_filter(filter);
+            expand_mode = root_tree.apply_filter(filter);
 
             file_names.clear();
 
@@ -436,7 +438,7 @@ void ProjectDS::draw_tree() {
         }
 
         ImGui::BeginChild("FileTree");
-        root_tree.draw(selection_info, archive_array);
+        root_tree.draw(selection_info, archive_array, true, expand_mode);
         ImGui::EndChild();
     }
     ImGui::End();

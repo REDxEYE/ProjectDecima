@@ -31,28 +31,24 @@ using FileTreeToggleable = std::pair<T, bool>;
 
 class FileTree {
 public:
+    enum class ExpandMode {
+        None,
+        Hide,
+        Show
+    };
+
+    static constexpr std::size_t ExpandThreshold = 15;
+
     std::map<std::string, FileTreeToggleable<std::unique_ptr<FileTree>>> folders;
     std::map<std::string, FileTreeToggleable<FileInfo>> files;
 
     FileTree* add_folder(const std::string& name);
-
     void add_file(const std::string& filename, uint64_t hash, Decima::CoreHeader header);
 
-    void update_filter(const ImGuiTextFilter& filter);
+    ExpandMode apply_filter(const ImGuiTextFilter& filter);
+    void reset_filter(bool visibility);
 
-    void reset_filter(bool state);
+    void draw(SelectionInfo& selection, Decima::ArchiveManager& archive_array, bool header, ExpandMode expand);
 
-    template <typename Visitor>
-    void visit(const Visitor& visitor, std::size_t depth = 0) const {
-        for (const auto& [name, data] : folders) {
-            visitor(name, depth);
-            data.first->visit(visitor, depth + 1);
-        }
-
-        for (const auto& [name, _] : files) {
-            visitor(name, depth);
-        }
-    }
-
-    void draw(SelectionInfo& selection, Decima::ArchiveManager& archive_array, bool draw_header = true);
+    std::size_t size() const;
 };
