@@ -36,9 +36,9 @@ void Decima::String::draw(Decima::StringMutator mutator) {
 
 void Decima::StringHashed::parse(ash::buffer& buffer) {
     const auto size = buffer.get<std::uint32_t>();
-    m_hash = buffer.get<decltype(m_hash)>();
 
     if (size > 0) {
+        m_hash = buffer.get<decltype(m_hash)>();
         m_data.resize(size);
         buffer.get(m_data);
     }
