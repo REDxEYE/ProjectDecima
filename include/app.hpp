@@ -25,7 +25,7 @@ public:
     void run();
 
 private:
-    uint64_t m_prev_time = glfwGetTime();
+    double m_prev_time = glfwGetTime();
 
     void init_glfw();
 

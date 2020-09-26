@@ -19,7 +19,7 @@ namespace Decima {
         }
 
     private:
-        friend inline std::string Decima::to_string(const Decima::GUID& value);
+        friend std::string Decima::to_string(const Decima::GUID& value);
 
         union {
             std::array<std::uint8_t, 16> m_data_1;
