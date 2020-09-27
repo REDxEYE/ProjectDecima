@@ -19,7 +19,7 @@ void Decima::ArchiveManager::load_archive(const std::string& path) {
 
 void Decima::ArchiveManager::load_prefetch() {
     auto& prefetch_file = query_file("prefetch/fullgame.prefetch").value().get();
-    prefetch_file.parse(*this);
+    prefetch_file.parse();
 
     Prefetch& prefetch = static_cast<Prefetch&>(*prefetch_file.objects.at(0).first);
 

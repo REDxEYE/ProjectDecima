@@ -360,7 +360,7 @@ void ProjectDS::draw_filepreview() {
 
                 if (selected_file_changed) {
                     selection_info.file = &archive_array.query_file(selection_info.selected_file).value().get();
-                    selection_info.file->parse(archive_array);
+                    selection_info.file->parse();
                     selection_info.preview_file = selection_info.selected_file;
                     selection_info.preview_file_size = selection_info.file->contents.size();
                     selection_info.preview_file_offset = 0;

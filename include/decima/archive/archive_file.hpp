@@ -16,9 +16,9 @@ namespace Decima {
 
     class CoreFile {
     public:
-        CoreFile(Archive& archive, ArchiveFileEntry& entry, mio::mmap_source& source);
+        CoreFile(Archive& archive, ArchiveManager& manager, ArchiveFileEntry& entry, mio::mmap_source& source);
 
-        void parse(ArchiveManager& archive_array);
+        void parse();
 
         void queue_reference(Ref*);
         void resolve_reference(const std::weak_ptr<CoreObject>&);
@@ -26,6 +26,7 @@ namespace Decima {
 
     private:
         Archive& archive;
+        ArchiveManager& manager;
         ArchiveFileEntry& entry;
 
     public:

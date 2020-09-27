@@ -6,6 +6,7 @@
 #include <Kraken.h>
 
 #include "decima/archive/archive.hpp"
+#include "decima/archive/archive_manager.hpp"
 #include "decima/serializable/handlers.hpp"
 #include "decima/serializable/reference.hpp"
 
@@ -72,8 +73,9 @@ std::vector<char> unpack(const Decima::Archive& archive, const Decima::ArchiveFi
     return buffer_decompressed;
 }
 
-Decima::CoreFile::CoreFile(Archive& archive, ArchiveFileEntry& entry, mio::mmap_source& source)
+Decima::CoreFile::CoreFile(Archive& archive, ArchiveManager& manager, ArchiveFileEntry& entry, mio::mmap_source& source)
     : archive(archive)
+    , manager(manager)
     , entry(entry)
     , contents(unpack(archive, entry, source)) { }
 
@@ -112,21 +114,21 @@ void Decima::CoreFile::queue_reference(Decima::Ref* ref) {
     }
 }
 
-void Decima::CoreFile::parse(ArchiveManager& archive_array) {
-    objects.clear();
+void Decima::CoreFile::parse() {
+    if (objects.empty()) {
+        // TODO: This is shitty API I wrote, please replace this
+        ash::buffer buffer(contents.data(), contents.size());
 
-    // TODO: This is shitty API I wrote, please replace this
-    ash::buffer buffer(contents.data(), contents.size());
+        while (buffer.size() > 0) {
+            const auto entry_header = Decima::CoreObject::peek_header(buffer);
+            const auto entry_offset = buffer.data() - contents.data();
 
-    while (buffer.size() > 0) {
-        const auto entry_header = Decima::CoreObject::peek_header(buffer);
-        const auto entry_offset = buffer.data() - contents.data();
-
-        objects.push_back([&] {
-            auto handler = Decima::get_type_handler(entry_header.file_type);
-            handler->parse(archive_array, buffer, *this);
-            return std::make_pair(handler, entry_offset);
-        }());
+            objects.push_back([&] {
+                auto handler = Decima::get_type_handler(entry_header.file_type);
+                handler->parse(manager, buffer, *this);
+                return std::make_pair(handler, entry_offset);
+            }());
+        }
     }
 
     resolve_reference(*this);
