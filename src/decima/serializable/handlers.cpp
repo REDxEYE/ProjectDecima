@@ -8,6 +8,7 @@
 #include "decima/serializable/object/texture.hpp"
 #include "decima/serializable/object/texture_set.hpp"
 #include "decima/serializable/object/resource/vertex_array_resource.hpp"
+#include "decima/serializable/object/resource/index_array_resource.hpp"
 
 #include "utils.hpp"
 
@@ -47,6 +48,7 @@ static const std::unordered_map<std::uint64_t, Decima::Handler<Decima::CoreObjec
     { DeathStranding_FileMagics::Collection,          construct<Decima::Collection>          },
     { DeathStranding_FileMagics::Prefetch,            construct<Decima::Prefetch>            },
     { DeathStranding_FileMagics::VertexArrayResource, construct<Decima::VertexArrayResource> },
+    { DeathStranding_FileMagics::IndexArrayResource,  construct<Decima::IndexArrayResource>  },
     // clang-format on
 };
 
@@ -60,6 +62,7 @@ static const std::unordered_map<uint64_t, std::string> names = {
     { DeathStranding_FileMagics::Collection,          "Collection"          },
     { DeathStranding_FileMagics::Prefetch,            "Prefetch"            },
     { DeathStranding_FileMagics::VertexArrayResource, "VertexArrayResource" },
+    { DeathStranding_FileMagics::IndexArrayResource,  "IndexArrayResource"  },
     // clang-format on
 };
 

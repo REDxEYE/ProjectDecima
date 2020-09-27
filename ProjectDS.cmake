@@ -27,7 +27,9 @@ add_executable(ProjectDS
         src/decima/serializable/guid.cpp
         src/decima/serializable/handlers.cpp
         src/decima/serializable/object/resource/vertex_array_resource.cpp
-        src/decima/serializable/object/resource/vertex_array_resource_draw.cpp)
+        src/decima/serializable/object/resource/vertex_array_resource_draw.cpp
+        src/decima/serializable/object/resource/index_array_resource.cpp
+        src/decima/serializable/object/resource/index_array_resource_draw.cpp)
 
 target_link_libraries(ProjectDS PRIVATE oodle hash imgui glfw glad)
 target_include_directories(ProjectDS PRIVATE include)
