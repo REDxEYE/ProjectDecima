@@ -42,8 +42,8 @@ unsigned int Decima::TexturePixelFormatInfo::create_texture(int width, int heigh
     return texture_id;
 }
 
-void Decima::Texture::parse(ArchiveManager& manager, ash::buffer& buffer, CoreFile* core_file) {
-    CoreObject::parse(manager, buffer, nullptr);
+void Decima::Texture::parse(ArchiveManager& manager, ash::buffer& buffer, CoreFile& file) {
+    CoreObject::parse(manager, buffer, file);
     type = buffer.get<decltype(type)>();
     width = buffer.get<decltype(width)>();
     height = buffer.get<decltype(height)>();
@@ -52,7 +52,7 @@ void Decima::Texture::parse(ArchiveManager& manager, ash::buffer& buffer, CoreFi
     pixel_format = buffer.get<decltype(pixel_format)>();
     unk_0 = buffer.get<decltype(unk_0)>();
     unk_1 = buffer.get<decltype(unk_1)>();
-    unk_2.parse(buffer);
+    unk_2.parse(buffer, file);
     buffer_size = buffer.get<decltype(buffer_size)>();
     total_size = buffer.get<decltype(total_size)>();
     stream_size = buffer.get<decltype(stream_size)>();
@@ -61,7 +61,7 @@ void Decima::Texture::parse(ArchiveManager& manager, ash::buffer& buffer, CoreFi
     unk_4 = buffer.get<decltype(unk_4)>();
 
     if (stream_size > 0)
-        external_data.parse(manager, buffer);
+        external_data.parse(manager, buffer, file);
 
     embedded_data.resize(total_size);
 

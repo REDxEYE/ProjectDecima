@@ -56,7 +56,7 @@ namespace Decima {
 
     class VertexStreamData {
     public:
-        void parse(ash::buffer& buffer);
+        void parse(ash::buffer& buffer, CoreFile& file);
         void draw();
 
     public:
@@ -68,7 +68,7 @@ namespace Decima {
 
     class VertexStreamInfo {
     public:
-        void parse(ash::buffer& buffer);
+        void parse(ash::buffer& buffer, CoreFile& file);
         void draw();
 
     public:
@@ -80,7 +80,7 @@ namespace Decima {
 
     class VertexArrayResource : public Resource {
     public:
-        void parse(ArchiveManager& manager, ash::buffer& buffer, CoreFile* core_file) override;
+        void parse(ArchiveManager& manager, ash::buffer& buffer, CoreFile& file) override;
         void draw() override;
 
     public:

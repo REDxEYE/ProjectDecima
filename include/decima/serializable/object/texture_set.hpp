@@ -70,7 +70,7 @@ namespace Decima {
 
     class TextureDefaultColor {
     public:
-        void parse(ash::buffer& buffer);
+        void parse(ash::buffer& buffer, CoreFile& file);
         void draw();
 
     private:
@@ -79,7 +79,7 @@ namespace Decima {
 
     class DecimaTextureSetEntry {
     public:
-        void parse(ash::buffer& buffer);
+        void parse(ash::buffer& buffer, CoreFile& file);
         void draw();
 
     private:
@@ -93,7 +93,7 @@ namespace Decima {
 
     struct DecimaTextureSetTextureDescriptor {
     public:
-        void parse(ash::buffer& buffer);
+        void parse(ash::buffer& buffer, CoreFile& file);
         void draw();
 
     private:
@@ -112,7 +112,7 @@ namespace Decima {
 
     class TextureSet : public CoreObject {
     public:
-        void parse(ArchiveManager& manager, ash::buffer& buffer, CoreFile* core_file) override;
+        void parse(ArchiveManager& manager, ash::buffer& buffer, CoreFile& file) override;
         void draw() override;
 
     private:

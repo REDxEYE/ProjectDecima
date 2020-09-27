@@ -6,7 +6,7 @@
 namespace Decima {
     class Stream {
     public:
-        void parse(ArchiveManager& manager, ash::buffer& buffer);
+        void parse(ArchiveManager& manager, ash::buffer& buffer, CoreFile& file);
         void draw();
 
         inline const String& name() const noexcept { return m_name; }

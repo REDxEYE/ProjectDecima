@@ -7,6 +7,7 @@
 
 #include "decima/archive/archive.hpp"
 #include "decima/serializable/handlers.hpp"
+#include "decima/serializable/reference.hpp"
 
 static void decrypt_chunk(uint8_t* data, const Decima::ArchiveChunkEntry& chunk_entry) {
     uint32_t iv[4];
@@ -76,6 +77,42 @@ Decima::CoreFile::CoreFile(Archive& archive, ArchiveFileEntry& entry, mio::mmap_
     , entry(entry)
     , contents(unpack(archive, entry, source)) { }
 
+void Decima::CoreFile::resolve_reference(const std::weak_ptr<CoreObject>& object) {
+    auto index = std::remove_if(references.begin(), references.end(), [&](auto& ref) {
+        if (ref->m_guid.hash() == object.lock()->guid.hash()) {
+            ref->m_object = object;
+            DECIMA_LOG("CoreFile::resolve_reference: Resolved reference");
+            return true;
+        }
+
+        return false;
+    });
+
+    if (index == references.end())
+        return;
+
+    references.erase(index);
+}
+
+void Decima::CoreFile::resolve_reference(const Decima::CoreFile& file) {
+    for (auto& [object, object_offset] : objects) {
+        resolve_reference(object);
+    }
+}
+
+void Decima::CoreFile::queue_reference(Decima::Ref* ref) {
+    switch (ref->mode()) {
+    case RefLoadMode::Embedded:
+    case RefLoadMode::ImmediateCoreFile:
+    case RefLoadMode::CoreFile:
+        references.push_back(ref);
+        break;
+    case RefLoadMode::NotPresent:
+    case RefLoadMode::WorkOnly:
+        return;
+    }
+}
+
 void Decima::CoreFile::parse(ArchiveManager& archive_array) {
     objects.clear();
 
@@ -88,8 +125,10 @@ void Decima::CoreFile::parse(ArchiveManager& archive_array) {
 
         objects.push_back([&] {
             auto handler = Decima::get_type_handler(entry_header.file_type);
-            handler->parse(archive_array, buffer, this);
+            handler->parse(archive_array, buffer, *this);
             return std::make_pair(handler, entry_offset);
         }());
     }
+
+    resolve_reference(*this);
 }

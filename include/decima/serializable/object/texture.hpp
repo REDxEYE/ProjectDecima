@@ -52,7 +52,7 @@ namespace Decima {
     public:
         ~Texture();
 
-        void parse(ArchiveManager& manager, ash::buffer& buffer, CoreFile* core_file) override;
+        void parse(ArchiveManager& manager, ash::buffer& buffer, CoreFile& file) override;
         void draw() override;
 
     private:

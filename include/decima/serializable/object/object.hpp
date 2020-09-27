@@ -20,7 +20,7 @@ namespace Decima {
 
     class CoreObject : public CoreSerializable {
     public:
-        virtual void parse(ArchiveManager& manager, ash::buffer& buffer, CoreFile* core_file);
+        virtual void parse(ArchiveManager& manager, ash::buffer& buffer, CoreFile& file);
         virtual void draw();
 
         inline static CoreHeader peek_header(ash::buffer buffer) {

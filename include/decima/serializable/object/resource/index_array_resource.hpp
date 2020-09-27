@@ -12,7 +12,7 @@ namespace Decima {
 
     class IndexArrayResource : public Resource {
     public:
-        void parse(ArchiveManager& manager, ash::buffer& buffer, CoreFile* core_file) override;
+        void parse(ArchiveManager& manager, ash::buffer& buffer, CoreFile& file) override;
         void draw() override;
 
     public:

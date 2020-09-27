@@ -2,8 +2,8 @@
 
 #include <imgui.h>
 
-void Decima::Stream::parse(ArchiveManager& manager, ash::buffer& buffer) {
-    m_name.parse(buffer);
+void Decima::Stream::parse(ArchiveManager& manager, ash::buffer& buffer, CoreFile& file) {
+    m_name.parse(buffer, file);
     buffer = buffer.skip(20);
     m_offs = buffer.get<decltype(m_offs)>();
     m_size = buffer.get<decltype(m_size)>();

@@ -12,8 +12,8 @@ static std::string read_string(ash::buffer& buffer, const std::string& default_v
     return default_value;
 }
 
-void Decima::Translation::parse(ArchiveManager& manager, ash::buffer& buffer, CoreFile* core_file) {
-    CoreObject::parse(manager, buffer, nullptr);
+void Decima::Translation::parse(ArchiveManager& manager, ash::buffer& buffer, CoreFile& file) {
+    CoreObject::parse(manager, buffer, file);
 
     for (uint32_t i = 0; i < std::size(languages); i++) {
         translations[i] = read_string(buffer);

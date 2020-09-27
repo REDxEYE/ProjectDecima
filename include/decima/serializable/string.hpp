@@ -3,6 +3,7 @@
 #include <functional>
 
 #include "decima/shared.hpp"
+#include "decima/archive/archive_file.hpp"
 #include "decima/serializable/serializable.hpp"
 #include "util/buffer.hpp"
 
@@ -11,7 +12,7 @@ namespace Decima {
 
     class String : public CoreSerializable {
     public:
-        void parse(ash::buffer& buffer);
+        void parse(ash::buffer& buffer, CoreFile& file);
         void draw();
         void draw(StringMutator mutator);
 
@@ -23,7 +24,7 @@ namespace Decima {
 
     class StringHashed : public CoreSerializable {
     public:
-        void parse(ash::buffer& buffer);
+        void parse(ash::buffer& buffer, CoreFile& file);
         void draw();
         void draw(StringMutator mutator);
 

@@ -5,6 +5,6 @@
 namespace Decima {
     class Dummy : public Decima::CoreObject {
     public:
-        void parse(ArchiveManager& manager, ash::buffer& buffer, CoreFile* core_file) override;
+        void parse(ArchiveManager& manager, ash::buffer& buffer, CoreFile& file) override;
     };
 }

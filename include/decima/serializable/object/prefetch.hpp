@@ -10,7 +10,7 @@
 namespace Decima {
     class Prefetch : public CoreObject {
     public:
-        void parse(ArchiveManager& manager, ash::buffer& buffer, CoreFile* core_file) override;
+        void parse(ArchiveManager& manager, ash::buffer& buffer, CoreFile& file) override;
         void draw() override;
 
     public:

@@ -17,7 +17,7 @@ static void string_draw(const std::string& data) {
     string_draw(data, default_mutator);
 }
 
-void Decima::String::parse(ash::buffer& buffer) {
+void Decima::String::parse(ash::buffer& buffer, CoreFile& file) {
     const auto size = buffer.get<std::uint32_t>();
 
     if (size > 0) {
@@ -34,7 +34,7 @@ void Decima::String::draw(Decima::StringMutator mutator) {
     string_draw(m_data, mutator);
 }
 
-void Decima::StringHashed::parse(ash::buffer& buffer) {
+void Decima::StringHashed::parse(ash::buffer& buffer, CoreFile& file) {
     const auto size = buffer.get<std::uint32_t>();
 
     if (size > 0) {

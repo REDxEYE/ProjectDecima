@@ -37,7 +37,7 @@ namespace Decima {
         std::string comments[std::size(languages)];
         std::uint8_t flags[std::size(languages)];
 
-        void parse(ArchiveManager& manager, ash::buffer& buffer, CoreFile* core_file) override;
+        void parse(ArchiveManager& manager, ash::buffer& buffer, CoreFile& file) override;
         void draw() override;
     };
 }

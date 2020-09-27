@@ -7,9 +7,11 @@
 #include "util/buffer.hpp"
 
 namespace Decima {
+    class CoreFile;
+
     class GUID {
     public:
-        void parse(ash::buffer& buffer);
+        void parse(ash::buffer& buffer, CoreFile& file);
         void draw();
 
         inline std::array<std::uint8_t, 16> data() const noexcept { return m_data_1; }

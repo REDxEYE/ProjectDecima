@@ -19,17 +19,21 @@ namespace Decima {
 
     class Ref : public CoreSerializable {
     public:
-        void parse(ash::buffer& buffer);
+        void parse(ash::buffer& buffer, CoreFile& file);
         void draw();
 
         inline RefLoadMode mode() const { return m_mode; }
         inline GUID guid() const { return m_guid; }
         inline StringHashed file() const { return m_file; }
+        inline const std::weak_ptr<CoreObject>& object() const { return m_object; }
 
     private:
+        friend class CoreFile;
+
         RefLoadMode m_mode;
         GUID m_guid;
         StringHashed m_file;
+        std::weak_ptr<CoreObject> m_object;
     };
 }
 

@@ -1,8 +1,8 @@
 #include "decima/serializable/object/prefetch.hpp"
 
-void Decima::Prefetch::parse(ArchiveManager& manager, ash::buffer& buffer, CoreFile* core_file) {
-    CoreObject::parse(manager, buffer, nullptr);
-    paths.parse(buffer);
-    sizes.parse(buffer);
-    indices.parse(buffer);
+void Decima::Prefetch::parse(ArchiveManager& manager, ash::buffer& buffer, CoreFile& file) {
+    CoreObject::parse(manager, buffer, file);
+    paths.parse(buffer, file);
+    sizes.parse(buffer, file);
+    indices.parse(buffer, file);
 }

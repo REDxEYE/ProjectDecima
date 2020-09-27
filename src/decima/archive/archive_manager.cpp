@@ -18,12 +18,10 @@ void Decima::ArchiveManager::load_archive(const std::string& path) {
 }
 
 void Decima::ArchiveManager::load_prefetch() {
-    auto& prefetch_data = query_file("prefetch/fullgame.prefetch").value().get();
+    auto& prefetch_file = query_file("prefetch/fullgame.prefetch").value().get();
+    prefetch_file.parse(*this);
 
-    ash::buffer buffer(prefetch_data.contents.data(), prefetch_data.contents.size());
-
-    Prefetch prefetch;
-    prefetch.parse(*this, buffer, nullptr);
+    Prefetch& prefetch = static_cast<Prefetch&>(*prefetch_file.objects.at(0).first);
 
     for (const auto& string : prefetch.paths.data()) {
         hash_to_name.emplace(hash_string(sanitize_name(string.data()), cipher_seed), string.data());

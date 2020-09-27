@@ -2,7 +2,7 @@
 
 #include <imgui.h>
 
-void Decima::GUID::parse(ash::buffer& buffer) {
+void Decima::GUID::parse(ash::buffer& buffer, CoreFile& file) {
     buffer.get(m_data_1.data(), sizeof(m_data_1));
 }
 
