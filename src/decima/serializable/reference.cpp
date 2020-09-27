@@ -17,7 +17,7 @@ void Decima::Ref::draw() {
     ImGui::TextDisabled("Reference (%s)", Decima::to_string(m_mode).c_str());
     ImGui::SameLine();
 
-    if (ImGui::SmallButton("Show")) {
+    if (ImGui::SmallButton(("Show##" + Decima::to_string(m_guid)).c_str())) {
         m_show_object = m_object.lock() != nullptr;
     }
 
@@ -36,11 +36,49 @@ void Decima::Ref::draw() {
     }
 
     if (m_show_object) {
-        ImGui::SetNextWindowSize({ 400, 200 }, ImGuiCond_Appearing);
+        ImGui::SetNextWindowSize({ 600, 400 }, ImGuiCond_Appearing);
         ImGui::SetNextWindowPos(ImGui::GetMousePos(), ImGuiCond_Appearing);
 
         if (ImGui::Begin(("Reference to " + Decima::to_string(m_guid)).c_str(), &m_show_object, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) {
+            ImGui::Columns(2);
+            ImGui::SetColumnWidth(0, 100);
+            ImGui::SetColumnWidth(1, ImGui::GetWindowWidth() - 100);
+
+            {
+                ImGui::Text("Reference");
+                ImGui::NextColumn();
+
+                ImGui::Text("%s", Decima::to_string(m_mode).c_str());
+                ImGui::NextColumn();
+
+                ImGui::Separator();
+            }
+
+            if (!m_file.data().empty()) {
+                ImGui::Text("File");
+                ImGui::NextColumn();
+
+                m_file.draw();
+                ImGui::NextColumn();
+
+                ImGui::Separator();
+            }
+
+            {
+                ImGui::Text("UUID");
+                ImGui::NextColumn();
+
+                m_guid.draw();
+                ImGui::NextColumn();
+            }
+
+            ImGui::Columns(1);
+
+            ImGui::Separator();
+
+            ImGui::BeginChild(("ReferenceChild" + Decima::to_string(m_guid)).c_str());
             m_object.lock()->draw();
+            ImGui::EndChild();
         }
 
         ImGui::End();
