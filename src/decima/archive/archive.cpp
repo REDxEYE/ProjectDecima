@@ -77,18 +77,3 @@ bool Decima::Archive::open() {
 
     return true;
 }
-
-Decima::OptionalRef<Decima::CoreFile> Decima::Archive::query_file(std::uint64_t hash) {
-    if (auto index = m_hash_to_index.find(hash); index != m_hash_to_index.end()) {
-        auto cache = m_cache.find(index->second);
-
-        if (cache == m_cache.end()) {
-            Decima::CoreFile file(*this, file_entries.at(index->second), m_stream);
-            cache = m_cache.emplace(index->second, std::move(file)).first;
-        }
-
-        return std::make_optional(std::ref(cache->second));
-    }
-
-    return {};
-}

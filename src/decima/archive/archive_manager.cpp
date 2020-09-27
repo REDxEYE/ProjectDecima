@@ -46,8 +46,20 @@ Decima::OptionalRef<Decima::ArchiveFileEntry> Decima::ArchiveManager::get_file_e
 }
 
 Decima::OptionalRef<Decima::CoreFile> Decima::ArchiveManager::query_file(std::uint64_t hash) {
-    if (auto archive_index = hash_to_archive_index.find(hash); archive_index != hash_to_archive_index.end())
-        return archives.at(archive_index->second).query_file(hash);
+    if (auto archive_index = hash_to_archive_index.find(hash); archive_index != hash_to_archive_index.end()) {
+        auto& archive = archives.at(archive_index->second);
+
+        if (auto index = archive.m_hash_to_index.find(hash); index != archive.m_hash_to_index.end()) {
+            auto cache = archive.m_cache.find(index->second);
+
+            if (cache == archive.m_cache.end()) {
+                Decima::CoreFile file(archive, *this, archive.file_entries.at(index->second), archive.m_stream);
+                cache = archive.m_cache.emplace(index->second, std::move(file)).first;
+            }
+
+            return std::make_optional(std::ref(cache->second));
+        }
+    }
 
     return {};
 }

@@ -67,8 +67,6 @@ namespace Decima {
     public:
         explicit Archive(const std::string& path);
 
-        [[nodiscard]] OptionalRef<Decima::CoreFile> query_file(std::uint64_t hash);
-
         std::string path;
         Decima::ArchiveHeader header {};
         std::vector<Decima::ArchiveFileEntry> file_entries;
