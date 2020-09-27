@@ -34,6 +34,7 @@ namespace Decima {
         GUID m_guid;
         StringHashed m_file;
         std::weak_ptr<CoreObject> m_object;
+        bool m_show_object { false };
     };
 }
 

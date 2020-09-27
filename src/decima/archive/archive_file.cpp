@@ -81,7 +81,6 @@ void Decima::CoreFile::resolve_reference(const std::weak_ptr<CoreObject>& object
     auto index = std::remove_if(references.begin(), references.end(), [&](auto& ref) {
         if (ref->m_guid.hash() == object.lock()->guid.hash()) {
             ref->m_object = object;
-            DECIMA_LOG("CoreFile::resolve_reference: Resolved reference");
             return true;
         }
 
