@@ -89,10 +89,7 @@ void Decima::CoreFile::resolve_reference(const std::weak_ptr<CoreObject>& object
         return false;
     });
 
-    if (index == references.end())
-        return;
-
-    references.erase(index);
+    references.erase(index, references.end());
 }
 
 void Decima::CoreFile::resolve_reference(const Decima::CoreFile& file) {
@@ -102,15 +99,15 @@ void Decima::CoreFile::resolve_reference(const Decima::CoreFile& file) {
 }
 
 void Decima::CoreFile::queue_reference(Decima::Ref* ref) {
-    switch (ref->mode()) {
-    case RefLoadMode::Embedded:
-    case RefLoadMode::ImmediateCoreFile:
-    case RefLoadMode::CoreFile:
-        references.push_back(ref);
-        break;
-    case RefLoadMode::NotPresent:
-    case RefLoadMode::WorkOnly:
+    if (ref->mode() == RefLoadMode::NotPresent || ref->mode() == RefLoadMode::WorkOnly)
         return;
+
+    if (ref->mode() == RefLoadMode::ImmediateCoreFile || ref->mode() == RefLoadMode::CoreFile) {
+        auto& file = manager.query_file(ref->file().data()).value().get();
+        file.references.push_back(ref);
+        file.parse();
+    } else {
+        references.push_back(ref);
     }
 }
 
