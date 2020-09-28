@@ -9,6 +9,7 @@
 #include "decima/serializable/object/texture_set.hpp"
 #include "decima/serializable/object/resource/vertex_array_resource.hpp"
 #include "decima/serializable/object/resource/index_array_resource.hpp"
+#include "decima/serializable/object/resource/primitive_resource.hpp"
 
 #include "utils.hpp"
 
@@ -27,6 +28,7 @@ public:
     static constexpr uint64_t Prefetch            = 0xd05789eae3acbf02;
     static constexpr uint64_t VertexArrayResource = 0x3ac29a123faabab4;
     static constexpr uint64_t IndexArrayResource  = 0x5fe633b37cedbf84;
+    static constexpr uint64_t PrimitiveResource   = 0xee49d93da4c1f4b8;
     // clang-format on
 };
 
@@ -49,6 +51,7 @@ static const std::unordered_map<std::uint64_t, Decima::Handler<Decima::CoreObjec
     { DeathStranding_FileMagics::Prefetch,            construct<Decima::Prefetch>            },
     { DeathStranding_FileMagics::VertexArrayResource, construct<Decima::VertexArrayResource> },
     { DeathStranding_FileMagics::IndexArrayResource,  construct<Decima::IndexArrayResource>  },
+    { DeathStranding_FileMagics::PrimitiveResource,   construct<Decima::PrimitiveResource>   },
     // clang-format on
 };
 
@@ -63,6 +66,7 @@ static const std::unordered_map<uint64_t, std::string> names = {
     { DeathStranding_FileMagics::Prefetch,            "Prefetch"            },
     { DeathStranding_FileMagics::VertexArrayResource, "VertexArrayResource" },
     { DeathStranding_FileMagics::IndexArrayResource,  "IndexArrayResource"  },
+    { DeathStranding_FileMagics::PrimitiveResource,   "PrimitiveResource"   },
     // clang-format on
 };
 
