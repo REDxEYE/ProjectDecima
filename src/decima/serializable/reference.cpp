@@ -37,7 +37,7 @@ void Decima::Ref::draw() {
 
     if (m_show_object) {
         ImGui::SetNextWindowSize({ 600, 400 }, ImGuiCond_Appearing);
-        ImGui::SetNextWindowPos(ImGui::GetMousePos(), ImGuiCond_Appearing);
+        ImGui::SetNextWindowPos(ImGui::GetMousePos(), ImGuiCond_Appearing, { 0.5, 0.5 });
 
         if (ImGui::Begin(("Reference to " + Decima::to_string(m_guid)).c_str(), &m_show_object, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) {
             ImGui::Columns(2);
