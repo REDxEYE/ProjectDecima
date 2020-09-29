@@ -318,7 +318,7 @@ void ProjectDS::draw_filepreview() {
                     ImGui::Text("Archive ID");
                     ImGui::NextColumn();
 
-                    ImGui::Text("%s", archive_manager.archives.at(archive_manager.hash_to_archive_index.at(selection_info.selected_file)).path.c_str());
+                    ImGui::Text("%s", archive_manager.archives.at(archive_manager.hash_to_archive_index.at(selection_info.selected_file)).path.stem().string().c_str());
                     ImGui::NextColumn();
 
                     ImGui::Separator();
