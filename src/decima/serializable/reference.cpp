@@ -3,6 +3,7 @@
 #include <imgui.h>
 
 void Decima::Ref::parse(ash::buffer& buffer, Decima::CoreFile& file) {
+    m_owner = file.objects.back().first;
     m_mode = buffer.get<decltype(m_mode)>();
     if (m_mode != RefLoadMode::NotPresent)
         m_guid.parse(buffer, file);

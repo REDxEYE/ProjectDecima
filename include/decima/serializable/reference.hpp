@@ -25,7 +25,8 @@ namespace Decima {
         inline RefLoadMode mode() const { return m_mode; }
         inline GUID guid() const { return m_guid; }
         inline StringHashed file() const { return m_file; }
-        inline const std::shared_ptr<CoreObject>& object() const { return m_object; }
+        inline const std::shared_ptr<CoreObject>& target() const { return m_object; }
+        inline const std::shared_ptr<CoreObject>& owner() const { return m_owner; }
 
     private:
         friend class CoreFile;
@@ -34,6 +35,7 @@ namespace Decima {
         GUID m_guid;
         StringHashed m_file;
         std::shared_ptr<CoreObject> m_object;
+        std::shared_ptr<CoreObject> m_owner;
         bool m_show_object { false };
     };
 }

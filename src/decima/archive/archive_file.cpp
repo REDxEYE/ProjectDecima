@@ -80,7 +80,7 @@ Decima::CoreFile::CoreFile(Archive& archive, ArchiveManager& manager, ArchiveFil
     , contents(unpack(archive, entry, source)) { }
 
 void Decima::CoreFile::resolve_reference(const std::shared_ptr<CoreObject>& object) {
-    auto index = std::remove_if(references.begin(), references.end(), [&](auto& ref) {
+    auto index = std::remove_if(references.begin(), references.end(), [&](Ref* ref) {
         if (ref->m_guid.hash() == object->guid.hash()) {
             ref->m_object = object;
             return true;
@@ -120,11 +120,13 @@ void Decima::CoreFile::parse() {
             const auto entry_header = Decima::CoreObject::peek_header(buffer);
             const auto entry_offset = buffer.data() - contents.data();
 
-            objects.push_back([&] {
-                auto handler = Decima::get_type_handler(entry_header.file_type);
-                handler->parse(manager, buffer, *this);
-                return std::make_pair(handler, entry_offset);
-            }());
+            /*
+             * Tricky hack to allow objects during parsing.
+             * This is useful for getting owner of the reference
+             */
+            auto handler = Decima::get_type_handler(entry_header.file_type);
+            objects.emplace_back(handler, entry_offset);
+            handler->parse(manager, buffer, *this);
         }
     }
 
