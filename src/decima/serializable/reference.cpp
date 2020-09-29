@@ -18,14 +18,14 @@ void Decima::Ref::draw() {
     ImGui::SameLine();
 
     if (ImGui::SmallButton(("Show##" + Decima::to_string(m_guid)).c_str())) {
-        m_show_object = m_object.lock() != nullptr;
+        m_show_object = m_object != nullptr;
     }
 
     if (ImGui::IsItemHovered()) {
         ImGui::BeginTooltip();
         ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
 
-        if (m_object.lock() == nullptr) {
+        if (m_object == nullptr) {
             ImGui::Text("Not resolved");
         } else {
             ImGui::Text("Click to show");
@@ -77,7 +77,7 @@ void Decima::Ref::draw() {
             ImGui::Separator();
 
             ImGui::BeginChild(("ReferenceChild" + Decima::to_string(m_guid)).c_str());
-            m_object.lock()->draw();
+            m_object->draw();
             ImGui::EndChild();
         }
 

@@ -79,9 +79,9 @@ Decima::CoreFile::CoreFile(Archive& archive, ArchiveManager& manager, ArchiveFil
     , entry(entry)
     , contents(unpack(archive, entry, source)) { }
 
-void Decima::CoreFile::resolve_reference(const std::weak_ptr<CoreObject>& object) {
+void Decima::CoreFile::resolve_reference(const std::shared_ptr<CoreObject>& object) {
     auto index = std::remove_if(references.begin(), references.end(), [&](auto& ref) {
-        if (ref->m_guid.hash() == object.lock()->guid.hash()) {
+        if (ref->m_guid.hash() == object->guid.hash()) {
             ref->m_object = object;
             return true;
         }

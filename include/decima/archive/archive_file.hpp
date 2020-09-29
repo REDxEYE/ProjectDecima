@@ -21,7 +21,7 @@ namespace Decima {
         void parse();
 
         void queue_reference(Ref*);
-        void resolve_reference(const std::weak_ptr<CoreObject>&);
+        void resolve_reference(const std::shared_ptr<CoreObject>&);
         void resolve_reference(const CoreFile&);
 
     private:
