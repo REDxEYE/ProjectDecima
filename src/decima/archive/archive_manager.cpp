@@ -8,7 +8,7 @@
 #include "utils.hpp"
 #include "decima/archive/archive_manager.hpp"
 
-void Decima::ArchiveManager::load_archive(const std::string& path) {
+void Decima::ArchiveManager::load_archive(const std::filesystem::path& path) {
     auto& archive = archives.emplace_back(path);
     archive.open();
 

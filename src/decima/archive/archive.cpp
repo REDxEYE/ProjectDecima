@@ -26,8 +26,8 @@ static void decrypt(uint32_t key_1, uint32_t key_2, uint32_t* data) {
     data[7] ^= iv[7];
 }
 
-Decima::Archive::Archive(const std::string& path)
-    : m_stream(path)
+Decima::Archive::Archive(const std::filesystem::path& path)
+    : m_stream(path.string())
     , path(path) { open(); }
 
 bool Decima::Archive::open() {

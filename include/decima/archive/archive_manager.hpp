@@ -8,7 +8,7 @@
 namespace Decima {
     class ArchiveManager {
     public:
-        void load_archive(const std::string& path);
+        void load_archive(const std::filesystem::path& path);
         void load_prefetch();
 
         [[nodiscard]] Decima::OptionalRef<Decima::CoreFile> query_file(std::uint64_t hash);
@@ -18,6 +18,8 @@ namespace Decima {
         [[nodiscard]] Decima::OptionalRef<Decima::ArchiveFileEntry> get_file_entry(const std::string& name);
 
         std::unordered_map<uint64_t, uint32_t> hash_to_archive_index;
+
+        // TODO: GUI-related, must be removed
         std::unordered_map<uint64_t, std::string> hash_to_name;
 
         std::vector<Archive> archives;

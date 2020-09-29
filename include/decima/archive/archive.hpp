@@ -3,6 +3,7 @@
 #include <vector>
 
 #include <util/mio.hpp>
+#include <filesystem>
 
 #include "archive_file.hpp"
 #include "util/buffer.hpp"
@@ -65,9 +66,9 @@ namespace Decima {
 
     class Archive {
     public:
-        explicit Archive(const std::string& path);
+        explicit Archive(const std::filesystem::path& path);
 
-        std::string path;
+        std::filesystem::path path;
         Decima::ArchiveHeader header {};
         std::vector<Decima::ArchiveFileEntry> file_entries;
         std::vector<Decima::ArchiveChunkEntry> chunk_entries;
