@@ -11,7 +11,7 @@ std::string uint64_to_hex(uint64_t value);
 
 uint64_t hash_string(const std::string& filename, uint8_t seed);
 
-std::string sanitize_name(const std::string& filename);
+std::string sanitize_name(std::string filename);
 
 void split(const std::string& str, std::vector<std::string>& cont, char delim);
 

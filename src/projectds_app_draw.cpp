@@ -489,10 +489,8 @@ void ProjectDS::draw_export() {
             ImGui::InputText("File name", path, IM_ARRAYSIZE(path) - 1);
 
             if (ImGui::Button("Add to selection!")) {
-                std::string str_path(path);
-                uint64_t file_hash = hash_string(sanitize_name(str_path), Decima::cipher_seed);
+                uint64_t file_hash = hash_string(sanitize_name(path), Decima::cipher_seed);
                 if (archive_manager.get_file_entry(file_hash).has_value()) {
-                    archive_manager.hash_to_name[file_hash] = str_path;
                     selection_info.selected_files.insert(file_hash);
                 }
             }
@@ -512,7 +510,6 @@ void ProjectDS::draw_export() {
 
             if (ImGui::Button("Add to selection!")) {
                 if (archive_manager.get_file_entry(file_hash).has_value()) {
-                    archive_manager.hash_to_name[file_hash] = "HASH: " + uint64_to_hex(file_hash);
                     selection_info.selected_files.insert(file_hash);
                 }
             }

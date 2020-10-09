@@ -19,7 +19,9 @@ uint64_t hash_string(const std::string& filename, uint8_t seed) {
     return hash[0];
 }
 
-std::string sanitize_name(const std::string& filename) {
+std::string sanitize_name(std::string filename) {
+    std::replace(filename.begin(), filename.end(), '\\', '/');
+
     const auto extension = filename.substr(filename.rfind('.') + 1);
 
     if (extension != "stream" && extension != "core")
