@@ -1,4 +1,5 @@
 #include "decima/serializable/reference.hpp"
+#include "decima/serializable/object/object.hpp"
 
 #include <imgui.h>
 

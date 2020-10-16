@@ -1,10 +1,8 @@
-//
-// Created by MED45 on 25.07.2020.
-//
-
-#include <MurmurHash3.h>
-
 #include "decima/archive/archive.hpp"
+#include "decima/shared.hpp"
+
+#include <fstream>
+#include <MurmurHash3.h>
 
 static void decrypt(uint32_t key_1, uint32_t key_2, uint32_t* data) {
     const std::uint32_t key[8] = {
@@ -26,12 +24,13 @@ static void decrypt(uint32_t key_1, uint32_t key_2, uint32_t* data) {
     data[7] ^= iv[7];
 }
 
-Decima::Archive::Archive(const std::filesystem::path& path)
-    : m_stream(path.string())
+Decima::Archive::Archive(const std::string& path)
+    : m_file(std::make_unique<std::ifstream>(path, std::ios::binary))
     , path(path) { open(); }
 
 bool Decima::Archive::open() {
-    memcpy(&header, m_stream.data(), sizeof(ArchiveHeader));
+    m_file->seekg(0, std::ios::beg);
+    m_file->read((char*)&header, sizeof(ArchiveHeader));
 
     if (header.type != ArchiveType::Regular && header.type != ArchiveType::Encrypted)
         return false;
@@ -39,15 +38,11 @@ bool Decima::Archive::open() {
     if (header.type == ArchiveType::Encrypted)
         decrypt(header.key, header.key + 1, (uint32_t*)&header.file_size);
 
-    std::size_t read_offset = sizeof(ArchiveHeader);
-
     file_entries.resize(header.file_entries_count);
-    memcpy(file_entries.data(), m_stream.data() + read_offset, sizeof(ArchiveFileEntry) * header.file_entries_count);
-
-    read_offset += sizeof(ArchiveFileEntry) * header.file_entries_count;
+    m_file->read((char*)file_entries.data(), sizeof(ArchiveFileEntry) * header.file_entries_count);
 
     chunk_entries.resize(header.chunk_entries_count);
-    memcpy(chunk_entries.data(), m_stream.data() + read_offset, sizeof(chunk_entries.front()) * header.chunk_entries_count);
+    m_file->read((char*)chunk_entries.data(), sizeof(ArchiveChunkEntry) * header.chunk_entries_count);
 
     if (header.type == ArchiveType::Encrypted) {
         for (auto& entry : file_entries) {

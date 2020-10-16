@@ -1,14 +1,18 @@
 #pragma once
 
 #include <unordered_map>
+#include <memory>
 
 #include "decima/archive/archive.hpp"
-#include "decima/serializable/object/prefetch.hpp"
+#include "decima/shared.hpp"
+#include "util/compressor.hpp"
 
 namespace Decima {
+    class CoreFile;
+
     class ArchiveManager {
     public:
-        void load_archive(const std::filesystem::path& path);
+        void load_archive(const std::string& path);
         void load_prefetch();
 
         [[nodiscard]] Decima::OptionalRef<Decima::CoreFile> query_file(std::uint64_t hash);
@@ -23,5 +27,6 @@ namespace Decima {
         std::unordered_map<uint64_t, std::string> hash_to_name;
 
         std::vector<Archive> archives;
+        std::unique_ptr<Decima::Compressor> compressor;
     };
 }

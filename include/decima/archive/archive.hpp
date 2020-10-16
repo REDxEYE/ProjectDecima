@@ -1,12 +1,11 @@
 #pragma once
 
+#include <unordered_map>
 #include <vector>
+#include <memory>
+#include <fstream>
 
-#include <util/mio.hpp>
-#include <filesystem>
-
-#include "archive_file.hpp"
-#include "util/buffer.hpp"
+#include "decima/archive/archive_file.hpp"
 
 namespace Decima {
     enum class ArchiveType : uint32_t {
@@ -66,12 +65,12 @@ namespace Decima {
 
     class Archive {
     public:
-        explicit Archive(const std::filesystem::path& path);
+        explicit Archive(const std::string& path);
 
-        std::filesystem::path path;
         Decima::ArchiveHeader header {};
         std::vector<Decima::ArchiveFileEntry> file_entries;
         std::vector<Decima::ArchiveChunkEntry> chunk_entries;
+        std::string path;
 
     private:
         friend class ArchiveManager;
@@ -81,6 +80,6 @@ namespace Decima {
 
         std::unordered_map<std::uint64_t, Decima::CoreFile> m_cache;
         std::unordered_map<std::uint64_t, std::uint64_t> m_hash_to_index;
-        mio::mmap_source m_stream;
+        std::unique_ptr<std::ifstream> m_file;
     };
 }

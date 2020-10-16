@@ -11,7 +11,6 @@ endif ()
 add_subdirectory(cmake_subprojects/hash)
 add_subdirectory(cmake_subprojects/glad)
 add_subdirectory(cmake_subprojects/imgui)
-add_subdirectory(cmake_subprojects/oodle)
 add_subdirectory(libs/glfw)
 
 include(ProjectDS.cmake)

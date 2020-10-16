@@ -1,14 +1,11 @@
-//
-// Created by MED45 on 26.07.2020.
-//
-
-#include <filesystem>
 #include <optional>
 
 #include "utils.hpp"
 #include "decima/archive/archive_manager.hpp"
+#include "decima/archive/archive.hpp"
+#include "decima/serializable/object/prefetch.hpp"
 
-void Decima::ArchiveManager::load_archive(const std::filesystem::path& path) {
+void Decima::ArchiveManager::load_archive(const std::string& path) {
     auto& archive = archives.emplace_back(path);
     archive.open();
 
@@ -53,7 +50,7 @@ Decima::OptionalRef<Decima::CoreFile> Decima::ArchiveManager::query_file(std::ui
             auto cache = archive.m_cache.find(index->second);
 
             if (cache == archive.m_cache.end()) {
-                Decima::CoreFile file(archive, *this, archive.file_entries.at(index->second), archive.m_stream);
+                Decima::CoreFile file(archive, *this, archive.file_entries.at(index->second), *archive.m_file);
                 cache = archive.m_cache.emplace(index->second, std::move(file)).first;
             }
 

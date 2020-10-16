@@ -27,8 +27,7 @@ public:
     };
 
 public:
-    ProjectDS(const std::pair<uint32_t, uint32_t>& windowSize, const std::string& title,
-        bool imgui_multi_viewport = false);
+    ProjectDS(Decima::ArchiveManager&&, const std::pair<uint32_t, uint32_t>& windowSize, const std::string& title);
 
 public:
     bool m_multi_viewport;

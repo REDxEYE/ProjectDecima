@@ -5,6 +5,8 @@
 #include <filesystem>
 
 #include "decima/archive/archive_tree.hpp"
+#include "decima/archive/archive_manager.hpp"
+#include "decima/archive/archive.hpp"
 
 #include <imgui.h>
 #include "utils.hpp"
@@ -96,7 +98,7 @@ void FileTree::draw(SelectionInfo& selection, Decima::ArchiveManager& archive_ar
              * then select everything
              */
 
-            std::unordered_set<std::uint64_t> folder_files;
+            std::set<std::uint64_t> folder_files;
 
             for (const auto& file : data.first->files) {
                 folder_files.insert(file.second.first.hash);

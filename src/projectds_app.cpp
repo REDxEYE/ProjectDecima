@@ -8,11 +8,9 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-ProjectDS::ProjectDS(const std::pair<uint32_t, uint32_t>& windowSize, const std::string& title,
-                     bool imgui_multi_viewport) : App(windowSize,
-                                                      title) {
-    m_multi_viewport = imgui_multi_viewport;
-}
+ProjectDS::ProjectDS(Decima::ArchiveManager&& manager, const std::pair<uint32_t, uint32_t>& windowSize, const std::string& title)
+    : App(windowSize, title)
+    , archive_manager(std::move(manager)) {}
 
 void ProjectDS::begin_frame_user() {
     App::begin_frame_user();

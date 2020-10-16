@@ -18,7 +18,7 @@ static void show_data_selection_dialog(ProjectDS& self) {
         for (auto file : std::filesystem::directory_iterator(folder)) {
             if (file.path().extension() == ".bin") {
                 DECIMA_LOG("Loading archive ", file.path().stem().string());
-                self.archive_manager.load_archive(file.path());
+                self.archive_manager.load_archive(file.path().string());
             }
         }
 
@@ -318,7 +318,7 @@ void ProjectDS::draw_filepreview() {
                     ImGui::Text("Archive ID");
                     ImGui::NextColumn();
 
-                    ImGui::Text("%s", archive_manager.archives.at(archive_manager.hash_to_archive_index.at(selection_info.selected_file)).path.stem().string().c_str());
+                    ImGui::Text("%s", archive_manager.archives.at(archive_manager.hash_to_archive_index.at(selection_info.selected_file)).path.c_str());
                     ImGui::NextColumn();
 
                     ImGui::Separator();

@@ -1,15 +1,12 @@
 #pragma once
 
-#include <unordered_set>
 #include <map>
-#include <memory>
-#include <string>
-#include <vector>
+#include <set>
 
 #include <imgui.h>
 
-#include "archive_manager.hpp"
-#include "decima/serializable/object/object_dummy.hpp"
+#include "decima/archive/archive_file.hpp"
+#include "decima/serializable/object/object.hpp"
 
 struct SelectionInfo {
     SelectionInfo() = default;
@@ -17,7 +14,7 @@ struct SelectionInfo {
     std::uint64_t preview_file_size { 0 };
     std::uint64_t preview_file_offset { 0 };
     std::uint64_t selected_file { 0 };
-    std::unordered_set<std::uint64_t> selected_files;
+    std::set<std::uint64_t> selected_files;
     Decima::CoreFile* file;
 };
 

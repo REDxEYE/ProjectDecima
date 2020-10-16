@@ -33,10 +33,10 @@ add_executable(ProjectDS
         src/decima/serializable/object/resource/primitive_resource.cpp
         src/decima/serializable/object/resource/primitive_resource_draw.cpp)
 
-target_link_libraries(ProjectDS PRIVATE oodle hash imgui glfw glad)
+target_link_libraries(ProjectDS PRIVATE hash imgui glfw glad)
 target_include_directories(ProjectDS PRIVATE include)
 
 if (MSVC)
-    target_compile_definitions(ProjectDS PUBLIC _CRT_SECURE_NO_WARNINGS)
+    target_compile_definitions(ProjectDS PUBLIC _CRT_SECURE_NO_WARNINGS _ITERATOR_DEBUG_LEVEL=0)
     target_compile_options(ProjectDS PUBLIC /EHs)
 endif ()

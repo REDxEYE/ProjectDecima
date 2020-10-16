@@ -1,22 +1,18 @@
 #pragma once
 
-#include <cstdint>
-#include <cmath>
-#include <vector>
 #include <memory>
-
-#include <util/mio.hpp>
-
-#include "decima/serializable/object/object_dummy.hpp"
+#include <vector>
 
 namespace Decima {
     class Archive;
+    class ArchiveManager;
     class ArchiveFileEntry;
+    class CoreObject;
     class Ref;
 
     class CoreFile {
     public:
-        CoreFile(Archive& archive, ArchiveManager& manager, ArchiveFileEntry& entry, mio::mmap_source& source);
+        CoreFile(Archive& archive, ArchiveManager& manager, ArchiveFileEntry& entry, std::ifstream& source);
 
         void parse();
 

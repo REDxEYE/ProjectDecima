@@ -1,12 +1,14 @@
 #include "decima/archive/archive_file.hpp"
 
+#include <algorithm>
 #include <numeric>
+
 #include <md5.h>
 #include <MurmurHash3.h>
-#include <Kraken.h>
 
 #include "decima/archive/archive.hpp"
 #include "decima/archive/archive_manager.hpp"
+#include "decima/serializable/object/object.hpp"
 #include "decima/serializable/handlers.hpp"
 #include "decima/serializable/reference.hpp"
 
@@ -26,58 +28,59 @@ static void decrypt_chunk(uint8_t* data, const Decima::ArchiveChunkEntry& chunk_
     }
 }
 
-std::vector<char> unpack(const Decima::Archive& archive, const Decima::ArchiveFileEntry& entry, mio::mmap_source& source) {
+std::vector<char> unpack(Decima::Compressor& compressor, const Decima::Archive& archive, const Decima::ArchiveFileEntry& entry, std::ifstream& source) {
     auto aligned_offset = [](std::uint64_t offset, std::uint64_t alignment) {
         return offset & ~(alignment - 1);
     };
 
     auto chunk_from_offset = [&](std::uint64_t offset) {
-        auto index = std::find_if(archive.chunk_entries.begin(), archive.chunk_entries.end(), [&](const auto& item) {
+        return std::find_if(archive.chunk_entries.begin(), archive.chunk_entries.end(), [&](const auto& item) {
             return item.decompressed_span.offset == offset;
         });
-
-        return std::distance(archive.chunk_entries.begin(), index);
     };
 
     auto [chunk_entry_begin, chunk_entry_end] = [&] {
         auto first_chunk_offset = aligned_offset(entry.span.offset, archive.header.chunk_maximum_size);
         auto last_chunk_offset = aligned_offset(entry.span.offset + entry.span.size, archive.header.chunk_maximum_size);
 
-        return std::make_pair(
-            archive.chunk_entries.begin() + chunk_from_offset(first_chunk_offset),
-            archive.chunk_entries.begin() + chunk_from_offset(last_chunk_offset) + 1);
+        return std::make_pair(chunk_from_offset(first_chunk_offset), chunk_from_offset(last_chunk_offset) + 1);
     }();
 
-    auto decompressed_size = std::accumulate(chunk_entry_begin, chunk_entry_end, 0, [](const auto acc, const auto& item) {
-        return acc + item.decompressed_span.size;
+    source.seekg(chunk_entry_begin->compressed_span.offset, std::ios::beg);
+
+    std::size_t chunk_buffer_offset = 0;
+    std::vector<char> chunk_buffer;
+
+    std::size_t result_buffer_size = 0;
+    std::size_t result_buffer_offset = entry.span.offset & (archive.header.chunk_maximum_size - 1);
+    std::vector<char> result_buffer;
+
+    std::for_each(chunk_entry_begin, chunk_entry_end, [&] (const Decima::ArchiveChunkEntry& chunk) {
+        chunk_buffer.resize(chunk_buffer.size() + chunk.compressed_span.size);
+        source.read((char*)chunk_buffer.data() + chunk_buffer_offset, chunk.compressed_span.size);
+        if (archive.header.type == Decima::ArchiveType::Encrypted)
+            decrypt_chunk((uint8_t*)chunk_buffer.data() + chunk_buffer_offset, chunk);
+        chunk_buffer_offset += chunk.compressed_span.size;
+        result_buffer_size += chunk.decompressed_span.size;
     });
 
-    std::vector<char> buffer_decompressed(decompressed_size);
-    std::size_t buffer_decompressed_offset = 0;
+    result_buffer.resize(result_buffer_size);
+    compressor.decompress(chunk_buffer, result_buffer);
 
-    for (auto chunk_entry = chunk_entry_begin; chunk_entry != chunk_entry_end; ++chunk_entry) {
-        std::vector<std::uint8_t> data_buffer(chunk_entry->compressed_span.size);
-        memcpy(data_buffer.data(), source.data() + chunk_entry->compressed_span.offset, chunk_entry->compressed_span.size);
+    result_buffer.erase(result_buffer.begin(), result_buffer.begin() + result_buffer_offset);
+    result_buffer.erase(result_buffer.begin() + entry.span.size, result_buffer.end());
 
-        if (archive.header.type == Decima::ArchiveType::Encrypted)
-            decrypt_chunk(data_buffer.data(), *chunk_entry);
+    std::ofstream output("suka.bin", std::ios::binary | std::ios::trunc);
+    output.write(result_buffer.data(), result_buffer.size());
 
-        Kraken_Decompress((std::uint8_t*)data_buffer.data(), chunk_entry->compressed_span.size, (std::uint8_t*)&buffer_decompressed.at(buffer_decompressed_offset), chunk_entry->decompressed_span.size);
-        buffer_decompressed_offset += chunk_entry->decompressed_span.size;
-    }
-
-    auto file_position = entry.span.offset & (archive.header.chunk_maximum_size - 1);
-    buffer_decompressed.erase(buffer_decompressed.begin(), buffer_decompressed.begin() + file_position);
-    buffer_decompressed.erase(buffer_decompressed.begin() + entry.span.size, buffer_decompressed.begin() + buffer_decompressed.size());
-
-    return buffer_decompressed;
+    return result_buffer;
 }
 
-Decima::CoreFile::CoreFile(Archive& archive, ArchiveManager& manager, ArchiveFileEntry& entry, mio::mmap_source& source)
+Decima::CoreFile::CoreFile(Archive& archive, ArchiveManager& manager, ArchiveFileEntry& entry, std::ifstream& source)
     : archive(archive)
     , manager(manager)
     , entry(entry)
-    , contents(unpack(archive, entry, source)) { }
+    , contents(unpack(*manager.compressor, archive, entry, source)) { }
 
 void Decima::CoreFile::resolve_reference(const std::shared_ptr<CoreObject>& object) {
     auto index = std::remove_if(references.begin(), references.end(), [&](Ref* ref) {

@@ -4,7 +4,6 @@
 #include <vector>
 #include <sstream>
 
-#include <Kraken.h>
 #include <MurmurHash3.h>
 
 std::string uint64_to_hex(uint64_t value);
