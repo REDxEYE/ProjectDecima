@@ -19,9 +19,8 @@ static void show_data_selection_dialog(ProjectDS& self) {
         for (auto file : std::filesystem::recursive_directory_iterator(folder)) {
             auto filename = file.path().filename();
 
-            if (filename.extension() == ".dll" && filename.string().find("oo2core") == 0) {
+            if (filename.extension() == ".dll" && filename.string().find("oo2core") == 0 && compressor_file.empty()) {
                 compressor_file = file.path().string();
-                self.archive_manager.compressor = std::make_unique<Decima::Compressor>(file.path().string());
             }
 
             if (filename.extension() == ".bin") {
