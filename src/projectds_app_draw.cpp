@@ -12,14 +12,15 @@
 #include "utils.hpp"
 
 static void show_data_selection_dialog(ProjectDS& self) {
-    auto folder = pfd::select_folder("Select game folder").result();
+    std::string folder = pfd::select_folder("Select game folder").result();
+    std::string compressor_file;
 
     if (!folder.empty()) {
         for (auto file : std::filesystem::recursive_directory_iterator(folder)) {
             auto filename = file.path().filename();
 
             if (filename.extension() == ".dll" && filename.string().find("oo2core") == 0) {
-                DECIMA_LOG("Using compressor '", filename.string(), "'");
+                compressor_file = file.path().string();
                 self.archive_manager.compressor = std::make_unique<Decima::Compressor>(file.path().string());
             }
 
@@ -29,17 +30,26 @@ static void show_data_selection_dialog(ProjectDS& self) {
             }
         }
 
-        if (!self.archive_manager.compressor) {
+        if (compressor_file.empty()) {
             DECIMA_LOG("Could not find compressor library");
 
             while (true) {
                 auto result = pfd::open_file("Select oo2core_X_win64.dll", "", { "oo2core_X_win64.dll", "oo2core_*_win64.dll" }).result();
 
                 if (!result.empty()) {
-                    self.archive_manager.compressor = std::make_unique<Decima::Compressor>(result[0]);
+                    compressor_file = result[0];
                     break;
                 }
             }
+        }
+
+        self.archive_manager.compressor = std::make_unique<Decima::Compressor>(compressor_file);
+
+        DECIMA_LOG("Using compressor '", std::filesystem::path(compressor_file).filename().string(), "' (version ", self.archive_manager.compressor->get_version_string(), ")");
+
+        if (self.archive_manager.compressor->get_version() < 0x2E070030) {
+            pfd::message("Unsupported compressor", "Compressor library version must be at least 2.7.0 (oo2core_7_win64) or greater", pfd::choice::ok, pfd::icon::error);
+            std::exit(EXIT_FAILURE);
         }
 
         self.archive_manager.load_prefetch();
