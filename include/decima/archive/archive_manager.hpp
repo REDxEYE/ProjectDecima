@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "decima/archive/archive.hpp"
+#include "decima/serializable/object/prefetch.hpp"
 #include "decima/shared.hpp"
 #include "util/compressor.hpp"
 
@@ -28,5 +29,6 @@ namespace Decima {
 
         std::vector<Archive> archives;
         std::unique_ptr<Decima::Compressor> compressor;
+        std::unique_ptr<Decima::Prefetch> prefetch;
     };
 }

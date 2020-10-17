@@ -12,13 +12,33 @@
 #include "utils.hpp"
 
 static void show_data_selection_dialog(ProjectDS& self) {
-    auto folder = pfd::select_folder("Select Death Stranding data folder!").result();
+    auto folder = pfd::select_folder("Select game folder").result();
 
     if (!folder.empty()) {
-        for (auto file : std::filesystem::directory_iterator(folder)) {
-            if (file.path().extension() == ".bin") {
-                DECIMA_LOG("Loading archive ", file.path().stem().string());
+        for (auto file : std::filesystem::recursive_directory_iterator(folder)) {
+            auto filename = file.path().filename();
+
+            if (filename.extension() == ".dll" && filename.string().find("oo2core") == 0) {
+                DECIMA_LOG("Using compressor '", filename.string(), "'");
+                self.archive_manager.compressor = std::make_unique<Decima::Compressor>(file.path().string());
+            }
+
+            if (filename.extension() == ".bin") {
+                DECIMA_LOG("Loading archive '", file.path().stem().string(), "'");
                 self.archive_manager.load_archive(file.path().string());
+            }
+        }
+
+        if (!self.archive_manager.compressor) {
+            DECIMA_LOG("Could not find compressor library");
+
+            while (true) {
+                auto result = pfd::open_file("Select oo2core_X_win64.dll", "", { "oo2core_X_win64.dll", "oo2core_*_win64.dll" }).result();
+
+                if (!result.empty()) {
+                    self.archive_manager.compressor = std::make_unique<Decima::Compressor>(result[0]);
+                    break;
+                }
             }
         }
 

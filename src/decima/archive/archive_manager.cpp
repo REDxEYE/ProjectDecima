@@ -18,9 +18,9 @@ void Decima::ArchiveManager::load_prefetch() {
     auto& prefetch_file = query_file("prefetch/fullgame.prefetch").value().get();
     prefetch_file.parse();
 
-    Prefetch& prefetch = static_cast<Prefetch&>(*prefetch_file.objects.at(0).first);
+    prefetch = std::make_unique<Prefetch>(static_cast<Prefetch&>(*prefetch_file.objects.at(0).first));
 
-    for (const auto& string : prefetch.paths.data()) {
+    for (const auto& string : prefetch->paths.data()) {
         hash_to_name.emplace(hash_string(sanitize_name(string.data()), cipher_seed), string.data());
     }
 
