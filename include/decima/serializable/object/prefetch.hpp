@@ -15,7 +15,8 @@ namespace Decima {
 
     public:
         Array<StringHashed> paths;
-        Array<uint32_t> sizes;
-        Array<uint32_t> indices;
+        Array<std::uint32_t> sizes;
+        std::uint32_t links_total;
+        std::vector<Array<std::uint32_t>> links;
     };
 }
