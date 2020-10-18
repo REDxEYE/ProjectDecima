@@ -25,7 +25,8 @@ namespace Decima {
         std::unordered_map<uint64_t, uint32_t> hash_to_archive_index;
 
         // TODO: GUI-related, must be removed
-        std::unordered_map<uint64_t, std::string> hash_to_name;
+        std::unordered_map<std::uint64_t, std::string> hash_to_name;
+        std::unordered_map<std::uint64_t, std::uint64_t> hash_to_index;
 
         std::vector<Archive> archives;
         std::unique_ptr<Decima::Compressor> compressor;

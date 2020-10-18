@@ -71,7 +71,7 @@ static void show_data_selection_dialog(ProjectDS& self) {
                     current_root = current_root->add_folder(*it);
 
                 if (self.archive_manager.hash_to_archive_index.find(hash) != self.archive_manager.hash_to_archive_index.end()) {
-                    current_root->add_file(split_path.back(), hash, { 0 });
+                    current_root->add_file(path, split_path.back(), hash, { 0 });
                 }
             }
 

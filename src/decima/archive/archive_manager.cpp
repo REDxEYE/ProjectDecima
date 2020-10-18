@@ -20,11 +20,12 @@ void Decima::ArchiveManager::load_prefetch() {
 
     prefetch = std::make_unique<Prefetch>(static_cast<Prefetch&>(*prefetch_file.objects.at(0).first));
 
-    for (const auto& string : prefetch->paths.data()) {
-        hash_to_name.emplace(hash_string(sanitize_name(string.data()), cipher_seed), string.data());
+    for (std::uint64_t index = 0; index < prefetch->paths.data().size(); index++) {
+        auto path = prefetch->paths.data()[index].data();
+        auto hash = hash_string(sanitize_name(path), cipher_seed);
+        hash_to_name.emplace(hash, path);
+        hash_to_index.emplace(hash, index);
     }
-
-    hash_to_name.emplace(0x2fff5af65cd64c0a, "prefetch/fullgame.prefetch");
 }
 
 Decima::OptionalRef<Decima::ArchiveFileEntry> Decima::ArchiveManager::get_file_entry(std::uint64_t hash) {

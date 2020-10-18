@@ -18,7 +18,15 @@ FileTree* FileTree::add_folder(const std::string& name) {
 }
 
 void FileTree::add_file(const std::string& filename, uint64_t hash, Decima::CoreHeader header) {
-    files.emplace(filename, std::make_pair(FileInfo { hash, header }, true));
+    add_file(filename, filename, hash, header);
+}
+
+void FileTree::add_file(const std::string& path, const std::string& filename, uint64_t hash, Decima::CoreHeader header) {
+    FileInfo info {};
+    info.path = path;
+    info.name = filename;
+    info.hash = hash;
+    files.emplace(filename, std::make_pair(std::move(info), true));
 }
 
 bool is_filter_matches(FileTree& root, const ImGuiTextFilter& filter) {
@@ -63,7 +71,7 @@ void FileTree::reset_filter(bool visibility) {
     }
 }
 
-void FileTree::draw(SelectionInfo& selection, Decima::ArchiveManager& archive_array, bool header, ExpandMode expand) {
+void FileTree::draw(SelectionInfo& selection, Decima::ArchiveManager& manager, bool header, ExpandMode expand) {
     if (header) {
         ImGui::Separator();
         ImGui::Columns(3);
@@ -130,7 +138,7 @@ void FileTree::draw(SelectionInfo& selection, Decima::ArchiveManager& archive_ar
 
         if (show) {
             if (items_count > 0) {
-                data.first->draw(selection, archive_array, false, expand);
+                data.first->draw(selection, manager, false, expand);
             } else {
                 ImGui::TextDisabled("Empty");
                 ImGui::NextColumn();
@@ -152,7 +160,7 @@ void FileTree::draw(SelectionInfo& selection, Decima::ArchiveManager& archive_ar
 
         ImGui::TreeNodeEx(name.c_str(), ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_Leaf | static_cast<int>(is_selected));
 
-        if (ImGui::IsItemClicked(ImGuiMouseButton_Left)) {
+        if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && ImGui::IsItemHovered()) {
             selection.selected_file = data.first.hash;
 
             if (ImGui::GetIO().KeyCtrl) {
@@ -162,6 +170,75 @@ void FileTree::draw(SelectionInfo& selection, Decima::ArchiveManager& archive_ar
                     selection.selected_files.insert(data.first.hash);
                 }
             }
+        } else if (ImGui::IsMouseReleased(ImGuiMouseButton_Right) && ImGui::IsItemHovered()) {
+            selection.highlighted_file = data.first;
+            ImGui::OpenPopup("TreeContextMenu");
+        }
+
+        ImGui::SetNextWindowSize({ 320, 0 }, ImGuiCond_Always);
+
+        if (ImGui::BeginPopupContextWindow("TreeContextMenu")) {
+            ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, { 0, 0 });
+            ImGui::PushStyleColor(ImGuiCol_Button, { 0, 0, 0, 0 });
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 1, 1, 1, 0.5 });
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 1, 1, 1, 0.4 });
+
+            if (ImGui::Button("Copy name", { -1, 0 })) {
+                ImGui::SetClipboardText(selection.highlighted_file.path.c_str());
+                ImGui::CloseCurrentPopup();
+            }
+
+            if (ImGui::Button("Copy hash", { -1, 0 })) {
+                ImGui::SetClipboardText(uint64_to_hex(selection.highlighted_file.hash).c_str());
+                ImGui::CloseCurrentPopup();
+            }
+
+            ImGui::Separator();
+
+            if (ImGui::Button("Find out what references this file", { -1, 0 })) {
+                DECIMA_LOG("What references file '", selection.highlighted_file.path, "':");
+
+                auto index = manager.hash_to_index.at(selection.highlighted_file.hash);
+                auto links = manager.prefetch->links.at(index).data();
+                auto paths = manager.prefetch->paths.data();
+
+                for (auto& link : links) {
+                    DECIMA_LOG(" - '", paths.at(link).data(), "'");
+                }
+
+                if (links.empty()) {
+                    DECIMA_LOG(" - <none>");
+                }
+
+                ImGui::CloseCurrentPopup();
+            }
+
+            if (ImGui::Button("Find out what is referenced by this file", { -1, 0 })) {
+                DECIMA_LOG("What is referenced by file '", selection.highlighted_file.path, "':");
+
+                auto index = manager.hash_to_index.at(selection.highlighted_file.hash);
+                auto paths = manager.prefetch->paths.data();
+                auto found = false;
+
+                for (std::uint64_t link_index = 0; link_index < paths.size(); link_index++) {
+                    for (auto& link : manager.prefetch->links.at(link_index).data()) {
+                        if (link == index) {
+                            DECIMA_LOG(" - '", paths.at(link_index).data(), "'");
+                            found = true;
+                        }
+                    }
+                }
+
+                if (!found) {
+                    DECIMA_LOG(" - <none>");
+                }
+
+                ImGui::CloseCurrentPopup();
+            }
+
+            ImGui::PopStyleColor(3);
+            ImGui::PopStyleVar();
+            ImGui::EndPopup();
         }
 
         ImGui::TreePop();
@@ -170,7 +247,7 @@ void FileTree::draw(SelectionInfo& selection, Decima::ArchiveManager& archive_ar
         ImGui::Text("File");
         ImGui::NextColumn();
 
-        const auto file_entry = archive_array.get_file_entry(data.first.hash);
+        const auto file_entry = manager.get_file_entry(data.first.hash);
 
         if (file_entry.has_value()) {
             ImGui::Text("%s", format_size(file_entry.value().get().span.size).c_str());
