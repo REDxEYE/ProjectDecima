@@ -73,16 +73,29 @@ void FileTree::reset_filter(bool visibility) {
 
 void FileTree::draw(SelectionInfo& selection, Decima::ArchiveManager& manager, bool header, ExpandMode expand) {
     if (header) {
+        ImGui::BeginChild(ImGui::GetID("TreeView"));
+
         ImGui::Separator();
+
         ImGui::Columns(3);
+        ImGui::SetColumnWidth(0, ImGui::GetWindowWidth() - 200);
+        ImGui::SetColumnWidth(1, 100);
+        ImGui::SetColumnWidth(2, 100);
+
         ImGui::Text("Name");
         ImGui::NextColumn();
         ImGui::Text("Type");
         ImGui::NextColumn();
         ImGui::Text("Size");
         ImGui::NextColumn();
+
         ImGui::Separator();
 
+        ImGui::Columns(1);
+
+        ImGui::BeginChild(ImGui::GetID("TreeViewContents"));
+
+        ImGui::Columns(3);
         ImGui::SetColumnWidth(0, ImGui::GetWindowWidth() - 200);
         ImGui::SetColumnWidth(1, 100);
         ImGui::SetColumnWidth(2, 100);
@@ -260,6 +273,8 @@ void FileTree::draw(SelectionInfo& selection, Decima::ArchiveManager& manager, b
 
     if (header) {
         ImGui::Columns(1);
+        ImGui::EndChild();
+        ImGui::EndChild();
     }
 }
 
