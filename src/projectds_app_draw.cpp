@@ -81,24 +81,25 @@ static void show_data_selection_dialog(ProjectDS& self) {
 }
 
 static void show_export_selection_dialog(ProjectDS& self) {
+    const auto write_to_file = [](Decima::CoreFile& file, const std::filesystem::path& path) {
+        std::filesystem::create_directories(path.parent_path());
+
+        std::ofstream output_file{ path, std::ios::binary };
+        output_file.write(reinterpret_cast<const char*>(file.contents.data()), file.contents.size());
+
+        std::cout << "File was exported to: " << path << "\n";
+    };
+
     if (self.selection_info.selected_files.empty())
         return;
 
-    const auto base_folder = pfd::select_folder("Choose destination folder").result();
-
-    if (!base_folder.empty()) {
+    if (const auto root = pfd::select_folder("Choose destination folder").result(); !root.empty()) {
         for (const auto selected_file : self.selection_info.selected_files) {
-            const auto filename = sanitize_name(self.archive_manager.hash_to_name.at(selected_file));
-
-            std::filesystem::path full_path = std::filesystem::path(base_folder) / filename;
-            std::filesystem::create_directories(full_path.parent_path());
-
-            auto& file = self.archive_manager.query_file(filename).value().get();
-
-            std::ofstream output_file { full_path, std::ios::binary };
-            output_file.write(reinterpret_cast<const char*>(file.contents.data()), file.contents.size());
-
-            std::cout << "File was exported to: " << full_path << "\n";
+            if (auto entry = self.archive_manager.hash_to_name.find(selected_file); entry != self.archive_manager.hash_to_name.end()) {
+                write_to_file(self.archive_manager.query_file(entry->second).value(), std::filesystem::path(root) / entry->second);
+            } else {
+                write_to_file(self.archive_manager.query_file(selected_file).value(), std::filesystem::path(root) / uint64_to_hex(selected_file));
+            }
         }
     }
 }
