@@ -70,9 +70,6 @@ std::vector<char> unpack(Decima::Compressor& compressor, const Decima::Archive& 
     result_buffer.erase(result_buffer.begin(), result_buffer.begin() + result_buffer_offset);
     result_buffer.erase(result_buffer.begin() + entry.span.size, result_buffer.end());
 
-    std::ofstream output("suka.bin", std::ios::binary | std::ios::trunc);
-    output.write(result_buffer.data(), result_buffer.size());
-
     return result_buffer;
 }
 
