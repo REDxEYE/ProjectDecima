@@ -1,3 +1,5 @@
+### This project is no longer under development. See https://github.com/ShadelessFox/decima
+
 This project is aimed to provide graphical user interface for previewing, exporting and modifying game resources in games based on Decima Engine in research purposes.
 
 ![The program interface showing texture of Sam's face](https://i.imgur.com/0yv9GsU.png)
